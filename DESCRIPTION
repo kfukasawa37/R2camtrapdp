@@ -6,7 +6,7 @@ Author: Keita Fukasawa (@kfukasawa37) and Kana Terayama
 Maintainer: Keita Fukasawa <k.fukasawa37@gmail.com>
 Description: R2camtrapdp includes functions and methods for a R6 class object
     for converting an arbitrary camera trap dataset into Camtrap DP.
-License: GPL (>= 3)
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
