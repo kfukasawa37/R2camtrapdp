@@ -1,10 +1,3 @@
-###########Functions for creating camtrapDP 1.0
-library(R6)
-library(tidyverse)
-library(taxadb)
-library(camtrapdp)
-library(frictionless)
-
 #' @title Create deployments
 #' @description \code{create_deployments} creates a table of deployments.
 #' @import magrittr
