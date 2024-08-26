@@ -5,8 +5,15 @@ library(taxadb)
 library(camtrapdp)
 library(frictionless)
 
-#deployments
-create_deployments_1.0<-function(deploymentID,
+#' @title Create deployments
+#' @description \code{create_deployments} creates a table of deployments.
+#' @import magrittr
+#' @importFrom lubridate as_datetime
+#' @importFrom tibble tibble
+#' @return A tibble of deployments.
+#' @export
+#' 
+create_deployments<-function(deploymentID,
 					latitude,
 					longitude,
 					deploymentStart=NULL,
@@ -247,8 +254,16 @@ create_deployments_1.0<-function(deploymentID,
 	return(deployments)
 }
 
-#media
-create_media_1.0<-function(	mediaID,
+#' @title Create media
+#' @description \code{create_media} creates a table of media.
+#' @import magrittr
+#' @importFrom lubridate as_datetime
+#' @importFrom tibble tibble
+#' @importFrom dplyr distinct
+#' @return A tibble of media.
+#' @export
+#' 
+create_media<-function(	mediaID,
 							deploymentID,
 							timestamp=NULL,
 							timestamp_date=NULL,
@@ -367,7 +382,16 @@ create_media_1.0<-function(	mediaID,
 	return(media)
 }
 
-create_observations_1.0<-function(	observationID,
+#' @title Create observations
+#' @description \code{create_media} creates a table of observations.
+#' @import magrittr
+#' @importFrom lubridate as_datetime
+#' @importFrom tibble tibble
+#' @importFrom dplyr distinct
+#' @return A tibble of observations.
+#' @export
+#' 
+create_observations<-function(	observationID,
 									deploymentID,
 									mediaID=NULL,
 									eventID=NULL,
@@ -631,7 +655,7 @@ create_observations_1.0<-function(	observationID,
 						)
 	
 	if(omitduplicate){
-		observations<-distinct(observations,observationID,.keep_all=T)
+		observations<-distinct(observations,observationID,.keep_all=TRUE)
 	}
 	
 	if(nrow(observations)!=length(unique(observations$observationID))){
@@ -642,17 +666,22 @@ create_observations_1.0<-function(	observationID,
 	return(observations)
 }
 
-#######R6 object for CamtrapDP 1.0
-R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
+#' @title R6 class representing Camtrap DP
+#'
+#' @description
+#' R6 class including metadata, deployments, media and observations.
+#' @Imports R6
+#' @export
+R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 			public = list(	resources=list(),
-							profile="https://raw.githubusercontent.com/tdwg/camtrap-dp/1.0/camtrap-dp-profile.json",
+							profile=NULL,
 							name=NULL,
 							id=NULL,
 							created=NA,
 							title=NULL,
 							contributors=list(),
 							description=NULL,
-							version="1.0",
+							version=NULL,
 							keywords=NULL,
 							image=NULL,
 							homepage=NULL,
@@ -668,20 +697,30 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 							references=list(),
 							directory=NULL,
 							data=list(),
+							#' @description
+							#' Creates new instance of R6_CamtrapDP class.
+							#' 
 							initialize = function(tz="Japan",...){
 								self$update_created(tz=tz)
 								self$set_properties(...)
 							},
+							#' @description
+							#' Updates timestamp of R6_CamtrapDP class.
+							#' 
 							update_created = function(tz="Japan"){
 								self$created<-Sys.time()%>%
 												as.POSIXct()%>%
 												strftime("%Y-%m-%dT%H:%M:%S%z",tz=tz)
 							},
-							set_properties = function(directory=getwd(),name=NULL,id=NULL,description=NULL,version=NULL,keywords=NULL,image=NULL,homepage=NULL,bibliographicCitation=NULL,coordinatePrecision=NULL){
+							#' @description
+							#' Sets properties of R6_CamtrapDP class.
+							#' 
+							set_properties = function(directory=getwd(),name=NULL,id=NULL,description=NULL,profile="https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json",version="1.0.1",keywords=NULL,image=NULL,homepage=NULL,bibliographicCitation=NULL,coordinatePrecision=NULL){
 								self$name<-name
 								self$id<-id
 								self$description<-description
 								self$version<-version
+								self$profile<-sub("<version>",version,profile)
 								self$keywords<-keywords
 								self$image<-image
 								self$homepage<-homepage
@@ -689,42 +728,57 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 								self$coordinatePrecision<-coordinatePrecision
 								self$directory<-directory
 							},								
+							#' @description
+							#' Sets deployments of R6_CamtrapDP class.
+							#' 
 							set_deployments = function(	data,
 														path="deployments.csv",
 														profile="tabular-data-resource",
 														format="csv",
 														mediatype="text/csv",
 														encoding="utf-8",
-														schema="https://raw.githubusercontent.com/tdwg/camtrap-dp/1.0/deployments-table-schema.json"
+														schema="https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/deployments-table-schema.json"
 														){
-								self$data$deployments<-data
+                schema<-sub("<version>",self$version,schema)
+							  self$data$deployments<-data
 								resource<-list(name="deployments",path=path,profile=profile,format=format,mediatype=mediatype,encoding=encoding,schema=schema)
 								self$resources[[1]]<-resource
 							},
+							#' @description
+							#' Sets media of R6_CamtrapDP class.
+							#' 
 							set_media = function(	data,
 														path="media.csv",
 														profile="tabular-data-resource",
 														format="csv",
 														mediatype="text/csv",
 														encoding="utf-8",
-														schema="https://raw.githubusercontent.com/tdwg/camtrap-dp/1.0/media-table-schema.json"
+														schema="https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/media-table-schema.json"
 														){
-								self$data$media<-data
+							  schema<-sub("<version>",self$version,schema)
+							  self$data$media<-data
 								resource<-list(name="media",path=path,profile=profile,format=format,mediatype=mediatype,encoding=encoding,schema=schema)
 								self$resources[[2]]<-resource
 							},
+							#' @description
+							#' Sets observations of R6_CamtrapDP class.
+							#' 
 							set_observations = function(	data,
 														path="observations.csv",
 														profile="tabular-data-resource",
 														format="csv",
 														mediatype="text/csv",
 														encoding="utf-8",
-														schema="https://raw.githubusercontent.com/tdwg/camtrap-dp/1.0/observations-table-schema.json"
+														schema="https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/observations-table-schema.json"
 														){
-								self$data$observations<-data
+							  schema<-sub("<version>",self$version,schema)
+							  self$data$observations<-data
 								resource<-list(name="observations",path=path,profile=profile,format=format,mediatype=mediatype,encoding=encoding,schema=schema)
 								self$resources[[3]]<-resource
 							},
+							#' @description
+							#' Sets custom data of R6_CamtrapDP class.
+							#' 
 							set_custom = function(name,description,data){
 								resource=list(name=name,description=description,data=data)
 								nlist<-length(self$resources)
@@ -733,6 +787,9 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 								}
 								self$resources[[nlist+1]]<-resource
 							},
+							#' @description
+							#' Adds contributors of R6_CamtrapDP class.
+							#' 
 							add_contributors = function(contrib_table){
 								if(!all(is.element(colnames(contrib_table),c("title","email","path","role","organization")))){
 									stop("Columns of 'contrib_table' should be either 'title','email','path','role' or 'organization'.")
@@ -791,6 +848,9 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 									}
 								}
 							},
+							#' @description
+							#' Add sources of R6_CamtrapDP class.
+							#' 
 							add_sources = function(title,path=NULL,email=NULL,version=NULL){
 								if(is.null(self$sources)){
 									self$sources<-list()
@@ -813,6 +873,9 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 								self$sources<-c(self$sources,list(source))
 								
 							},
+							#' @description
+							#' Add license of R6_CamtrapDP class.
+							#' 
 							add_license=function(name,scope,path=NULL,title=NULL){
 								if(!grepl("^(data|media)$",scope)){
 									stop("'scope' is invalid.")
@@ -834,6 +897,9 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 								
 								self$licenses<-c(self$licenses,list(license))
 							},
+							#' @description
+							#' Sets project of R6_CamtrapDP class.
+							#' 
 							set_project=function(title,samplingDesign,captureMethod,individualAnimals,observationLevel,id=NULL,acronym=NULL,description=NULL,path=NULL){
 								if(!grepl("^(simpleRandom|systematicRandom|clusteredRandom|experimental|targeted|opportunistic)$",samplingDesign)){
 									stop("'samplingDesign' is invalid.")
@@ -880,6 +946,9 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 								
 								self$project<-c(self$project,observationLevel=list(as.list(observationLevel)))
 							},								
+							#' @description
+							#' Sets spatial and temporal of R6_CamtrapDP class.
+							#' 
 							set_st=function(){
 								if(is.null(self$data$deployments)){
 									stop("'deployments' should be registered.")
@@ -897,19 +966,26 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 								self$temporal$start<-time.start
 								self$temporal$end<-time.end
 							},
+							#' @description
+							#' Sets taxonomic of R6_CamtrapDP class.
+							#' @importFrom taxadb get_ids
+							#' @importFrom tibble tibble
+							#' @importFrom dplyr mutate left_join
+							#' @Imports magrittr
+							#' 
 							set_taxon=function(taxonDB="itis",taxonDBurl="https://www.itis.gov/"){
 								if(is.null(self$data$observations)){
 									stop("'observations' should be registered.")
 								}
 								sciname<-self$data$observations$scientificName
 								unique.sciname<-unique(sciname)
-								taxonIDtable<-tibble(sciname=unique.sciname)%>%
-									mutate(id=taxadb::get_ids(sciname,taxonDB,format="bare"))
+								taxonIDtable<-tibble::tibble(sciname=unique.sciname)%>%
+									dplyr::mutate(id=taxadb::get_ids(sciname,taxonDB,format="bare"))
 								taxonIDtableclean<-na.omit(taxonIDtable)
 								ntaxa<-nrow(taxonIDtableclean)
 
 								taxonIDjoin<-tibble(sciname=sciname)%>%
-									left_join(taxonIDtable,by="sciname")
+								  dplyr::left_join(taxonIDtable,by="sciname")
 
 								taxonID<-taxonIDjoin$id
 
@@ -921,6 +997,9 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 									self$taxonomic[[i]]$scientificName<-taxonIDtableclean$sciname[i]
 								}
 							},
+							#' @description
+							#' Add relatedIdentifiers of R6_CamtrapDP class.
+							#' 
 							add_relatedIdentifiers=function(relationType,relatedIdentifier,relatedIdentifierType,resourceTypeGeneral=NULL){
 								if(!grepl("^(IsCitedBy|Cites|IsSupplementTo|IsSupplementedBy|IsContinuedBy|Continues|IsNewVersionOf|IsPreviousVersionOf|IsPartOf|HasPart|IsPublishedIn|IsReferencedBy|References|IsDocumentedBy|Documents|IsCompiledBy|Compiles|IsVariantFormOf|IsOriginalFormOf|IsIdenticalTo|HasMetadata|IsMetadataFor|Reviews|IsReviewedBy|IsDerivedFrom|IsSourceOf|Describes|IsDescribedBy|HasVersion|IsVersionOf|Requires|IsRequiredBy|Obsoletes|IsObsoletedBy)$",relationType)){
 									stop("'relationType' is invalid.")
@@ -949,9 +1028,19 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 								
 								self$relatedIdentifiers<-c(self$relatedIdentifiers,list(relatedIdentifier))
 							},
+							#' @description
+							#' Add references of R6_CamtrapDP class.
+							#' 
 							add_references=function(reference){
 								self$references<-c(self$references,reference)
 							},
+							#' @description
+							#' Exports \code{camtrapdp} object and datapackage.
+							#' @Import camtrapdp
+							#' @importFrom jsonlite toJSON
+							#' @importFrom readr write_csv
+							#' @return \code{camtrapdp} object 
+							#' 
 							out_camtrapdp=function(write=FALSE,directory=NULL){
 								outname<-c("resources","profile","name","id","created","title","contributors","description","version","keywords","image","homepage","sources","licences","bibliographicCitation","project","coordinatePrecision","spatial","temporal","taxonomic","relatedIdentifiers","references","directory","data")
 								nout<-length(outname)
@@ -960,7 +1049,7 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 									dp[[outname[i]]]<-self[[outname[i]]]
 								}
 								class(dp)<-c("camtrapdp","datapackage","list")
-								attr(dp,"version")<-"1.0"
+								attr(dp,"version")<-self$version
 								if(write){
 									if(is.null(directory)){
 										stop("'directory' is required.\n")
@@ -976,18 +1065,21 @@ R6_CamtrapDP_1.0<-R6::R6Class(	"CamtrapDP_1.0",
 									
 									resources.name<-sapply(dp$resources,"[[","name")
 									deployments.file<-dp$resources[[which(resources.name=="deployments")]]$path
-									write_csv(dp$data$deployments,file.path(directory,deployments.file),na="")
+									readr::write_csv(dp$data$deployments,file.path(directory,deployments.file),na="")
 									
 									media.file<-dp$resources[[which(resources.name=="media")]]$path
-									write_csv(dp$data$media,file.path(directory,media.file),na="")
+									readr::write_csv(dp$data$media,file.path(directory,media.file),na="")
 									
 									observations.file<-dp$resources[[which(resources.name=="observations")]]$path
-									write_csv(dp$data$observations,file.path(directory,observations.file),na="")
+									readr::write_csv(dp$data$observations,file.path(directory,observations.file),na="")
 									
 									cat("Datapackage was saved to disk.\n")
 								}
 								return(dp)
 							},
+							#' @description
+							#' Import metadata from a list.
+							#' 
 							import_metadata=function(metadata0){
 								listname<-names(metadata0)
 								listname<-listname[listname!="resources"]
