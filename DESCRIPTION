@@ -20,3 +20,7 @@ Imports:
     readr,
     taxadb,
     tibble
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
