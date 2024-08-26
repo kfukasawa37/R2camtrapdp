@@ -4,19 +4,20 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of R2camtrapdp is to ...
+R2camtrapdp is an R package to convert camera trap data in R into Camtrap DP.
 
 ## Installation
 
 You can install the development version of R2camtrapdp like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+#install.packages("devtools")
+devtools::install_github("/kfukasawa37/R2camtrapdp")
 ```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+(Coming soon)
 
 ``` r
 library(R2camtrapdp)

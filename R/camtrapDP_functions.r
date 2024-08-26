@@ -1,8 +1,8 @@
 #' @title Create deployments
 #' @description \code{create_deployments} creates a table of deployments.
 #' @import magrittr
-#' @importFrom lubridate as_datetime
-#' @importFrom tibble tibble
+#' @import lubridate
+#' @import tibble
 #' @return A tibble of deployments.
 #' @export
 #' 
@@ -55,7 +55,7 @@ create_deployments<-function(deploymentID,
 		if(is.null(deploymentStart_date)|is.null(deploymentStart_time)){
 			stop("'deploymentStart must be specified.'")
 		}else{
-			deploymentStart<-paste(deploymentStart_date,deploymentStart_time)
+			deploymentStart<-paste(deploymentStart_date,deploymentStart_time)%>%as.POSIXlt(tz=tz)
 		}
 	}else{
 		deploymentStart<-as.character(deploymentStart)
@@ -65,7 +65,7 @@ create_deployments<-function(deploymentID,
 		if(is.null(deploymentEnd_date)|is.null(deploymentEnd_time)){
 			stop("'deploymentEnd must be specified.'")
 		}else{
-			deploymentEnd<-paste(deploymentEnd_date,deploymentEnd_time)
+			deploymentEnd<-paste(deploymentEnd_date,deploymentEnd_time)%>%as.POSIXlt(tz=tz)
 		}
 	}else{
 		deploymentEnd<-as.character(deploymentEnd)
@@ -250,8 +250,8 @@ create_deployments<-function(deploymentID,
 #' @title Create media
 #' @description \code{create_media} creates a table of media.
 #' @import magrittr
-#' @importFrom lubridate as_datetime
-#' @importFrom tibble tibble
+#' @import lubridate
+#' @import tibble
 #' @importFrom dplyr distinct
 #' @return A tibble of media.
 #' @export
@@ -282,7 +282,7 @@ create_media<-function(	mediaID,
 		if(is.null(timestamp_date)|is.null(timestamp_time)){
 			stop("'timestamp' must be specified.")
 		}else{
-			timestamp<-paste(timestamp_date,timestamp_time)
+			timestamp<-paste(timestamp_date,timestamp_time)%>%as.POSIXlt(tz=tz)
 		}
 	}else{
 		timestamp<-as.character(timestamp)
@@ -378,8 +378,8 @@ create_media<-function(	mediaID,
 #' @title Create observations
 #' @description \code{create_media} creates a table of observations.
 #' @import magrittr
-#' @importFrom lubridate as_datetime
-#' @importFrom tibble tibble
+#' @import lubridate
+#' @import tibble
 #' @importFrom dplyr distinct
 #' @return A tibble of observations.
 #' @export
@@ -388,8 +388,12 @@ create_observations<-function(	observationID,
 									deploymentID,
 									mediaID=NULL,
 									eventID=NULL,
-									eventStart,
-									eventEnd,
+									eventStart=NULL,
+									eventStart_date=NULL,
+									eventStart_time=NULL,
+									eventEnd=NULL,
+									eventEnd_date=NULL,
+									eventEnd_time=NULL,
 									observationLevel,
 									observationType,
 									cameraSetupType=NULL,
@@ -415,14 +419,35 @@ create_observations<-function(	observationID,
 									tz="Japan",
 									omitduplicate=TRUE
 								){
-	eventStart<-eventStart%>%
+  
+  if(is.null(eventStart)){
+    if(is.null(eventStart_date)|is.null(eventStart_time)){
+      stop("'eventStart must be specified.'")
+    }else{
+      eventStart<-paste(eventStart_date,eventStart_time)%>%as.POSIXlt(tz=tz)
+    }
+  }else{
+    eventStart<-as.character(eventStart)
+  }
+  
+  if(is.null(eventEnd)){
+    if(is.null(eventEnd_date)|is.null(eventEnd_time)){
+      stop("'eventEnd must be specified.'")
+    }else{
+      eventEnd<-paste(eventEnd_date,eventEnd_time)%>%as.POSIXlt(tz=tz)
+    }
+  }else{
+    eventEnd<-as.character(eventEnd)
+  }
+
+  eventStart<-eventStart%>%
 		as_datetime(tz=tz)
 							
 	eventEnd<-eventEnd%>%
 		as_datetime(tz=tz)
 
-	if(any(is.na(observationID))|any(is.na(deploymentID))|any(is.na(eventStart))|any(is.na(eventEnd))|any(is.na(observationLevel))|any(is.na(observationType))){
-		stop("NAs in 'observationID','deploymentID','eventStart','eventEnd','observationLevel','observationType' are not permitted.")
+	if(any(is.na(observationID))|any(is.na(deploymentID))|any(is.na(observationLevel))|any(is.na(observationType))){
+		stop("NAs in 'observationID','deploymentID','observationLevel','observationType' are not permitted.")
 	}
 	
 	if(any(is.na(mediaID)&(is.na(eventID)))){
@@ -663,7 +688,7 @@ create_observations<-function(	observationID,
 #'
 #' @description
 #' R6 class including metadata, deployments, media and observations.
-#' @Imports R6
+#' @import R6
 #' @export
 R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 			public = list(	resources=list(),
@@ -692,6 +717,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							data=list(),
 							#' @description
 							#' Creates new instance of R6_CamtrapDP class.
+							#' @param tz Time zone.
 							#' 
 							initialize = function(tz="Japan",...){
 								self$update_created(tz=tz)
@@ -699,6 +725,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Updates timestamp of R6_CamtrapDP class.
+							#' @param tz Time zone.
 							#' 
 							update_created = function(tz="Japan"){
 								self$created<-Sys.time()%>%
@@ -707,6 +734,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Sets properties of R6_CamtrapDP class.
+							#' @param directory Directory of datapackage.
 							#' 
 							set_properties = function(directory=getwd(),name=NULL,id=NULL,description=NULL,profile="https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json",version="1.0.1",keywords=NULL,image=NULL,homepage=NULL,bibliographicCitation=NULL,coordinatePrecision=NULL){
 								self$name<-name
@@ -723,6 +751,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},								
 							#' @description
 							#' Sets deployments of R6_CamtrapDP class.
+							#' @param data Deployments dataset.
 							#' 
 							set_deployments = function(	data,
 														path="deployments.csv",
@@ -739,6 +768,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Sets media of R6_CamtrapDP class.
+							#' @param data Media dataset.
 							#' 
 							set_media = function(	data,
 														path="media.csv",
@@ -755,6 +785,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Sets observations of R6_CamtrapDP class.
+							#' @param data Observations dataset.
 							#' 
 							set_observations = function(	data,
 														path="observations.csv",
@@ -771,6 +802,9 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Sets custom data of R6_CamtrapDP class.
+							#' @param name Name of dataset.
+							#' @param description Description of dataset.
+							#' @param data Custom dataset.
 							#' 
 							set_custom = function(name,description,data){
 								resource=list(name=name,description=description,data=data)
@@ -782,6 +816,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Adds contributors of R6_CamtrapDP class.
+							#' @param contrib_table data frame or tibble of contributors including title, email, path, role and organizaiton.
 							#' 
 							add_contributors = function(contrib_table){
 								if(!all(is.element(colnames(contrib_table),c("title","email","path","role","organization")))){
@@ -843,6 +878,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Add sources of R6_CamtrapDP class.
+							#' @param title Title of sources.
 							#' 
 							add_sources = function(title,path=NULL,email=NULL,version=NULL){
 								if(is.null(self$sources)){
@@ -868,6 +904,8 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Add license of R6_CamtrapDP class.
+							#' @param name Name of license.
+							#' @param scope scope of license ("data" or "media").
 							#' 
 							add_license=function(name,scope,path=NULL,title=NULL){
 								if(!grepl("^(data|media)$",scope)){
@@ -892,6 +930,11 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Sets project of R6_CamtrapDP class.
+							#' @param title Title of project.
+							#' @param samplingDesign Sampling design. Either "(simpleRandom|systematicRandom|clusteredRandom|experimental|targeted|opportunistic)".
+							#' @param captureMethod Capture method. Either "(activityDetection|timeLapse)".
+							#' @param individualAnimals Logical indicating whether the individuals are recognized.
+							#' @param observationLevel Observation level. Either "(media|event)".
 							#' 
 							set_project=function(title,samplingDesign,captureMethod,individualAnimals,observationLevel,id=NULL,acronym=NULL,description=NULL,path=NULL){
 								if(!grepl("^(simpleRandom|systematicRandom|clusteredRandom|experimental|targeted|opportunistic)$",samplingDesign)){
@@ -961,10 +1004,11 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Sets taxonomic of R6_CamtrapDP class.
+							#' @param taxonDB Name of taxon data base passed to \code{taxadb::get_ids()}.
 							#' @importFrom taxadb get_ids
 							#' @importFrom tibble tibble
 							#' @importFrom dplyr mutate left_join
-							#' @Imports magrittr
+							#' @import magrittr
 							#' 
 							set_taxon=function(taxonDB="itis",taxonDBurl="https://www.itis.gov/"){
 								if(is.null(self$data$observations)){
@@ -992,7 +1036,10 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Add relatedIdentifiers of R6_CamtrapDP class.
-							#' 
+							#' @param relationType Type of relation. Either "^(IsCitedBy|Cites|IsSupplementTo|IsSupplementedBy|IsContinuedBy|Continues|IsNewVersionOf|IsPreviousVersionOf|IsPartOf|HasPart|IsPublishedIn|IsReferencedBy|References|IsDocumentedBy|Documents|IsCompiledBy|Compiles|IsVariantFormOf|IsOriginalFormOf|IsIdenticalTo|HasMetadata|IsMetadataFor|Reviews|IsReviewedBy|IsDerivedFrom|IsSourceOf|Describes|IsDescribedBy|HasVersion|IsVersionOf|Requires|IsRequiredBy|Obsoletes|IsObsoletedBy)$".
+							#' @param relatedIdentifier Related identifier.
+							#' @param relatedIdentifierType Type of related identifier. Either "^(ARK|arXiv|bibcode|DOI|EAN13|EISSN|Handle|IGSN|ISBN|ISSN|ISTC|LISSN|LSID|PMID|PURL|UPC|URL|URN|w3id)$".
+							#'  
 							add_relatedIdentifiers=function(relationType,relatedIdentifier,relatedIdentifierType,resourceTypeGeneral=NULL){
 								if(!grepl("^(IsCitedBy|Cites|IsSupplementTo|IsSupplementedBy|IsContinuedBy|Continues|IsNewVersionOf|IsPreviousVersionOf|IsPartOf|HasPart|IsPublishedIn|IsReferencedBy|References|IsDocumentedBy|Documents|IsCompiledBy|Compiles|IsVariantFormOf|IsOriginalFormOf|IsIdenticalTo|HasMetadata|IsMetadataFor|Reviews|IsReviewedBy|IsDerivedFrom|IsSourceOf|Describes|IsDescribedBy|HasVersion|IsVersionOf|Requires|IsRequiredBy|Obsoletes|IsObsoletedBy)$",relationType)){
 									stop("'relationType' is invalid.")
@@ -1023,13 +1070,15 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Add references of R6_CamtrapDP class.
+							#' @param reference Reference of data
 							#' 
 							add_references=function(reference){
 								self$references<-c(self$references,reference)
 							},
 							#' @description
 							#' Exports \code{camtrapdp} object and datapackage.
-							#' @Import camtrapdp
+							#' @param write If TRUE, datapackage is written to \code{directory}.
+							#' @import camtrapdp
 							#' @importFrom jsonlite toJSON
 							#' @importFrom readr write_csv
 							#' @return \code{camtrapdp} object 
@@ -1072,6 +1121,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Import metadata from a list.
+							#' @param metadata0 List of metadata.
 							#' 
 							import_metadata=function(metadata0){
 								listname<-names(metadata0)
