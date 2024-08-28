@@ -1084,7 +1084,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @return \code{camtrapdp} object 
 							#' 
 							out_camtrapdp=function(write=FALSE,directory=NULL){
-								outname<-c("resources","profile","name","id","created","title","contributors","description","version","keywords","image","homepage","sources","licences","bibliographicCitation","project","coordinatePrecision","spatial","temporal","taxonomic","relatedIdentifiers","references","directory","data")
+								outname<-c("resources","profile","name","id","created","title","contributors","description","version","keywords","image","homepage","sources","licenses","bibliographicCitation","project","coordinatePrecision","spatial","temporal","taxonomic","relatedIdentifiers","references","directory","data")
 								nout<-length(outname)
 								dp<-vector("list",nout);names(dp)<-outname
 								for(i in 1:nout){
