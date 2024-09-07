@@ -12,7 +12,7 @@ You can install the development version of R2camtrapdp like so:
 
 ``` r
 #install.packages("devtools")
-devtools::install_github("/kfukasawa37/R2camtrapdp")
+devtools::install_github("kfukasawa37/R2camtrapdp")
 ```
 
 ## Example
