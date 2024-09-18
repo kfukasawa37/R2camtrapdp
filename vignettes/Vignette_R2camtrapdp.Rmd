@@ -17,3 +17,67 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(R2camtrapdp)
 ```
+
+## How to create deployment
+
+If you have deployment and observation data.
+
+```{r}
+data(Vdep)
+data(Vobs)
+```
+Using Vdep, deployment (tibble data) was created as below,
+```{r}
+deployments<-create_deployments(
+  deploymentID=Vdep$deploymentID,
+  longitude=Vdep$longitude,
+  latitude=Vdep$latitude,
+  locationID=Vdep$locationID,
+  deploymentStart_date=Vdep$startDate,
+  deploymentStart_time=Vdep$startTime,
+  deploymentEnd_date=Vdep$endDate,
+  deploymentEnd_time=Vdep$endTime,
+  cameraID=Vdep$cameraID,
+  cameraModel=Vdep$cameraModel,
+  cameraDelay=Vdep$Delay,
+  cameraHeight=Vdep$Height,
+  baitUse=Vdep$bait,
+  setupBy=Vdep$setupBy)
+```
+
+## How to create media
+Using Vdep and Vobs, media (tibble data) was created as below,
+```{r}
+##settings
+#media ID
+mediaID<-paste(Vobs$institutionCode,
+               Vobs$collectionCode,
+               Vobs$locationID,
+               as.numeric(factor(Vobs$filename)),
+               sep="_")
+#capture method
+capturemethod<-"activityDetection"
+nmedia<-length(mediaID)
+captureMethod<-rep(capturemethod,nmedia)
+
+#filePath
+filePath<-paste("Video")
+
+#fileName
+fileName<-Vobs$filename
+filetype<-tolower(unlist(lapply(strsplit(fileName,"\\."),"[",2)))
+
+#filePublic
+fileMediatype<-paste("video",filetype,sep="/")
+filePublic<-!grepl("ヒト",fileName)
+
+media<-create_media( mediaID=mediaID,
+                     deploymentID=Vdep$deploymentID,
+                     timestamp_date=timestamp_date,
+                     timestamp_time=Vobs$time,
+                     filePath=filePath,
+                     filePublic=filePublic,
+                     fileMediatype=fileMediatype,
+                     captureMethod="activityDetection",
+                     fileName=fileName)
+```
