@@ -689,9 +689,34 @@ create_observations<-function(	observationID,
 #' @description
 #' R6 class including metadata, deployments, media and observations.
 #' @import R6
-#' @export
+#' @export 
 R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
-			public = list(	resources=list(),
+			public = list(
+			  #' @field resources is the package data resources
+			  #' @field profile of the resource
+			  #' @field name Identifier of the resource
+			  #' @field id A property reserved for globally unique identifiers e.g., UUID and DOI
+			  #' @field created The datetime on which this Data Package was created
+			  #' @field title Title of this Data Package
+			  #' @field contributors The people or organizations who contributed to this Data Package
+			  #' @field description Description of this Data Package
+			  #' @field version The version of this Data Package
+			  #' @field keywords Keywords of this Data Package
+			  #' @field image A URL or Path of an image for this Data Package
+			  #' @field homepage A URL for the home on the web that is related to this Data Package
+			  #' @field sources A row sources for this Data Package
+			  #' @field licenses The licenses under which the Data Package is provided
+			  #' @field bibliographicCitation A bibliographical reference for the resource
+			  #' @field project Camera trap project or study that originated this Data package
+			  #' @field coordinatePrecision Least precise coordinate precision of the deployments.latitude and deployments.longitude
+			  #' @field spatial Spatial coverage of this Data Package, expressed as GeoJSON
+			  #' @field temporal Temporal coverage of this Data Package
+			  #' @field taxonomic Taxonomic coverage of this Data Package, based on the unique observations.scientificName
+			  #' @field relatedIdentifiers Identifiers of resources related to this Data Package
+			  #' @field references List of references related to this Data Package
+			  #' @field directory Directory of this Data Package
+			  #' @field data Observation, Media and Deployments which consist this Data Package
+			        resources=list(),
 							profile=NULL,
 							name=NULL,
 							id=NULL,
@@ -735,6 +760,16 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Sets properties of R6_CamtrapDP class.
 							#' @param directory Directory of datapackage.
+							#' @param name Identifier of the resource
+							#' @param id A property reserved for globally unique identifiers e.g., UUID and DOI
+							#' @param description Description of this Data Package
+							#' @param version The version of this Data Package
+							#' @param profile Profile of the resource
+							#' @param keywords Keywords of this Data Package
+							#' @param image A URL or Path of an image for this Data Package
+							#' @param homepage A URL for the home on the web that is related to this Data Package
+							#' @param bibliographicCitation A bibliographical reference for the resource
+							#' @param coordinatePrecision Least precise coordinate precision of the deployments.latitude and deployments.longitude
 							#' 
 							set_properties = function(directory=getwd(),name=NULL,id=NULL,description=NULL,profile="https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json",version="1.0.1",keywords=NULL,image=NULL,homepage=NULL,bibliographicCitation=NULL,coordinatePrecision=NULL){
 								self$name<-name
@@ -752,6 +787,12 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Sets deployments of R6_CamtrapDP class.
 							#' @param data Deployments dataset.
+							#' @param path Path or URL to the data file
+							#' @param profile Profile of deployments
+							#' @param format Format of deployments data
+							#' @param mediatype Media type of deployments data
+							#' @param encoding Encpding of deployments data
+							#' @param schema URL of the used Camtrap DP Table Schema version
 							#' 
 							set_deployments = function(	data,
 														path="deployments.csv",
@@ -769,6 +810,12 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Sets media of R6_CamtrapDP class.
 							#' @param data Media dataset.
+							#' @param path Path or URL to the data file
+							#' @param profile Profile of media data
+							#' @param format Format of media data
+							#' @param mediatype Mediatype of media data
+							#' @param encoding Encoding of media data
+							#' @param schema URL of the used Camtrap DP Table Schema version
 							#' 
 							set_media = function(	data,
 														path="media.csv",
@@ -786,6 +833,12 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Sets observations of R6_CamtrapDP class.
 							#' @param data Observations dataset.
+							#' @param path Path of URL to the data file
+							#' @param profile Profile of observations
+							#' @param format Format of observation data
+							#' @param mediatype Mediatype of observation data
+							#' @param encoding Encoding of observation data
+							#' @param schema URL of the used Camtrap DP Table Schema version
 							#' 
 							set_observations = function(	data,
 														path="observations.csv",
@@ -879,6 +932,9 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Add sources of R6_CamtrapDP class.
 							#' @param title Title of sources.
+							#' @param path Path or URL to the source
+							#' @param email An email address
+							#' @param version The version of this Data Package
 							#' 
 							add_sources = function(title,path=NULL,email=NULL,version=NULL){
 								if(is.null(self$sources)){
@@ -906,6 +962,8 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' Add license of R6_CamtrapDP class.
 							#' @param name Name of license.
 							#' @param scope scope of license ("data" or "media").
+							#' @param path A URL or path to the details of license
+							#' @param title A title of license
 							#' 
 							add_license=function(name,scope,path=NULL,title=NULL){
 								if(!grepl("^(data|media)$",scope)){
@@ -935,6 +993,10 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @param captureMethod Capture method. Either "(activityDetection|timeLapse)".
 							#' @param individualAnimals Logical indicating whether the individuals are recognized.
 							#' @param observationLevel Observation level. Either "(media|event)".
+							#' @param id Unique identifier of the project
+							#' @param acronym Project acronym
+							#' @param description Description of the project
+							#' @param path Project website
 							#' 
 							set_project=function(title,samplingDesign,captureMethod,individualAnimals,observationLevel,id=NULL,acronym=NULL,description=NULL,path=NULL){
 								if(!grepl("^(simpleRandom|systematicRandom|clusteredRandom|experimental|targeted|opportunistic)$",samplingDesign)){
@@ -1009,6 +1071,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @importFrom tibble tibble
 							#' @importFrom dplyr mutate left_join
 							#' @import magrittr
+							#' @param taxonDBurl An URL to taxon data pase
 							#' 
 							set_taxon=function(taxonDB="itis",taxonDBurl="https://www.itis.gov/"){
 								if(is.null(self$data$observations)){
@@ -1039,6 +1102,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @param relationType Type of relation. Either "^(IsCitedBy|Cites|IsSupplementTo|IsSupplementedBy|IsContinuedBy|Continues|IsNewVersionOf|IsPreviousVersionOf|IsPartOf|HasPart|IsPublishedIn|IsReferencedBy|References|IsDocumentedBy|Documents|IsCompiledBy|Compiles|IsVariantFormOf|IsOriginalFormOf|IsIdenticalTo|HasMetadata|IsMetadataFor|Reviews|IsReviewedBy|IsDerivedFrom|IsSourceOf|Describes|IsDescribedBy|HasVersion|IsVersionOf|Requires|IsRequiredBy|Obsoletes|IsObsoletedBy)$".
 							#' @param relatedIdentifier Related identifier.
 							#' @param relatedIdentifierType Type of related identifier. Either "^(ARK|arXiv|bibcode|DOI|EAN13|EISSN|Handle|IGSN|ISBN|ISSN|ISTC|LISSN|LSID|PMID|PURL|UPC|URL|URN|w3id)$".
+							#' @param resourceTypeGeneral General type of the related resource
 							#'  
 							add_relatedIdentifiers=function(relationType,relatedIdentifier,relatedIdentifierType,resourceTypeGeneral=NULL){
 								if(!grepl("^(IsCitedBy|Cites|IsSupplementTo|IsSupplementedBy|IsContinuedBy|Continues|IsNewVersionOf|IsPreviousVersionOf|IsPartOf|HasPart|IsPublishedIn|IsReferencedBy|References|IsDocumentedBy|Documents|IsCompiledBy|Compiles|IsVariantFormOf|IsOriginalFormOf|IsIdenticalTo|HasMetadata|IsMetadataFor|Reviews|IsReviewedBy|IsDerivedFrom|IsSourceOf|Describes|IsDescribedBy|HasVersion|IsVersionOf|Requires|IsRequiredBy|Obsoletes|IsObsoletedBy)$",relationType)){
@@ -1078,6 +1142,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Exports \code{camtrapdp} object and datapackage.
 							#' @param write If TRUE, datapackage is written to \code{directory}.
+							#' @param directory Path to the directory where new data packages will save
 							#' @import camtrapdp
 							#' @importFrom jsonlite toJSON
 							#' @importFrom readr write_csv

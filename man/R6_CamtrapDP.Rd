@@ -6,6 +6,59 @@
 \description{
 R6 class including metadata, deployments, media and observations.
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{resources}}{is the package data resources}
+
+\item{\code{profile}}{of the resource}
+
+\item{\code{name}}{Identifier of the resource}
+
+\item{\code{id}}{A property reserved for globally unique identifiers e.g., UUID and DOI}
+
+\item{\code{created}}{The datetime on which this Data Package was created}
+
+\item{\code{title}}{Title of this Data Package}
+
+\item{\code{contributors}}{The people or organizations who contributed to this Data Package}
+
+\item{\code{description}}{Description of this Data Package}
+
+\item{\code{version}}{The version of this Data Package}
+
+\item{\code{keywords}}{Keywords of this Data Package}
+
+\item{\code{image}}{A URL or Path of an image for this Data Package}
+
+\item{\code{homepage}}{A URL for the home on the web that is related to this Data Package}
+
+\item{\code{sources}}{A row sources for this Data Package}
+
+\item{\code{licenses}}{The licenses under which the Data Package is provided}
+
+\item{\code{bibliographicCitation}}{A bibliographical reference for the resource}
+
+\item{\code{project}}{Camera trap project or study that originated this Data package}
+
+\item{\code{coordinatePrecision}}{Least precise coordinate precision of the deployments.latitude and deployments.longitude}
+
+\item{\code{spatial}}{Spatial coverage of this Data Package, expressed as GeoJSON}
+
+\item{\code{temporal}}{Temporal coverage of this Data Package}
+
+\item{\code{taxonomic}}{Taxonomic coverage of this Data Package, based on the unique observations.scientificName}
+
+\item{\code{relatedIdentifiers}}{Identifiers of resources related to this Data Package}
+
+\item{\code{references}}{List of references related to this Data Package}
+
+\item{\code{directory}}{Directory of this Data Package}
+
+\item{\code{data}}{Observation, Media and Deployments which consist this Data Package}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -89,6 +142,26 @@ Sets properties of R6_CamtrapDP class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{directory}}{Directory of datapackage.}
+
+\item{\code{name}}{Identifier of the resource}
+
+\item{\code{id}}{A property reserved for globally unique identifiers e.g., UUID and DOI}
+
+\item{\code{description}}{Description of this Data Package}
+
+\item{\code{profile}}{Profile of the resource}
+
+\item{\code{version}}{The version of this Data Package}
+
+\item{\code{keywords}}{Keywords of this Data Package}
+
+\item{\code{image}}{A URL or Path of an image for this Data Package}
+
+\item{\code{homepage}}{A URL for the home on the web that is related to this Data Package}
+
+\item{\code{bibliographicCitation}}{A bibliographical reference for the resource}
+
+\item{\code{coordinatePrecision}}{Least precise coordinate precision of the deployments.latitude and deployments.longitude}
 }
 \if{html}{\out{</div>}}
 }
@@ -115,6 +188,18 @@ Sets deployments of R6_CamtrapDP class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{data}}{Deployments dataset.}
+
+\item{\code{path}}{Path or URL to the data file}
+
+\item{\code{profile}}{Profile of deployments}
+
+\item{\code{format}}{Format of deployments data}
+
+\item{\code{mediatype}}{Media type of deployments data}
+
+\item{\code{encoding}}{Encpding of deployments data}
+
+\item{\code{schema}}{URL of the used Camtrap DP Table Schema version}
 }
 \if{html}{\out{</div>}}
 }
@@ -141,6 +226,18 @@ Sets media of R6_CamtrapDP class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{data}}{Media dataset.}
+
+\item{\code{path}}{Path or URL to the data file}
+
+\item{\code{profile}}{Profile of media data}
+
+\item{\code{format}}{Format of media data}
+
+\item{\code{mediatype}}{Mediatype of media data}
+
+\item{\code{encoding}}{Encoding of media data}
+
+\item{\code{schema}}{URL of the used Camtrap DP Table Schema version}
 }
 \if{html}{\out{</div>}}
 }
@@ -167,6 +264,18 @@ Sets observations of R6_CamtrapDP class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{data}}{Observations dataset.}
+
+\item{\code{path}}{Path of URL to the data file}
+
+\item{\code{profile}}{Profile of observations}
+
+\item{\code{format}}{Format of observation data}
+
+\item{\code{mediatype}}{Mediatype of observation data}
+
+\item{\code{encoding}}{Encoding of observation data}
+
+\item{\code{schema}}{URL of the used Camtrap DP Table Schema version}
 }
 \if{html}{\out{</div>}}
 }
@@ -222,6 +331,12 @@ Add sources of R6_CamtrapDP class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{title}}{Title of sources.}
+
+\item{\code{path}}{Path or URL to the source}
+
+\item{\code{email}}{An email address}
+
+\item{\code{version}}{The version of this Data Package}
 }
 \if{html}{\out{</div>}}
 }
@@ -241,6 +356,10 @@ Add license of R6_CamtrapDP class.
 \item{\code{name}}{Name of license.}
 
 \item{\code{scope}}{scope of license ("data" or "media").}
+
+\item{\code{path}}{A URL or path to the details of license}
+
+\item{\code{title}}{A title of license}
 }
 \if{html}{\out{</div>}}
 }
@@ -276,6 +395,14 @@ Sets project of R6_CamtrapDP class.
 \item{\code{individualAnimals}}{Logical indicating whether the individuals are recognized.}
 
 \item{\code{observationLevel}}{Observation level. Either "(media|event)".}
+
+\item{\code{id}}{Unique identifier of the project}
+
+\item{\code{acronym}}{Project acronym}
+
+\item{\code{description}}{Description of the project}
+
+\item{\code{path}}{Project website}
 }
 \if{html}{\out{</div>}}
 }
@@ -303,6 +430,8 @@ Sets taxonomic of R6_CamtrapDP class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{taxonDB}}{Name of taxon data base passed to \code{taxadb::get_ids()}.}
+
+\item{\code{taxonDBurl}}{An URL to taxon data pase}
 }
 \if{html}{\out{</div>}}
 }
@@ -329,6 +458,8 @@ Add relatedIdentifiers of R6_CamtrapDP class.
 \item{\code{relatedIdentifier}}{Related identifier.}
 
 \item{\code{relatedIdentifierType}}{Type of related identifier. Either "^(ARK|arXiv|bibcode|DOI|EAN13|EISSN|Handle|IGSN|ISBN|ISSN|ISTC|LISSN|LSID|PMID|PURL|UPC|URL|URN|w3id)$".}
+
+\item{\code{resourceTypeGeneral}}{General type of the related resource}
 }
 \if{html}{\out{</div>}}
 }
@@ -363,6 +494,8 @@ Exports \code{camtrapdp} object and datapackage.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{write}}{If TRUE, datapackage is written to \code{directory}.}
+
+\item{\code{directory}}{Path to the directory where new data packages will save}
 }
 \if{html}{\out{</div>}}
 }
