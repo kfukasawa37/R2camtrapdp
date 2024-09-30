@@ -1,6 +1,6 @@
 Package: R2camtrapdp
 Type: Package
-Title: An R package for converting camera trap dataset into Camera trap data package (Camtrap DP).
+Title: An R package for converting camera trap dataset into Camera trap data package (Camtrap DP)
 Version: 0.1.0
 Author: Keita Fukasawa (@kfukasawa37) and Kana Terayama
 Maintainer: Keita Fukasawa <k.fukasawa37@gmail.com>
@@ -15,6 +15,7 @@ Imports:
     camtrapdp,
     dplyr,
     jsonlite,
+    lubridate,
     magrittr,
     R6,
     readr,
