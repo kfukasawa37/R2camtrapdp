@@ -743,6 +743,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Creates new instance of R6_CamtrapDP class.
 							#' @param tz Time zone.
+							#' @param ... parameters
 							#' 
 							initialize = function(tz="Japan",...){
 								self$update_created(tz=tz)

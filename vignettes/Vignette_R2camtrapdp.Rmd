@@ -73,7 +73,7 @@ filePublic<-!grepl("ヒト",fileName)
 
 media<-create_media( mediaID=mediaID,
                      deploymentID=Vdep$deploymentID,
-                     timestamp_date=timestamp_date,
+                     timestamp_date=Vobs$date,
                      timestamp_time=Vobs$time,
                      filePath=filePath,
                      filePublic=filePublic,

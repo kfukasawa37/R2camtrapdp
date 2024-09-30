@@ -95,6 +95,8 @@ Creates new instance of R6_CamtrapDP class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{tz}}{Time zone.}
+
+\item{\code{...}}{description}
 }
 \if{html}{\out{</div>}}
 }
