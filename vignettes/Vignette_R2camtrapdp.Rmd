@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 library(R2camtrapdp)
 ```
 
-## How to create deployment
+## Create deployment
 
 If you have deployment and observation data.
 
@@ -28,6 +28,7 @@ data(Vobs)
 ```
 Using Vdep, deployment (tibble data) was created as below,
 ```{r}
+##create deployment
 deployments<-create_deployments(
   deploymentID=Vdep$deploymentID,
   longitude=Vdep$longitude,
@@ -45,7 +46,7 @@ deployments<-create_deployments(
   setupBy=Vdep$setupBy)
 ```
 
-## How to create media
+## Create media
 Using Vdep and Vobs, media (tibble data) was created as below,
 ```{r}
 ##settings
@@ -71,6 +72,7 @@ filetype<-tolower(unlist(lapply(strsplit(fileName,"\\."),"[",2)))
 fileMediatype<-paste("video",filetype,sep="/")
 filePublic<-!grepl("ヒト",fileName)
 
+##create media
 media<-create_media( mediaID=mediaID,
                      deploymentID=Vdep$deploymentID,
                      timestamp_date=Vobs$date,
@@ -80,4 +82,58 @@ media<-create_media( mediaID=mediaID,
                      fileMediatype=fileMediatype,
                      captureMethod="activityDetection",
                      fileName=fileName)
+```
+
+## Create observation
+Using Vobs, observation (tibble data) was created as below,
+```{r}
+#If the observations were media-based observations, observationLevel expressed as "media"
+observationLevel<-"media"
+
+#If the observations classified by human, classificationmethod expressed as "humam" 
+classificationmethod<-"human"
+#classificationprobability is the degree of certainty of the classification of the observed object (1=maximum certainty)
+classificationprobability<-1
+
+#create observationIDs that express the unique identifier of the observation 
+observationID<-paste(mediaID,Vobs$pictID,sep="_")
+#deploymentID is belong to deployment
+deploymentID<-Vdep$deploymentID
+#mediaID is belong to media
+mediaID<-mediaID
+
+#Timestamp (date and time) at which the observation started (e.g., the timestamp when the video or photo was taken)
+tz="Japan"
+timestamp<-paste(Vobs$date,Vobs$time)
+
+#categorized observationType (animal, human, vehicle, blank, unknown, or unclassified)
+observationType<-ifelse(Vobs$object=="hito","human",
+                        ifelse(Vobs$object=="none","blank",
+                               ifelse(Vobs$object=="unidentifiable","unknown","animal")))
+
+#Scientific name of the animals observed
+scientificName<-ifelse(is.na(Vobs$genus),Vobs$class,paste(Vobs$genus,Vobs$species))
+
+#create observations
+observations<-create_observations(observationID=observationID,
+                                  deploymentID=deploymentID,
+                                       mediaID=mediaID,
+                                       eventStart=timestamp,
+                                       eventEnd=timestamp,
+                                       observationLevel=observationLevel,
+                                       observationType=observationType,
+                                       scientificName=scientificName,
+                                       count=Vobs$individualCount,
+                                       classificationMethod=classificationmethod,
+                                       classificationProbability=classificationprobability
+)
+
+```
+
+## Create datapackages
+```{r}
+#set taxsonomic information
+taxonDB<-"itis"
+t
+
 ```
