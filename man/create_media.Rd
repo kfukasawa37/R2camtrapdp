@@ -22,6 +22,37 @@ create_media(
   omitduplicate = TRUE
 )
 }
+\arguments{
+\item{mediaID}{Unique identifier of the media file}
+
+\item{deploymentID}{Identifier of the deployment the media file belongs to}
+
+\item{timestamp}{Date and time at which the media file was recorded}
+
+\item{timestamp_date}{Date at which the media file was recorded}
+
+\item{timestamp_time}{Time at which the media file was recorded}
+
+\item{filePath}{URL or relative path to the media file, respectively for externally hosted files or files that are part of the package}
+
+\item{filePublic}{false if the media file is not publicly accessible}
+
+\item{fileMediatype}{Mediatype of the media file. Expressed as an IANA Media Type}
+
+\item{fileName}{Name of the media file}
+
+\item{captureMethod}{Method used to capture the media file}
+
+\item{exifData}{EXIF data of the media file}
+
+\item{favorite}{true if the media file is deemed of interest}
+
+\item{mediaComments}{Comments or notes about the media file}
+
+\item{tz}{Time zone of the media file was recorded}
+
+\item{omitduplicate}{true if duplicate exclusion}
+}
 \value{
 A tibble of media.
 }

@@ -41,6 +41,75 @@ create_observations(
   omitduplicate = TRUE
 )
 }
+\arguments{
+\item{observationID}{Unique identifier of the observation}
+
+\item{deploymentID}{Identifier of the deployment the observation belongs to}
+
+\item{mediaID}{Identifier of the media file that was classified}
+
+\item{eventID}{Identifier of the event the observation belongs to}
+
+\item{eventStart}{Date and time at which the event started}
+
+\item{eventStart_date}{Date at which the event started}
+
+\item{eventStart_time}{Time at which the event started}
+
+\item{eventEnd}{Date and time at which the event ended}
+
+\item{eventEnd_date}{Date at which the event ended}
+
+\item{eventEnd_time}{Time at which the event ended}
+
+\item{observationLevel}{Level at which the observation was classified}
+
+\item{observationType}{Type of the observation}
+
+\item{cameraSetupType}{Type of the camera setup action associated with the observation}
+
+\item{scientificName}{Scientific name of the observed individual}
+
+\item{count}{Number of observed individuals}
+
+\item{lifeStage}{Age class or life stage of the observed individual}
+
+\item{sex}{Sex of the observed individual}
+
+\item{behavior}{Dominant behavior of the observed individual}
+
+\item{individualID}{Identifier of the observed individual}
+
+\item{individualPositionRadius}{Distance from the camera to the observed individual identified by individualID}
+
+\item{individualPositionAngle}{Angular distance from the camera view centerline to the observed individual identified by individualID}
+
+\item{individualSpeed}{Average movement speed of the observed individual identified by individualID}
+
+\item{bboxX}{Horizontal position of the top-left corner of a bounding box}
+
+\item{bboxY}{Vertical position of the top-left corner of a bounding box}
+
+\item{bboxWidth}{Width of a bounding box}
+
+\item{bboxHeight}{Height of the bounding box}
+
+\item{classificationMethod}{Method used to classify the observation}
+
+\item{classifiedBy}{Name or identifier of the person or AI algorithm that classified the observation}
+
+\item{classificationTimestamp}{Date and time of the classification}
+
+\item{classificationProbability}{Degree of certainty of the classification}
+
+\item{observationTags}{Tags associated with the observation}
+
+\item{observationComments}{Comments or notes about the observation}
+
+\item{tz}{Time zone of observation}
+
+\item{omitduplicate}{true if duplicate exclusion}
+}
 \value{
 A tibble of observations.
 }

@@ -96,7 +96,7 @@ Creates new instance of R6_CamtrapDP class.
 \describe{
 \item{\code{tz}}{Time zone.}
 
-\item{\code{...}}{description}
+\item{\code{...}}{parameters}
 }
 \if{html}{\out{</div>}}
 }

@@ -36,6 +36,65 @@ create_deployments(
   tz = "Japan"
 )
 }
+\arguments{
+\item{deploymentID}{Unique identifier of the deployment}
+
+\item{latitude}{Latitude of the deployment location in decimal degrees, using the WGS84 datum}
+
+\item{longitude}{Longitude of the deployment location in decimal degrees, using the WGS84 datum}
+
+\item{deploymentStart}{Date and time at which the deployment was started}
+
+\item{deploymentStart_date}{Date at which the deployment was started}
+
+\item{deploymentStart_time}{Time at which the deployment was started}
+
+\item{deploymentEnd}{Date and time at which the deployment was ended}
+
+\item{deploymentEnd_date}{Date at which the deployment was ended}
+
+\item{deploymentEnd_time}{Time at which the deployment was ended}
+
+\item{locationID}{Identifier of the deployment location}
+
+\item{locationName}{Name given to the deployment location}
+
+\item{coordinateUncertainty}{Horizontal distance from the given latitude and longitude describing the smallest circle containing the deployment location}
+
+\item{setupBy}{Name or identifier of the person or organization that deployed the camera}
+
+\item{cameraID}{Identifier of the camera used for the deployment}
+
+\item{cameraModel}{Manufacturer and model of the camera}
+
+\item{cameraDelay}{Predefined duration after detection when further activity is ignored}
+
+\item{cameraHeight}{Height at which the camera was deployed}
+
+\item{cameraDepth}{Depth at which the camera was deployed}
+
+\item{cameraTilt}{Angle at which the camera was deployed in the vertical plane}
+
+\item{cameraHeading}{Angle at which the camera was deployed in the horizontal plane}
+
+\item{detectionDistance}{Maximum distance at which the camera can reliably detect activity}
+
+\item{timestampIssues}{true if timestamps in the media resource for the deployment are known to have unsolvable issues}
+
+\item{baitUse}{true if bait was used for the deployment}
+
+\item{featureType}{Type of the feature associated with the deployment}
+
+\item{habitat}{Short characterization of the habitat at the deployment location}
+
+\item{deploymentGroups}{Deployment groups associated with the deployment}
+
+\item{deploymentTags}{Tags associated with the deployment}
+
+\item{deploymentComments}{Comments or notes about the deployment}
+
+\item{tz}{Deployment time zone}
+}
 \value{
 A tibble of deployments.
 }

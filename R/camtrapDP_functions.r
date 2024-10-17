@@ -4,9 +4,38 @@
 #' @import lubridate
 #' @import tibble
 #' @return A tibble of deployments.
+#' @param deploymentID Unique identifier of the deployment
+#' @param latitude Latitude of the deployment location in decimal degrees, using the WGS84 datum
+#' @param longitude Longitude of the deployment location in decimal degrees, using the WGS84 datum
+#' @param deploymentStart Date and time at which the deployment was started
+#' @param deploymentStart_date Date at which the deployment was started
+#' @param deploymentStart_time Time at which the deployment was started
+#' @param deploymentEnd Date and time at which the deployment was ended
+#' @param deploymentEnd_date Date at which the deployment was ended
+#' @param deploymentEnd_time Time at which the deployment was ended
+#' @param locationID Identifier of the deployment location
+#' @param locationName Name given to the deployment location
+#' @param coordinateUncertainty Horizontal distance from the given latitude and longitude describing the smallest circle containing the deployment location
+#' @param setupBy Name or identifier of the person or organization that deployed the camera
+#' @param cameraID Identifier of the camera used for the deployment
+#' @param cameraModel Manufacturer and model of the camera
+#' @param cameraDelay Predefined duration after detection when further activity is ignored
+#' @param cameraHeight Height at which the camera was deployed
+#' @param cameraDepth Depth at which the camera was deployed
+#' @param cameraTilt Angle at which the camera was deployed in the vertical plane
+#' @param cameraHeading Angle at which the camera was deployed in the horizontal plane
+#' @param detectionDistance Maximum distance at which the camera can reliably detect activity
+#' @param timestampIssues true if timestamps in the media resource for the deployment are known to have unsolvable issues
+#' @param baitUse true if bait was used for the deployment
+#' @param featureType Type of the feature associated with the deployment
+#' @param habitat Short characterization of the habitat at the deployment location
+#' @param deploymentGroups Deployment groups associated with the deployment
+#' @param deploymentTags Tags associated with the deployment
+#' @param deploymentComments Comments or notes about the deployment
+#' @param tz Deployment time zone
 #' @export
 #' 
-create_deployments<-function(deploymentID,
+create_deployments<-function( deploymentID,
 					latitude,
 					longitude,
 					deploymentStart=NULL,
@@ -254,9 +283,24 @@ create_deployments<-function(deploymentID,
 #' @import tibble
 #' @importFrom dplyr distinct
 #' @return A tibble of media.
+#' @param mediaID Unique identifier of the media file
+#' @param deploymentID Identifier of the deployment the media file belongs to
+#' @param timestamp Date and time at which the media file was recorded
+#' @param timestamp_date Date at which the media file was recorded
+#' @param timestamp_time Time at which the media file was recorded
+#' @param filePath URL or relative path to the media file, respectively for externally hosted files or files that are part of the package
+#' @param filePublic false if the media file is not publicly accessible
+#' @param fileMediatype Mediatype of the media file. Expressed as an IANA Media Type
+#' @param fileName Name of the media file
+#' @param captureMethod Method used to capture the media file
+#' @param exifData EXIF data of the media file
+#' @param favorite true if the media file is deemed of interest
+#' @param mediaComments Comments or notes about the media file
+#' @param tz Time zone of the media file was recorded
+#' @param omitduplicate true if duplicate exclusion 
 #' @export
 #' 
-create_media<-function(	mediaID,
+create_media<-function( mediaID,
 							deploymentID,
 							timestamp=NULL,
 							timestamp_date=NULL,
@@ -382,6 +426,40 @@ create_media<-function(	mediaID,
 #' @import tibble
 #' @importFrom dplyr distinct
 #' @return A tibble of observations.
+#' @param observationID Unique identifier of the observation
+#' @param deploymentID Identifier of the deployment the observation belongs to
+#' @param mediaID Identifier of the media file that was classified
+#' @param eventID Identifier of the event the observation belongs to
+#' @param eventStart Date and time at which the event started
+#' @param eventStart_date Date at which the event started
+#' @param eventStart_time Time at which the event started
+#' @param eventEnd Date and time at which the event ended
+#' @param eventEnd_date Date at which the event ended
+#' @param eventEnd_time Time at which the event ended
+#' @param observationLevel Level at which the observation was classified
+#' @param observationType Type of the observation
+#' @param cameraSetupType Type of the camera setup action associated with the observation
+#' @param scientificName Scientific name of the observed individual
+#' @param count Number of observed individuals
+#' @param lifeStage Age class or life stage of the observed individual
+#' @param sex Sex of the observed individual
+#' @param behavior Dominant behavior of the observed individual
+#' @param individualID Identifier of the observed individual
+#' @param individualPositionRadius Distance from the camera to the observed individual identified by individualID
+#' @param individualPositionAngle Angular distance from the camera view centerline to the observed individual identified by individualID
+#' @param individualSpeed Average movement speed of the observed individual identified by individualID
+#' @param bboxX Horizontal position of the top-left corner of a bounding box
+#' @param bboxY Vertical position of the top-left corner of a bounding box
+#' @param bboxWidth Width of a bounding box
+#' @param bboxHeight Height of the bounding box
+#' @param classificationMethod Method used to classify the observation
+#' @param classifiedBy Name or identifier of the person or AI algorithm that classified the observation
+#' @param classificationTimestamp Date and time of the classification
+#' @param classificationProbability Degree of certainty of the classification
+#' @param observationTags Tags associated with the observation
+#' @param observationComments Comments or notes about the observation
+#' @param tz Time zone of observation
+#' @param omitduplicate true if duplicate exclusion
 #' @export
 #' 
 create_observations<-function(	observationID,
@@ -1200,5 +1278,3 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							}
 						)
 )
-
-
