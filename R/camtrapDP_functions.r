@@ -1150,7 +1150,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @importFrom tibble tibble
 							#' @importFrom dplyr mutate left_join
 							#' @import magrittr
-							#' @param taxonDBurl An URL to taxon data pase
+							#' @param taxonDBurl An URL to taxon data base
 							#' 
 							set_taxon=function(taxonDB="itis",taxonDBurl="https://www.itis.gov/"){
 								if(is.null(self$data$observations)){
