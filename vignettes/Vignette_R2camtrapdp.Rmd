@@ -273,18 +273,6 @@ List of references related to the "package". References preferably include a DOI
 datapackage$add_references(reference=c("TestdatainNIES https://doi.org/xxxxx"))
 ```
 
-6.Custom Information
-If you have some of the "datapackage" information as metadata, but it is not listed in the above sections, the "set_custom" function will help. This function can be used to list new data from a data frame, and the values of name, description , and of course data frame are required. 
-For example,suppose you have a data frame for estimating animal abundance based on the REST method. The code is as follows, 
-```{r}
-#data frame of REST data (This is dummy data)
-RD=data.frame(id=seq(1:38),
-              Time=sample(1:29,38,replace=T))
-##add REST data as medatada
-datapackage$set_custom(name=c("REST"),
-                       description = c("dataforRESTmethod"),
-                       data=RD)
-```
 
 #Convert and output as Camtrap DP object
 The R6class object (i.e., "datapackage") can be converted to the Camtrap DP object using the "out_camtrapdp()" function, as shown below,  
@@ -295,5 +283,6 @@ data_camtrapdp<-datapackage$out_camtrapdp()
 If you want, "datapackage" can be converted to the Camtrap DP object and created in the directory (described by path), as shown below,  
 ```{r}
 #data frame of REST data
+path="D:/data/camtrapDP"
 datapackage$out_camtrapdp(write=T,directory=path)
 ```

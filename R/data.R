@@ -13,3 +13,10 @@ NULL
 #' @references Originally data can be used doi.xxx.xxx
 #' @keywords data
 NULL
+
+#' Camtrap DP objects have been created from Vdep and Vobs
+#' @name datapackageVdata
+#' @docType data
+#' @references Originally data can be used doi.xxx.xxx
+#' @keywords data camtrapDP
+NULL

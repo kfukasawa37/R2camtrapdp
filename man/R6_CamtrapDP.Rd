@@ -433,7 +433,7 @@ Sets taxonomic of R6_CamtrapDP class.
 \describe{
 \item{\code{taxonDB}}{Name of taxon data base passed to \code{taxadb::get_ids()}.}
 
-\item{\code{taxonDBurl}}{An URL to taxon data pase}
+\item{\code{taxonDBurl}}{An URL to taxon data base}
 }
 \if{html}{\out{</div>}}
 }
