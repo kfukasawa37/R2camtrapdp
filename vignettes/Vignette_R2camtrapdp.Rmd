@@ -21,7 +21,6 @@ library(R2camtrapdp)
 ## Create deployment
 
 If you have deployment and observation data.
-
 ```{r}
 data("Vdep")
 data("Vobs")
@@ -193,25 +192,25 @@ datapackage$set_project(title=c("TestdatainNIES"),
                         observationLevel = c("media"))
 ```
 
-4.Spatial and temporal
+3.Spatial and temporal
 Spatial and temporal coverage of the "package".
 The function "set_st()" collects spatial and temporal data from "deployment" and can be imported into "datapackage".
 ```{r}
 datapackage$set_st()
 ```
 
-5.Taxonomic
+4.Taxonomic
 Taxonomic coverage of the "datapackage", based on the unique "scientificName" of "observation".
 The "set_taxon()" function lists scientific name of observation and collect taxonID from taxon data base (express as taxonDB). For default, taxonDB is "itis" and taxonDBurl (An URL to taxon data base) is "https://www.itis.gov/". You can use other taxonDB and taxonDBurl (see details in "taxadb::get_ids").
 ```{r}
 datapackage$set_taxon()
 ```
 
-6.Created
+5.Created
 The datetime on which "datapackage" was created.
 The "update_created()" function gets the current datetime from system time and can be update the datetime on which "datapackage" was created.
 ```{r}
-#set timezone
+#set timezone ("Japan" is default value)
 tz="Japan"
 #update datetime
 datapackage$update_created()
@@ -232,14 +231,69 @@ Note that this function need to use for each license information.
 
 2.Related Identifiers
 Identifiers of resources related to the "package" (e.g., papers, project pages, derived datasets, APIs etc.).
-The function "add_relatedIdentifiers()" can be used to import related identifiers. The related identifiers need to set relatonType, relatedIdentifier, resourceTypeGeneral, and relatedIdentifierType.
-relationType: Description of the relationship between the resource (the "package") and the related resource. Available from IsCitedBy, Cites, IsSupplementTo, IsSupplementedBy, IsContinuedBy, Continues, IsNewVersionOf, IsPreviousVersionOf, IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsDocumentedBy, Documents, IsCompiledBy, Compiles, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, HasMetadata, IsMetadataFor, Reviews, IsReviewedBy, IsDerivedFrom, IsSourceOf, Describes, IsDescribedBy, HasVersion, IsVersionOf, Requires, IsRequiredBy, Obsoletes, and IsObsoletedBy.
+The function "add_relatedIdentifiers()" can be used to import related identifiers. The related identifiers need to set relationType, relatedIdentifier, resourceTypeGeneral, and relatedIdentifierType.
+relationType: Description of the relationship between the resource (the "package") and the related resource. Available from IsCitedBy, Cites, IsSupplementTo, IsSupplementedBy, IsContinuedBy, Continues, IsNewVersionOf, IsPreviousVersionOf, IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsDocumentedBy, Documents, IsCompiledBy, Compiles, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, HasMetadata, IsMetadataFor, Reviews, IsReviewedBy, IsDerivedFrom, IsSourceOf, Describes, IsDescribedBy, HasVersion, IsVersionOf, Requires, IsRequiredBy, Obsoletes, or IsObsoletedBy.
 relatedIdentifier: Unique identifier of the related resource (e.g., a DOI or URL).
 resourceTypeGeneral: General type of the related resource. Available from  Audiovisual, Book, BookChapter, Collection, ComputationalNotebook, ConferencePaper, ConferenceProceeding, DataPaper, Dataset, Dissertation, Event, Image, InteractiveResource, Journal, JournalArticle, Model, OutputManagementPlan, PeerReview, PhysicalObject, Preprint, Report, Service, Software, Sound, Standard, Text, Workflow, and Other.
 relatedIdentifierType: Type of the RelatedIdentifier. Available from ARK, arXiv, bibcode, DOI, EAN13, EISSN, Handle, IGSN, ISBN, ISSN, ISTC, LISSN, LSID, PMID, PURL, UPC, URL, URN, and w3id.
 ```{r}
 datapackage$add_relatedIdentifiers(relationType = c("IsSupplementTo"),
-                                   relatedIdentifier =as.character(c("xxxxxx")) ,
+                                   relatedIdentifier =as.character(c("https://doi.xxxx")) ,
                                    relatedIdentifierType = c("DOI"),
                                    resourceTypeGeneral = c("JournalArticle"))
+```
+
+3.Properties
+The "set_properties" function can be used to list some additional information about the "datapackage" as metadata. The values can be used as shown below;
+directory: Working directory.
+name: Identifier of the resource.
+id: A property reserved for globally unique identifiers. (e.g., UUID and DOI)
+description: Description of "datapackage".
+version: The Camtrap DP version of "datapackage". The default is "1.0.1".
+profile: Profile of the resource. The dafault is "https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json".
+keywords: Keywords of "datapackage".
+image: A URL or Path of an image for "datapackage".
+homepage: A URL for the home on the web that is related to "datapackage".
+bibliographicCitation: A bibliographical reference for the resource.
+coordinatePrecision: Least precise coordinate precision of the latitude and longitude of "deployment".
+```{r}
+datapackage$set_properties(name=c("Testdata-NIES"),
+                           homepage = c("https://www.nies.go.jp/biology/snapshot_japan/index.html"))
+```
+
+4.Source
+The "add_sources" function can be used to list the sources of "datapackage". The values of title (title of the sources), path (path or URL to the source), email (an email address), and version (the version of "datapackage") are available for this function.
+```{r}
+datapackage$add_sources(title=c("TestdatainNIES"))
+```
+
+5.Reference
+List of references related to the "package". References preferably include a DOI.
+```{r}
+datapackage$add_references(reference=c("TestdatainNIES https://doi.org/xxxxx"))
+```
+
+6.Custom Information
+If you have some of the "datapackage" information as metadata, but it is not listed in the above sections, the "set_custom" function will help. This function can be used to list new data from a data frame, and the values of name, description , and of course data frame are required. 
+For example,suppose you have a data frame for estimating animal abundance based on the REST method. The code is as follows, 
+```{r}
+#data frame of REST data (This is dummy data)
+RD=data.frame(id=seq(1:38),
+              Time=sample(1:29,38,replace=T))
+##add REST data as medatada
+datapackage$set_custom(name=c("REST"),
+                       description = c("dataforRESTmethod"),
+                       data=RD)
+```
+
+#Convert and output as Camtrap DP object
+The R6class object (i.e., "datapackage") can be converted to the Camtrap DP object using the "out_camtrapdp()" function, as shown below,  
+```{r}
+#data frame of REST data
+data_camtrapdp<-datapackage$out_camtrapdp()
+```
+If you want, "datapackage" can be converted to the Camtrap DP object and created in the directory (described by path), as shown below,  
+```{r}
+#data frame of REST data
+datapackage$out_camtrapdp(write=T,directory=path)
 ```
