@@ -809,7 +809,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							set_custom = function(name,description,data){
 								resource=list(name=name,description=description,data=data)
 								nlist<-length(self$resources)
-								if(is.element(c("deployments","media","observations"),sapply(self$resources,"[[","name"))){
+								if(!all(is.element(c("deployments","media","observations"),sapply(self$resources,"[[","name")))){
 									stop("Add deployments, media and obervations prior to adding custom datasets")
 								}
 								self$resources[[nlist+1]]<-resource
