@@ -153,14 +153,14 @@ For the metadata of Camera Trap Data Package (Camtrap DP), five properties (cont
 
 **3-1.Required Properties**  
 **3-1-1.Contributors**  
-The function "add_contributors()" can be used to import a data frame of contributors. The contributor data frame consists of title, email, path, role, and organization.  
-| Values | Definition |  
-| :------ | ----- |  
-|"title"|Name of contributor|    
-|email  |e-mail address of contributor|  
-|path   |URL for the contributor's web page|  
-|role   |Role of contributor. Defaults to contributor. Other role can use from contact, principalInvestigator, rightsHolder and publisher|   
-|organization|organization of contributor|    
+The function "add_contributors()" can be used to import a data frame of contributors. The contributor data frame consists of title, email, path, role, and organization.
+
+**title**: Name of contributor.    
+**email**: e-mail address of contributor.  
+**path**: URL for the contributor's web page.    
+**role**: Role of contributor. Defaults to contributor. Other role can use from contact, principalInvestigator, rightsHolder and publisher.   
+**organization**: Organization of contributor. 
+
 Import contributors into "datapackage" as below,
 ```{r}
 #create dataframe of contributors
@@ -174,18 +174,21 @@ datapackage$add_contributors(cd)
 ```
 
 **3-1-2.Project**  
-The information of Camera trap project or study that originated the package. For project, title, samplingDesign, captureMethod, individualAnimals, and observationLevel are need to be filled in. In addition, id, acronym, description, path are available as additional information.  
+The information of Camera trap project or study that originated the package. For project, title, samplingDesign, captureMethod, individualAnimals, and observationLevel are need to be filled in. In addition, id, acronym, description, path are available as additional information. 
+
 **[Required information]**  
-title: Title of the project  
-samplingDesign: Type of sampling design/layout. The values can be used from simpleRandom, systematicRandom, clusteredRandom, experimental, targeted, or opportunistic.  
-captureMethod: Method used to capture the media files, values activityDetection or timeLapse can be used.  
-individualAnimals: true if the project includes marked or recognizable individuals.  
-observationLevel: Level at which observations are provided, values media or event can be used.  
+**title**: Title of the project.  
+**samplingDesign**: Type of sampling design/layout. The values can be used from simpleRandom, systematicRandom, clusteredRandom, experimental, targeted, or opportunistic.  
+**captureMethod**: Method used to capture the media files, values activityDetection or timeLapse can be used.  
+**individualAnimals**: true if the project includes marked or recognizable individuals.  
+**observationLevel**: Level at which observations are provided, values media or event can be used. 
+
 **[Additional information]**  
-id: Unique identifier of the project.  
-acronym: Project acronym.  
-description: Description of the project.  
-path: Path for project website.    
+**id**: Unique identifier of the project.  
+**acronym**: Project acronym.  
+**description**: Description of the project.  
+**path**: Path for project website.
+
 The function "set_project()" can be used to import for project into "datapackage".
 ```{r}
 datapackage$set_project(title=c("TestdatainNIES"),
@@ -235,10 +238,11 @@ Note that this function need to use for each license information.
 **3-2-2.Related Identifiers**  
 Identifiers of resources related to the "package" (e.g., papers, project pages, derived datasets, APIs etc.).
 The function "add_relatedIdentifiers()" can be used to import related identifiers. The related identifiers need to set relationType, relatedIdentifier, resourceTypeGeneral, and relatedIdentifierType.  
-relationType: Description of the relationship between the resource (the "package") and the related resource. Available from IsCitedBy, Cites, IsSupplementTo, IsSupplementedBy, IsContinuedBy, Continues, IsNewVersionOf, IsPreviousVersionOf, IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsDocumentedBy, Documents, IsCompiledBy, Compiles, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, HasMetadata, IsMetadataFor, Reviews, IsReviewedBy, IsDerivedFrom, IsSourceOf, Describes, IsDescribedBy, HasVersion, IsVersionOf, Requires, IsRequiredBy, Obsoletes, or IsObsoletedBy.  
-relatedIdentifier: Unique identifier of the related resource (e.g., a DOI or URL).  
-resourceTypeGeneral: General type of the related resource. Available from  Audiovisual, Book, BookChapter, Collection, ComputationalNotebook, ConferencePaper, ConferenceProceeding, DataPaper, Dataset, Dissertation, Event, Image, InteractiveResource, Journal, JournalArticle, Model, OutputManagementPlan, PeerReview, PhysicalObject, Preprint, Report, Service, Software, Sound, Standard, Text, Workflow, and Other.  
-relatedIdentifierType: Type of the RelatedIdentifier. Available from ARK, arXiv, bibcode, DOI, EAN13, EISSN, Handle, IGSN, ISBN, ISSN, ISTC, LISSN, LSID, PMID, PURL, UPC, URL, URN, and w3id.
+
+**relationType**: Description of the relationship between the resource (the "package") and the related resource. Available from IsCitedBy, Cites, IsSupplementTo, IsSupplementedBy, IsContinuedBy, Continues, IsNewVersionOf, IsPreviousVersionOf, IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsDocumentedBy, Documents, IsCompiledBy, Compiles, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, HasMetadata, IsMetadataFor, Reviews, IsReviewedBy, IsDerivedFrom, IsSourceOf, Describes, IsDescribedBy, HasVersion, IsVersionOf, Requires, IsRequiredBy, Obsoletes, or IsObsoletedBy.  
+**relatedIdentifier**: Unique identifier of the related resource (e.g., a DOI or URL).  
+**resourceTypeGeneral**: General type of the related resource. Available from  Audiovisual, Book, BookChapter, Collection, ComputationalNotebook, ConferencePaper, ConferenceProceeding, DataPaper, Dataset, Dissertation, Event, Image, InteractiveResource, Journal, JournalArticle, Model, OutputManagementPlan, PeerReview, PhysicalObject, Preprint, Report, Service, Software, Sound, Standard, Text, Workflow, and Other.  
+**relatedIdentifierType**: Type of the RelatedIdentifier. Available from ARK, arXiv, bibcode, DOI, EAN13, EISSN, Handle, IGSN, ISBN, ISSN, ISTC, LISSN, LSID, PMID, PURL, UPC, URL, URN, and w3id.
 ```{r}
 datapackage$add_relatedIdentifiers(relationType = c("IsSupplementTo"),
                                    relatedIdentifier =as.character(c("https://doi.xxxx")) ,
@@ -248,17 +252,18 @@ datapackage$add_relatedIdentifiers(relationType = c("IsSupplementTo"),
 
 **3-2-3.Properties**  
 The "set_properties()" function can be used to list some additional information about the "datapackage" as metadata. The values can be used as shown below;  
-directory: Working directory.  
-name: Identifier of the resource.  
-id: A property reserved for globally unique identifiers. (e.g., UUID and DOI)
-description: Description of "datapackage".  
-version: The Camtrap DP version of "datapackage". The default is "1.0.1".  
-profile: Profile of the resource. The dafault is "https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json".  
-keywords: Keywords of "datapackage".  
-image: A URL or Path of an image for "datapackage".  
-homepage: A URL for the home on the web that is related to "datapackage".  
-bibliographicCitation: A bibliographical reference for the resource.  
-coordinatePrecision: Least precise coordinate precision of the latitude and longitude of "deployment".
+
+**directory**: Working directory.  
+**name**: Identifier of the resource.  
+**id**: A property reserved for globally unique identifiers. (e.g., UUID and DOI)
+**description**: Description of "datapackage".  
+**version**: The Camtrap DP version of "datapackage". The default is "1.0.1".  
+**profile**: Profile of the resource. The dafault is "https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json".  
+**keywords**: Keywords of "datapackage".  
+**image**: A URL or Path of an image for "datapackage".  
+**homepage**: A URL for the home on the web that is related to "datapackage".  
+**bibliographicCitation**: A bibliographical reference for the resource.  
+**coordinatePrecision**: Least precise coordinate precision of the latitude and longitude of "deployment".
 ```{r}
 datapackage$set_properties(name=c("Testdata-NIES"),
                            homepage = c("https://www.nies.go.jp/biology/snapshot_japan/index.html"))
