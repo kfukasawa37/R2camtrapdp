@@ -131,12 +131,12 @@ observations<-create_observations(observationID=observationID,
 ```
 
 ## Create datapackages
-##1.Create an R6 object with named "datapackage"
+###1.Create an R6 object with named "datapackage"
 ```{r}
 datapackage<-R6_CamtrapDP$new()
 ```
 
-##2.Import tibble data (deployment, media and observation) into "datapackage"
+###2.Import tibble data (deployment, media and observation) into "datapackage"
 The functions "set_deployments()", "set_media()", and "set_observations()" can be used as below;
 ```{r}
 #set deployments
@@ -148,11 +148,11 @@ datapackage$set_observations(observations)
 
 ```
 
-##3.Import metadata (e.g., contributors, licences, and properties) into "datapackage"
+###3.Import metadata (e.g., contributors, licences, and properties) into "datapackage"
 For the metadata of Camera Trap Data Package (Camtrap DP), five properties (contributors, project, spatial, temporal and taxonomic, and created) are required. In addition, six properties can be used for additional information of metadata.
 
-##3-1.Required Properties
-##3-1-1.Contributors
+###3-1.Required Properties
+####3-1-1.Contributors
 The function "add_contributors()" can be used to import a data frame of contributors. The contributor data frame consists of title, email, path, role, and organization.
 title: Name of contributor
 email: e-mail address of contributor
@@ -171,19 +171,19 @@ datapackage$add_contributors(cd)
 
 ```
 
-##3-1-2.Project
+####3-1-2.Project
 The information of Camera trap project or study that originated the package. For project, title, samplingDesign, captureMethod, individualAnimals, and observationLevel are need to be filled in. In addition, id, acronym, description, path are available as additional information.
-[Required information]
-title: Title of the project
-samplingDesign: Type of sampling design/layout. The values can be used from simpleRandom, systematicRandom, clusteredRandom, experimental, targeted, or opportunistic.
-captureMethod: Method used to capture the media files, values activityDetection or timeLapse can be used.
-individualAnimals: true if the project includes marked or recognizable individuals.
-observationLevel: Level at which observations are provided, values media or event can be used.
-[Additional information]
-id: Unique identifier of the project.
-acronym: Project acronym.
-description: Description of the project.
-path: Path for project website.
+**[Required information]**
+*title: Title of the project
+*samplingDesign: Type of sampling design/layout. The values can be used from simpleRandom, systematicRandom, clusteredRandom, experimental, targeted, or opportunistic.
+*captureMethod: Method used to capture the media files, values activityDetection or timeLapse can be used.
+*individualAnimals: true if the project includes marked or recognizable individuals.
+*observationLevel: Level at which observations are provided, values media or event can be used.
+**[Additional information]**
+*id: Unique identifier of the project.
+*acronym: Project acronym.
+*description: Description of the project.
+*path: Path for project website.  
 The function "set_project()" can be used to import for project into "datapackage".
 ```{r}
 datapackage$set_project(title=c("TestdatainNIES"),
@@ -193,21 +193,21 @@ datapackage$set_project(title=c("TestdatainNIES"),
                         observationLevel = c("media"))
 ```
 
-##3-1-3.Spatial and temporal
+####3-1-3.Spatial and temporal
 Spatial and temporal coverage of the "package".
 The function "set_st()" collects spatial and temporal data from "deployment" and can be imported into "datapackage".
 ```{r}
 datapackage$set_st()
 ```
 
-##3-1-4.Taxonomic
+####3-1-4.Taxonomic
 Taxonomic coverage of the "datapackage", based on the unique "scientificName" of "observation".
 The "set_taxon()" function lists scientific name of observation and collect taxonID from taxon data base (express as taxonDB). For default, taxonDB is "itis" and taxonDBurl (An URL to taxon data base) is "https://www.itis.gov/". You can use other taxonDB and taxonDBurl (see details in "taxadb::get_ids").
 ```{r}
 datapackage$set_taxon()
 ```
 
-##3-1-5.Created
+####3-1-5.Created
 The datetime on which "datapackage" was created.
 The "update_created()" function gets the current datetime from system time and can be update the datetime on which "datapackage" was created.
 ```{r}
@@ -217,8 +217,8 @@ tz="Japan"
 datapackage$update_created()
 ```
 
-##3-2.Additional properties
-##3-2-1.Licenses
+###3-2.Additional properties
+####3-2-1.Licenses
 The information of licenses related to "datapackage" can be listed as metadata. If provide, "Camtrap DP" further requires at least a license for content of the "package" and one for the media files. The function "add_license()" can be used as below,
 ```{r}
 datapackage$add_license(name=c("CC-BY-4.0"),
@@ -230,10 +230,10 @@ datapackage$add_license(name=c("CC-BY-4.0"),
 ```
 Note that this function need to use for each license information.
 
-##3-2-2.Related Identifiers
+####3-2-2.Related Identifiers
 Identifiers of resources related to the "package" (e.g., papers, project pages, derived datasets, APIs etc.).
 The function "add_relatedIdentifiers()" can be used to import related identifiers. The related identifiers need to set relationType, relatedIdentifier, resourceTypeGeneral, and relatedIdentifierType.
-relationType: Description of the relationship between the resource (the "package") and the related resource. Available from IsCitedBy, Cites, IsSupplementTo, IsSupplementedBy, IsContinuedBy, Continues, IsNewVersionOf, IsPreviousVersionOf, IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsDocumentedBy, Documents, IsCompiledBy, Compiles, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, HasMetadata, IsMetadataFor, Reviews, IsReviewedBy, IsDerivedFrom, IsSourceOf, Describes, IsDescribedBy, HasVersion, IsVersionOf, Requires, IsRequiredBy, Obsoletes, or IsObsoletedBy.
+*relationType: Description of the relationship between the resource (the "package") and the related resource. Available from IsCitedBy, Cites, IsSupplementTo, IsSupplementedBy, IsContinuedBy, Continues, IsNewVersionOf, IsPreviousVersionOf, IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsDocumentedBy, Documents, IsCompiledBy, Compiles, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, HasMetadata, IsMetadataFor, Reviews, IsReviewedBy, IsDerivedFrom, IsSourceOf, Describes, IsDescribedBy, HasVersion, IsVersionOf, Requires, IsRequiredBy, Obsoletes, or IsObsoletedBy.
 relatedIdentifier: Unique identifier of the related resource (e.g., a DOI or URL).
 resourceTypeGeneral: General type of the related resource. Available from  Audiovisual, Book, BookChapter, Collection, ComputationalNotebook, ConferencePaper, ConferenceProceeding, DataPaper, Dataset, Dissertation, Event, Image, InteractiveResource, Journal, JournalArticle, Model, OutputManagementPlan, PeerReview, PhysicalObject, Preprint, Report, Service, Software, Sound, Standard, Text, Workflow, and Other.
 relatedIdentifierType: Type of the RelatedIdentifier. Available from ARK, arXiv, bibcode, DOI, EAN13, EISSN, Handle, IGSN, ISBN, ISSN, ISTC, LISSN, LSID, PMID, PURL, UPC, URL, URN, and w3id.
@@ -244,7 +244,7 @@ datapackage$add_relatedIdentifiers(relationType = c("IsSupplementTo"),
                                    resourceTypeGeneral = c("JournalArticle"))
 ```
 
-##3-2-3.Properties
+####3-2-3.Properties
 The "set_properties()" function can be used to list some additional information about the "datapackage" as metadata. The values can be used as shown below;
 directory: Working directory.
 name: Identifier of the resource.
@@ -262,19 +262,19 @@ datapackage$set_properties(name=c("Testdata-NIES"),
                            homepage = c("https://www.nies.go.jp/biology/snapshot_japan/index.html"))
 ```
 
-##3-2-4.Source
+####3-2-4.Source
 The "add_sources()" function can be used to list the sources of "datapackage". The values of title (title of the sources), path (path or URL to the source), email (an email address), and version (the version of "datapackage") are available for this function.
 ```{r}
 datapackage$add_sources(title=c("TestdatainNIES"))
 ```
 
-##3-2-5.Reference
+####3-2-5.Reference
 List of references related to the "package". References preferably include a DOI.
 ```{r}
 datapackage$add_references(reference=c("TestdatainNIES https://doi.org/xxxxx"))
 ```
 
-##3-2-6.Custom Information
+####3-2-6.Custom Information
 If you have some of the "datapackage" information as metadata, but it is not listed in the above sections, the "set_custom()" function will help. This function can be used to list new data from a data frame, and the values of name, description , and of course data frame are required. 
 For example,suppose you have a data frame for estimating animal abundance based on the REST method. The code is as follows, 
 ```{r}
@@ -287,14 +287,12 @@ datapackage$set_custom(name=c("REST"),
                        data=RD)
 ```
 
-##4.Convert and output as Camtrap DP object
+###4.Convert and output as Camtrap DP object
 The R6class object (i.e., "datapackage") can be converted to the Camtrap DP object using the "out_camtrapdp()" function, as shown below,  
 ```{r}
 data_camtrapdp<-datapackage$out_camtrapdp()
 ```
 If you want, "datapackage" can be converted to the Camtrap DP object and created in the directory (described by path), as shown below,  
-```{r}
-\dontrun{
-  datapackage$out_camtrapdp(write=T,directory=path)
-}
+```{r, eval=FALSE}
+datapackage$out_camtrapdp(write=T,directory=path)
 ```
