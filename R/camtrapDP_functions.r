@@ -941,7 +941,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							set_custom = function(name,description,data){
 								resource=list(name=name,description=description,data=data)
 								nlist<-length(self$resources)
-								if(is.element(c("deployments","media","observations"),sapply(self$resources,"[[","name"))){
+								if(!all(is.element(c("deployments","media","observations"),sapply(self$resources,"[[","name")))){
 									stop("Add deployments, media and obervations prior to adding custom datasets")
 								}
 								self$resources[[nlist+1]]<-resource
@@ -1228,7 +1228,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @return \code{camtrapdp} object 
 							#' 
 							out_camtrapdp=function(write=FALSE,directory=NULL){
-								outname<-c("resources","profile","name","id","created","title","contributors","description","version","keywords","image","homepage","sources","licences","bibliographicCitation","project","coordinatePrecision","spatial","temporal","taxonomic","relatedIdentifiers","references","directory","data")
+								outname<-c("resources","profile","name","id","created","title","contributors","description","version","keywords","image","homepage","sources","licenses","bibliographicCitation","project","coordinatePrecision","spatial","temporal","taxonomic","relatedIdentifiers","references","directory","data")
 								nout<-length(outname)
 								dp<-vector("list",nout);names(dp)<-outname
 								for(i in 1:nout){
