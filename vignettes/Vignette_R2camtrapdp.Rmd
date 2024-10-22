@@ -294,5 +294,7 @@ data_camtrapdp<-datapackage$out_camtrapdp()
 ```
 If you want, "datapackage" can be converted to the Camtrap DP object and created in the directory (described by path), as shown below,  
 ```{r}
-datapackage$out_camtrapdp(write=T,directory=path)
+\dontrun{
+  datapackage$out_camtrapdp(write=T,directory=path)
+}
 ```
