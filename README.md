@@ -12,15 +12,15 @@ You can install the development version of R2camtrapdp like so:
 
 ``` r
 #install.packages("devtools")
-devtools::install_github("kfukasawa37/R2camtrapdp")
+devtools::install_github("kfukasawa37/R2camtrapdp",build_vignettes = TRUE)
 ```
 
-## Example
+## Vignette
 
-(Coming soon)
+R2camtrapdp has a vignette to give details of the functions of this package. 
 
 ``` r
 library(R2camtrapdp)
-## basic example code
+vignette("Vignette_R2camtrapdp")
 ```
 
