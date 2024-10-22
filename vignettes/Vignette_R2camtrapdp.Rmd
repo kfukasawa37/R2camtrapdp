@@ -154,7 +154,7 @@ For the metadata of Camera Trap Data Package (Camtrap DP), five properties (cont
 **3-1.Required Properties**  
 **3-1-1.Contributors**  
 The function "add_contributors()" can be used to import a data frame of contributors. The contributor data frame consists of title, email, path, role, and organization.  
-|values |     |
+|Values|Description|  
 |:------|-----|  
 |title  |Name of contributor|    
 |email  |e-mail address of contributor|  
