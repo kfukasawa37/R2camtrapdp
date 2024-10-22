@@ -4,9 +4,38 @@
 #' @import lubridate
 #' @import tibble
 #' @return A tibble of deployments.
+#' @param deploymentID Unique identifier of the deployment
+#' @param latitude Latitude of the deployment location in decimal degrees, using the WGS84 datum
+#' @param longitude Longitude of the deployment location in decimal degrees, using the WGS84 datum
+#' @param deploymentStart Date and time at which the deployment was started
+#' @param deploymentStart_date Date at which the deployment was started
+#' @param deploymentStart_time Time at which the deployment was started
+#' @param deploymentEnd Date and time at which the deployment was ended
+#' @param deploymentEnd_date Date at which the deployment was ended
+#' @param deploymentEnd_time Time at which the deployment was ended
+#' @param locationID Identifier of the deployment location
+#' @param locationName Name given to the deployment location
+#' @param coordinateUncertainty Horizontal distance from the given latitude and longitude describing the smallest circle containing the deployment location
+#' @param setupBy Name or identifier of the person or organization that deployed the camera
+#' @param cameraID Identifier of the camera used for the deployment
+#' @param cameraModel Manufacturer and model of the camera
+#' @param cameraDelay Predefined duration after detection when further activity is ignored
+#' @param cameraHeight Height at which the camera was deployed
+#' @param cameraDepth Depth at which the camera was deployed
+#' @param cameraTilt Angle at which the camera was deployed in the vertical plane
+#' @param cameraHeading Angle at which the camera was deployed in the horizontal plane
+#' @param detectionDistance Maximum distance at which the camera can reliably detect activity
+#' @param timestampIssues true if timestamps in the media resource for the deployment are known to have unsolvable issues
+#' @param baitUse true if bait was used for the deployment
+#' @param featureType Type of the feature associated with the deployment
+#' @param habitat Short characterization of the habitat at the deployment location
+#' @param deploymentGroups Deployment groups associated with the deployment
+#' @param deploymentTags Tags associated with the deployment
+#' @param deploymentComments Comments or notes about the deployment
+#' @param tz Deployment time zone
 #' @export
 #' 
-create_deployments<-function(deploymentID,
+create_deployments<-function( deploymentID,
 					latitude,
 					longitude,
 					deploymentStart=NULL,
@@ -254,9 +283,24 @@ create_deployments<-function(deploymentID,
 #' @import tibble
 #' @importFrom dplyr distinct
 #' @return A tibble of media.
+#' @param mediaID Unique identifier of the media file
+#' @param deploymentID Identifier of the deployment the media file belongs to
+#' @param timestamp Date and time at which the media file was recorded
+#' @param timestamp_date Date at which the media file was recorded
+#' @param timestamp_time Time at which the media file was recorded
+#' @param filePath URL or relative path to the media file, respectively for externally hosted files or files that are part of the package
+#' @param filePublic false if the media file is not publicly accessible
+#' @param fileMediatype Mediatype of the media file. Expressed as an IANA Media Type
+#' @param fileName Name of the media file
+#' @param captureMethod Method used to capture the media file
+#' @param exifData EXIF data of the media file
+#' @param favorite true if the media file is deemed of interest
+#' @param mediaComments Comments or notes about the media file
+#' @param tz Time zone of the media file was recorded
+#' @param omitduplicate true if duplicate exclusion 
 #' @export
 #' 
-create_media<-function(	mediaID,
+create_media<-function( mediaID,
 							deploymentID,
 							timestamp=NULL,
 							timestamp_date=NULL,
@@ -382,6 +426,40 @@ create_media<-function(	mediaID,
 #' @import tibble
 #' @importFrom dplyr distinct
 #' @return A tibble of observations.
+#' @param observationID Unique identifier of the observation
+#' @param deploymentID Identifier of the deployment the observation belongs to
+#' @param mediaID Identifier of the media file that was classified
+#' @param eventID Identifier of the event the observation belongs to
+#' @param eventStart Date and time at which the event started
+#' @param eventStart_date Date at which the event started
+#' @param eventStart_time Time at which the event started
+#' @param eventEnd Date and time at which the event ended
+#' @param eventEnd_date Date at which the event ended
+#' @param eventEnd_time Time at which the event ended
+#' @param observationLevel Level at which the observation was classified
+#' @param observationType Type of the observation
+#' @param cameraSetupType Type of the camera setup action associated with the observation
+#' @param scientificName Scientific name of the observed individual
+#' @param count Number of observed individuals
+#' @param lifeStage Age class or life stage of the observed individual
+#' @param sex Sex of the observed individual
+#' @param behavior Dominant behavior of the observed individual
+#' @param individualID Identifier of the observed individual
+#' @param individualPositionRadius Distance from the camera to the observed individual identified by individualID
+#' @param individualPositionAngle Angular distance from the camera view centerline to the observed individual identified by individualID
+#' @param individualSpeed Average movement speed of the observed individual identified by individualID
+#' @param bboxX Horizontal position of the top-left corner of a bounding box
+#' @param bboxY Vertical position of the top-left corner of a bounding box
+#' @param bboxWidth Width of a bounding box
+#' @param bboxHeight Height of the bounding box
+#' @param classificationMethod Method used to classify the observation
+#' @param classifiedBy Name or identifier of the person or AI algorithm that classified the observation
+#' @param classificationTimestamp Date and time of the classification
+#' @param classificationProbability Degree of certainty of the classification
+#' @param observationTags Tags associated with the observation
+#' @param observationComments Comments or notes about the observation
+#' @param tz Time zone of observation
+#' @param omitduplicate true if duplicate exclusion
 #' @export
 #' 
 create_observations<-function(	observationID,
@@ -689,9 +767,34 @@ create_observations<-function(	observationID,
 #' @description
 #' R6 class including metadata, deployments, media and observations.
 #' @import R6
-#' @export
+#' @export 
 R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
-			public = list(	resources=list(),
+			public = list(
+			  #' @field resources is the package data resources
+			  #' @field profile of the resource
+			  #' @field name Identifier of the resource
+			  #' @field id A property reserved for globally unique identifiers e.g., UUID and DOI
+			  #' @field created The datetime on which this Data Package was created
+			  #' @field title Title of this Data Package
+			  #' @field contributors The people or organizations who contributed to this Data Package
+			  #' @field description Description of this Data Package
+			  #' @field version The version of this Data Package
+			  #' @field keywords Keywords of this Data Package
+			  #' @field image A URL or Path of an image for this Data Package
+			  #' @field homepage A URL for the home on the web that is related to this Data Package
+			  #' @field sources A row sources for this Data Package
+			  #' @field licenses The licenses under which the Data Package is provided
+			  #' @field bibliographicCitation A bibliographical reference for the resource
+			  #' @field project Camera trap project or study that originated this Data package
+			  #' @field coordinatePrecision Least precise coordinate precision of the deployments.latitude and deployments.longitude
+			  #' @field spatial Spatial coverage of this Data Package, expressed as GeoJSON
+			  #' @field temporal Temporal coverage of this Data Package
+			  #' @field taxonomic Taxonomic coverage of this Data Package, based on the unique observations.scientificName
+			  #' @field relatedIdentifiers Identifiers of resources related to this Data Package
+			  #' @field references List of references related to this Data Package
+			  #' @field directory Directory of this Data Package
+			  #' @field data Observation, Media and Deployments which consist this Data Package
+			        resources=list(),
 							profile=NULL,
 							name=NULL,
 							id=NULL,
@@ -718,6 +821,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Creates new instance of R6_CamtrapDP class.
 							#' @param tz Time zone.
+							#' @param ... parameters
 							#' 
 							initialize = function(tz="Japan",...){
 								self$update_created(tz=tz)
@@ -735,6 +839,16 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Sets properties of R6_CamtrapDP class.
 							#' @param directory Directory of datapackage.
+							#' @param name Identifier of the resource
+							#' @param id A property reserved for globally unique identifiers e.g., UUID and DOI
+							#' @param description Description of this Data Package
+							#' @param version The version of this Data Package
+							#' @param profile Profile of the resource
+							#' @param keywords Keywords of this Data Package
+							#' @param image A URL or Path of an image for this Data Package
+							#' @param homepage A URL for the home on the web that is related to this Data Package
+							#' @param bibliographicCitation A bibliographical reference for the resource
+							#' @param coordinatePrecision Least precise coordinate precision of the deployments.latitude and deployments.longitude
 							#' 
 							set_properties = function(directory=getwd(),name=NULL,id=NULL,description=NULL,profile="https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json",version="1.0.1",keywords=NULL,image=NULL,homepage=NULL,bibliographicCitation=NULL,coordinatePrecision=NULL){
 								self$name<-name
@@ -752,6 +866,12 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Sets deployments of R6_CamtrapDP class.
 							#' @param data Deployments dataset.
+							#' @param path Path or URL to the data file
+							#' @param profile Profile of deployments
+							#' @param format Format of deployments data
+							#' @param mediatype Media type of deployments data
+							#' @param encoding Encpding of deployments data
+							#' @param schema URL of the used Camtrap DP Table Schema version
 							#' 
 							set_deployments = function(	data,
 														path="deployments.csv",
@@ -769,6 +889,12 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Sets media of R6_CamtrapDP class.
 							#' @param data Media dataset.
+							#' @param path Path or URL to the data file
+							#' @param profile Profile of media data
+							#' @param format Format of media data
+							#' @param mediatype Mediatype of media data
+							#' @param encoding Encoding of media data
+							#' @param schema URL of the used Camtrap DP Table Schema version
 							#' 
 							set_media = function(	data,
 														path="media.csv",
@@ -786,6 +912,12 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Sets observations of R6_CamtrapDP class.
 							#' @param data Observations dataset.
+							#' @param path Path of URL to the data file
+							#' @param profile Profile of observations
+							#' @param format Format of observation data
+							#' @param mediatype Mediatype of observation data
+							#' @param encoding Encoding of observation data
+							#' @param schema URL of the used Camtrap DP Table Schema version
 							#' 
 							set_observations = function(	data,
 														path="observations.csv",
@@ -879,6 +1011,9 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Add sources of R6_CamtrapDP class.
 							#' @param title Title of sources.
+							#' @param path Path or URL to the source
+							#' @param email An email address
+							#' @param version The version of this Data Package
 							#' 
 							add_sources = function(title,path=NULL,email=NULL,version=NULL){
 								if(is.null(self$sources)){
@@ -906,6 +1041,8 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' Add license of R6_CamtrapDP class.
 							#' @param name Name of license.
 							#' @param scope scope of license ("data" or "media").
+							#' @param path A URL or path to the details of license
+							#' @param title A title of license
 							#' 
 							add_license=function(name,scope,path=NULL,title=NULL){
 								if(!grepl("^(data|media)$",scope)){
@@ -935,6 +1072,10 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @param captureMethod Capture method. Either "(activityDetection|timeLapse)".
 							#' @param individualAnimals Logical indicating whether the individuals are recognized.
 							#' @param observationLevel Observation level. Either "(media|event)".
+							#' @param id Unique identifier of the project
+							#' @param acronym Project acronym
+							#' @param description Description of the project
+							#' @param path Project website
 							#' 
 							set_project=function(title,samplingDesign,captureMethod,individualAnimals,observationLevel,id=NULL,acronym=NULL,description=NULL,path=NULL){
 								if(!grepl("^(simpleRandom|systematicRandom|clusteredRandom|experimental|targeted|opportunistic)$",samplingDesign)){
@@ -1009,6 +1150,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @importFrom tibble tibble
 							#' @importFrom dplyr mutate left_join
 							#' @import magrittr
+							#' @param taxonDBurl An URL to taxon data base
 							#' 
 							set_taxon=function(taxonDB="itis",taxonDBurl="https://www.itis.gov/"){
 								if(is.null(self$data$observations)){
@@ -1039,6 +1181,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @param relationType Type of relation. Either "^(IsCitedBy|Cites|IsSupplementTo|IsSupplementedBy|IsContinuedBy|Continues|IsNewVersionOf|IsPreviousVersionOf|IsPartOf|HasPart|IsPublishedIn|IsReferencedBy|References|IsDocumentedBy|Documents|IsCompiledBy|Compiles|IsVariantFormOf|IsOriginalFormOf|IsIdenticalTo|HasMetadata|IsMetadataFor|Reviews|IsReviewedBy|IsDerivedFrom|IsSourceOf|Describes|IsDescribedBy|HasVersion|IsVersionOf|Requires|IsRequiredBy|Obsoletes|IsObsoletedBy)$".
 							#' @param relatedIdentifier Related identifier.
 							#' @param relatedIdentifierType Type of related identifier. Either "^(ARK|arXiv|bibcode|DOI|EAN13|EISSN|Handle|IGSN|ISBN|ISSN|ISTC|LISSN|LSID|PMID|PURL|UPC|URL|URN|w3id)$".
+							#' @param resourceTypeGeneral General type of the related resource
 							#'  
 							add_relatedIdentifiers=function(relationType,relatedIdentifier,relatedIdentifierType,resourceTypeGeneral=NULL){
 								if(!grepl("^(IsCitedBy|Cites|IsSupplementTo|IsSupplementedBy|IsContinuedBy|Continues|IsNewVersionOf|IsPreviousVersionOf|IsPartOf|HasPart|IsPublishedIn|IsReferencedBy|References|IsDocumentedBy|Documents|IsCompiledBy|Compiles|IsVariantFormOf|IsOriginalFormOf|IsIdenticalTo|HasMetadata|IsMetadataFor|Reviews|IsReviewedBy|IsDerivedFrom|IsSourceOf|Describes|IsDescribedBy|HasVersion|IsVersionOf|Requires|IsRequiredBy|Obsoletes|IsObsoletedBy)$",relationType)){
@@ -1078,6 +1221,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @description
 							#' Exports \code{camtrapdp} object and datapackage.
 							#' @param write If TRUE, datapackage is written to \code{directory}.
+							#' @param directory Path to the directory where new data packages will save
 							#' @import camtrapdp
 							#' @importFrom jsonlite toJSON
 							#' @importFrom readr write_csv
@@ -1134,5 +1278,3 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							}
 						)
 )
-
-

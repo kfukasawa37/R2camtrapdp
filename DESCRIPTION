@@ -15,8 +15,15 @@ Imports:
     camtrapdp,
     dplyr,
     jsonlite,
+    lubridate,
     magrittr,
     R6,
     readr,
     taxadb,
     tibble
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)
