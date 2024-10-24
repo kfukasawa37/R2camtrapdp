@@ -1145,8 +1145,8 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Sets taxonomic of R6_CamtrapDP class.
-							#' @param taxonDB Name of taxon data base passed to \code{taxadb::get_ids()}.
-							#' @importFrom taxadb get_ids
+							#' @param taxonDB Name of taxon data base passed to \code{taxadb::get_ids()} and \code{taxadb::filter_name()}.
+							#' @importFrom taxadb get_ids filter_name
 							#' @importFrom tibble tibble
 							#' @importFrom dplyr mutate left_join
 							#' @import magrittr
