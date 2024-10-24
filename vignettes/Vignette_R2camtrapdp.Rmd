@@ -207,7 +207,7 @@ datapackage$set_st()
 
 **3-1-4.Taxonomic**  
 Taxonomic coverage of the "datapackage", based on the unique "scientificName" of "observation".  
-The "set_taxon()" function lists scientific name of observation and collect taxonID from taxon data base (express as taxonDB). For default, taxonDB is "itis" and taxonDBurl (An URL to taxon data base) is "https://www.itis.gov/". You can use other taxonDB and taxonDBurl (see details in "taxadb::get_ids").
+The "set_taxon()" function lists scientific name of observation and collect taxonID, taxonRank, kingdom, phylum, class, order, family, and genus from taxon data base (express as taxonDB). For default, taxonDB is "gbif". You can use other taxonDB (see details in "taxadb::get_ids").
 ```{r}
 datapackage$set_taxon()
 ```

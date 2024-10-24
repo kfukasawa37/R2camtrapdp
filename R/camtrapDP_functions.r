@@ -1145,35 +1145,42 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							},
 							#' @description
 							#' Sets taxonomic of R6_CamtrapDP class.
-							#' @param taxonDB Name of taxon data base passed to \code{taxadb::get_ids()}.
-							#' @importFrom taxadb get_ids
+							#' @param taxonDB Name of taxon data base passed to \code{taxadb::get_ids()} and \code{taxadb::filter_name()}.
+							#' @importFrom taxadb get_ids filter_name
 							#' @importFrom tibble tibble
 							#' @importFrom dplyr mutate left_join
 							#' @import magrittr
-							#' @param taxonDBurl An URL to taxon data base
 							#' 
-							set_taxon=function(taxonDB="itis",taxonDBurl="https://www.itis.gov/"){
+							set_taxon=function(taxonDB="gbif"){
 								if(is.null(self$data$observations)){
 									stop("'observations' should be registered.")
 								}
 								sciname<-self$data$observations$scientificName
-								unique.sciname<-unique(sciname)
+								unique.sciname<-unique(sciname)%>%na.omit()
 								taxonIDtable<-tibble::tibble(sciname=unique.sciname)%>%
-									dplyr::mutate(id=taxadb::get_ids(sciname,taxonDB,format="bare"))
-								taxonIDtableclean<-na.omit(taxonIDtable)
-								ntaxa<-nrow(taxonIDtableclean)
+									dplyr::mutate(id=taxadb::get_ids(sciname,taxonDB,format="uri"))
+								taxonHigher<-taxadb::filter_name(unique.sciname,taxonDB)
+								colnames(taxonHigher)[2]<-"sciname"
+								ntaxa<-length(unique.sciname)
 
-								taxonIDjoin<-tibble(sciname=sciname)%>%
-								  dplyr::left_join(taxonIDtable,by="sciname")
+								taxonIDjoin<-tibble(sciname=unique.sciname)%>%
+								  dplyr::left_join(taxonIDtable,by="sciname")%>%
+								  left_join(taxonHigher,by="sciname")
 
 								taxonID<-taxonIDjoin$id
 
 								self$taxonomic<-vector("list",ntaxa)
 								for(i in 1:ntaxa){
 									self$taxonomic[[i]]<-list()
-									self$taxonomic[[i]]$taxonID<-taxonIDtableclean$id[i]
-									self$taxonomic[[i]]$taxonIDReference<-taxonDBurl
-									self$taxonomic[[i]]$scientificName<-taxonIDtableclean$sciname[i]
+									self$taxonomic[[i]]$taxonID<-taxonIDjoin$id[i]
+									self$taxonomic[[i]]$scientificName<-taxonIDjoin$sciname[i]
+									self$taxonomic[[i]]$taxonRank<-taxonIDjoin$taxonRank[i]
+									self$taxonomic[[i]]$kingdom<-taxonIDjoin$kingdom[i]
+									self$taxonomic[[i]]$phylum<-taxonIDjoin$phylum[i]
+									self$taxonomic[[i]]$class<-taxonIDjoin$class[i]
+									self$taxonomic[[i]]$order<-taxonIDjoin$order[i]
+									self$taxonomic[[i]]$family<-taxonIDjoin$family[i]
+									self$taxonomic[[i]]$family<-taxonIDjoin$genus[i]
 								}
 							},
 							#' @description

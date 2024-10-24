@@ -425,15 +425,13 @@ Sets spatial and temporal of R6_CamtrapDP class.
 \subsection{Method \code{set_taxon()}}{
 Sets taxonomic of R6_CamtrapDP class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{R6_CamtrapDP$set_taxon(taxonDB = "itis", taxonDBurl = "https://www.itis.gov/")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{R6_CamtrapDP$set_taxon(taxonDB = "gbif")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{taxonDB}}{Name of taxon data base passed to \code{taxadb::get_ids()}.}
-
-\item{\code{taxonDBurl}}{An URL to taxon data base}
+\item{\code{taxonDB}}{Name of taxon data base passed to \code{taxadb::get_ids()} and \code{taxadb::filter_name()}.}
 }
 \if{html}{\out{</div>}}
 }
