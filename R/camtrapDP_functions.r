@@ -1180,7 +1180,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 									self$taxonomic[[i]]$class<-taxonIDjoin$class[i]
 									self$taxonomic[[i]]$order<-taxonIDjoin$order[i]
 									self$taxonomic[[i]]$family<-taxonIDjoin$family[i]
-									self$taxonomic[[i]]$family<-taxonIDjoin$genus[i]
+									self$taxonomic[[i]]$genus<-taxonIDjoin$genus[i]
 								}
 							},
 							#' @description
