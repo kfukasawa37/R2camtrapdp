@@ -1148,27 +1148,36 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @param taxonDB Name of taxon data base passed to \code{taxadb::get_ids()} and \code{taxadb::filter_name()}.
 							#' @importFrom taxadb get_ids filter_name
 							#' @importFrom tibble tibble
-							#' @importFrom dplyr mutate left_join
+							#' @importFrom dplyr mutate left_join select group_by bind_cols
+							#' @importFrom tidyr nest unnest
+							#' @importFrom purrr map
 							#' @import magrittr
 							#' 
 							set_taxon=function(taxonDB="gbif"){
 								if(is.null(self$data$observations)){
 									stop("'observations' should be registered.")
 								}
+							  if(!is.element(taxonDB,c("gbif","itis","ncbi"))){
+							    stop("Only supports 'gbif','itis' and 'ncbi'.")
+							  }
+							  uritemplate<-sub("[0-9].*$","",taxadb::get_ids("Homo sapiens",taxonDB,format="uri"))
 								sciname<-self$data$observations$scientificName
 								unique.sciname<-unique(sciname)%>%na.omit()
-								taxonIDtable<-tibble::tibble(sciname=unique.sciname)%>%
-									dplyr::mutate(id=taxadb::get_ids(sciname,taxonDB,format="uri"))
-								taxonHigher<-taxadb::filter_name(unique.sciname,taxonDB)
-								colnames(taxonHigher)[2]<-"sciname"
 								ntaxa<-length(unique.sciname)
+								unique.sciname.clean<-sub(" sp\\.$","",unique.sciname)
+								taxonIDtable<-taxadb::filter_name(unique.sciname.clean,taxonDB)%>%dplyr::group_by(scientificName)%>%
+								                tidyr::nest()%>%
+								                dplyr::mutate(data2=purrr::map(data,~dplyr::arrange(.,.$taxonomicStatus)[1,]))%>%
+								                dplyr::select(-data)%>%
+								                tidyr::unnest(cols=data2)
+								colnames(taxonIDtable)[1]<-"sciname.clean"
+								
+								taxonIDtable<-tibble(sciname=unique.sciname,sciname.clean=unique.sciname.clean)%>%left_join(taxonIDtable,by="sciname.clean")
+								taxonID<-paste0(uritemplate,sub("^.*\\:","",taxonIDtable$taxonID))
 
-								taxonIDjoin<-tibble(sciname=unique.sciname)%>%
-								  dplyr::left_join(taxonIDtable,by="sciname")%>%
-								  left_join(taxonHigher,by="sciname")
+								taxonIDjoin<-taxonIDtable%>%dplyr::bind_cols(id=taxonID)
 
-								taxonID<-taxonIDjoin$id
-
+ 
 								self$taxonomic<-vector("list",ntaxa)
 								for(i in 1:ntaxa){
 									self$taxonomic[[i]]<-list()
