@@ -1148,7 +1148,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @param taxonDB Name of taxon data base passed to \code{taxadb::get_ids()} and \code{taxadb::filter_name()}.
 							#' @importFrom taxadb get_ids filter_name
 							#' @importFrom tibble tibble
-							#' @importFrom dplyr mutate left_join select group_by
+							#' @importFrom dplyr mutate left_join select group_by bind_cols
 							#' @importFrom tidyr nest unnest
 							#' @importFrom purrr map
 							#' @import magrittr
@@ -1173,7 +1173,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 								taxonIDtable<-tibble(sciname=unique.sciname)%>%left_join(taxonIDtable,by="sciname")
 								taxonID<-paste0(uritemplate,sub("^.*\\:","",taxonIDtable$taxonID))
 
-								taxonIDjoin<-taxonIDtable%>%bind_cols(id=taxonID)
+								taxonIDjoin<-taxonIDtable%>%dplyr::bind_cols(id=taxonID)
 
  
 								self$taxonomic<-vector("list",ntaxa)
