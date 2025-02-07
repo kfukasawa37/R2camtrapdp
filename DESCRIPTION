@@ -17,10 +17,12 @@ Imports:
     jsonlite,
     lubridate,
     magrittr,
+    purrr,
     R6,
     readr,
     taxadb,
-    tibble
+    tibble,
+    tidyr
 Suggests: 
     knitr,
     rmarkdown
