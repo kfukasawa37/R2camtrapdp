@@ -1164,14 +1164,15 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 								sciname<-self$data$observations$scientificName
 								unique.sciname<-unique(sciname)%>%na.omit()
 								ntaxa<-length(unique.sciname)
-								taxonIDtable<-taxadb::filter_name(unique.sciname,taxonDB)%>%dplyr::group_by(scientificName)%>%
+								unique.sciname.clean<-sub(" sp\\.$","",unique.sciname)
+								taxonIDtable<-taxadb::filter_name(unique.sciname.clean,taxonDB)%>%dplyr::group_by(scientificName)%>%
 								                tidyr::nest()%>%
 								                dplyr::mutate(data2=purrr::map(data,~dplyr::arrange(.,.$taxonomicStatus)[1,]))%>%
 								                dplyr::select(-data)%>%
 								                tidyr::unnest(cols=data2)
-								colnames(taxonIDtable)[1]<-"sciname"
+								colnames(taxonIDtable)[1]<-"sciname.clean"
 								
-								taxonIDtable<-tibble(sciname=unique.sciname)%>%left_join(taxonIDtable,by="sciname")
+								taxonIDtable<-tibble(sciname=unique.sciname,sciname.clean=unique.sciname.clean)%>%left_join(taxonIDtable,by="sciname.clean")
 								taxonID<-paste0(uritemplate,sub("^.*\\:","",taxonIDtable$taxonID))
 
 								taxonIDjoin<-taxonIDtable%>%dplyr::bind_cols(id=taxonID)
