@@ -10,14 +10,14 @@ NULL
 #' Observation data of videos which collected by a camera-trap
 #' @name Vobs
 #' @docType data
-#' @references Originally data can be used doi.xxx.xxx
+#' @references Originally data can be used from https://doi.org/10.34462/0002000233
 #' @keywords data
 NULL
 
 #' Camtrap DP objects have been created from Vdep and Vobs
 #' @name datapackageVdata
 #' @docType data
-#' @references Originally data can be used doi.xxx.xxx
+#' @references Originally data can be used from https://doi.org/10.34462/0002000233
 #' @keywords data camtrapDP
 NULL
 
