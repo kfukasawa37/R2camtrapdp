@@ -119,13 +119,16 @@ mediaID<-paste(Iobs$institutionCode,
                Iobs$locationID,
                as.numeric(factor(Vobs$filename)),
                sep="_")
+#add deployment ID
+Iobs<-Iobs%>%left_join(Idep%>%select(deploymentID,locationID),by=c("locationID"))
+
 #capture method
 capturemethod<-"activityDetection"
 nmedia<-length(mediaID)
 captureMethod<-rep(capturemethod,nmedia)
 
 #filePath
-filePath<-paste("Video")
+filePath<-paste("Image")
 
 #fileName
 fileName<-Iobs$filename
@@ -137,7 +140,7 @@ filePublic<-!grepl("ヒト",fileName)
 
 ##create media
 media<-create_media( mediaID=mediaID,
-                     deploymentID=Idep$deploymentID,
+                     deploymentID=Iobs$deploymentID,
                      timestamp_date=Iobs$date,
                      timestamp_time=Iobs$time,
                      filePath=filePath,
