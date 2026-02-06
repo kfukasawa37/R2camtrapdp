@@ -77,14 +77,14 @@ Using deployment and observation data (e.g., Vdep and Vobs), media (tibble data)
 ```{r}
 ##settings
 #media ID
-mediaID<-paste(Vobs$institutionCode,
+mediaIDv<-paste(Vobs$institutionCode,
                Vobs$collectionCode,
                Vobs$locationID,
                as.numeric(factor(Vobs$filename)),
                sep="_")
 #capture method
 capturemethod<-"activityDetection"
-nmedia<-length(mediaID)
+nmedia<-length(mediaIDv)
 captureMethod<-rep(capturemethod,nmedia)
 
 #filePath
@@ -99,7 +99,7 @@ fileMediatype<-paste("video",filetype,sep="/")
 filePublic<-!grepl("ヒト",fileName)
 
 ##create media
-media<-create_media( mediaID=mediaID,
+media<-create_media( mediaID=mediaIDv,
                      deploymentID=Vdep$deploymentID,
                      timestamp_date=Vobs$date,
                      timestamp_time=Vobs$time,
@@ -114,17 +114,15 @@ Using deployment and observation data (e.g., Idep and Iobs), media (tibble data)
 ```{r}
 ##settings
 #media ID
-mediaID<-paste(Iobs$institutionCode,
+mediaIDi<-paste(Iobs$institutionCode,
                Iobs$collectionCode,
                Iobs$locationID,
                as.numeric(factor(Vobs$filename)),
                sep="_")
-#add deployment ID
-Iobs<-Iobs%>%left_join(Idep%>%select(deploymentID,locationID),by=c("locationID"))
 
 #capture method
 capturemethod<-"activityDetection"
-nmedia<-length(mediaID)
+nmedia<-length(mediaIDi)
 captureMethod<-rep(capturemethod,nmedia)
 
 #filePath
@@ -139,7 +137,7 @@ fileMediatype<-paste("image",filetype,sep="/")
 filePublic<-!grepl("ヒト",fileName)
 
 ##create media
-media<-create_media( mediaID=mediaID,
+media<-create_media( mediaID=mediaIDi,
                      deploymentID=Iobs$deploymentID,
                      timestamp_date=Iobs$date,
                      timestamp_time=Iobs$time,
@@ -163,7 +161,7 @@ classificationmethod<-"human"
 classificationprobability<-1
 
 #create observationIDs that express the unique identifier of the observation 
-observationID<-paste(mediaID,Vobs$VideoID,sep="_")
+observationID<-paste(mediaIDv,Vobs$VideoID,sep="_")
 #deploymentID is belong to deployment
 deploymentID<-Vdep$deploymentID
 #mediaID is belong to media
@@ -209,7 +207,7 @@ classificationmethod<-"human"
 classificationprobability<-1
 
 #create observationIDs that express the unique identifier of the observation
-observationID<-paste(mediaID,Iobs$obsID,sep="_")
+observationID<-paste(mediaIDi,Iobs$obsID,sep="_")
 #deploymentID is belong to deployment
 deploymentID<-Vdep$deploymentID
 #eventID is belong to the event
