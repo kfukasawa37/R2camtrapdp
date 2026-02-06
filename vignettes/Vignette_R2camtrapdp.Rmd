@@ -165,7 +165,7 @@ observationID<-paste(mediaIDv,Vobs$VideoID,sep="_")
 #deploymentID is belong to deployment
 deploymentID<-Vdep$deploymentID
 #mediaID is belong to media
-mediaID<-mediaID
+mediaID<-mediaIDv
 
 #Timestamp (date and time) at which the observation started (e.g., the timestamp when the video or photo was taken)
 tz="Japan"
