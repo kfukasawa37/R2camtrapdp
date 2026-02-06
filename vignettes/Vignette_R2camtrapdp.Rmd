@@ -132,7 +132,7 @@ fileName<-Iobs$filename
 filetype<-tolower(unlist(lapply(strsplit(fileName,"\\."),"[",2)))
 
 #filePublic
-fileMediatype<-paste("Iobs",filetype,sep="/")
+fileMediatype<-paste("image",filetype,sep="/")
 filePublic<-!grepl("ヒト",fileName)
 
 ##create media
