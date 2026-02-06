@@ -21,11 +21,16 @@ library(R2camtrapdp)
 ## Data
 If you have deployment and observation data.
 ```{r}
+#for the single deployment with video data
 data("Vdep")
 data("Vobs")
+#for the multiple deployments with images data
+data("Idep")
+data("Iobs")
 ```
 
 ## Create deployment
+[Single Camera]
 Using deployment data (e.g., Vdep), deployment (tibble data) was created as below,
 ```{r}
 ##create deployment
@@ -45,8 +50,29 @@ deployments<-create_deployments(
   baitUse=Vdep$bait,
   setupBy=Vdep$setupBy)
 ```
+[Multiple Camera]
+Using deployment data (e.g., Idep), deployment (tibble data) was created as below,
+```{r}
+##create deployment
+deployments<-create_deployments(
+  deploymentID=Idep$deploymentID,
+  longitude=Idep$longitude,
+  latitude=Idep$latitude,
+  locationID=Idep$locationID,
+  deploymentStart_date=Idep$startDate,
+  deploymentStart_time=Idep$startTime,
+  deploymentEnd_date=Idep$endDate,
+  deploymentEnd_time=Idep$endTime,
+  cameraID=Idep$cameraID,
+  cameraModel=Idep$cameraModel,
+  cameraDelay=Idep$Delay,
+  cameraHeight=Idep$Height,
+  baitUse=Idep$bait,
+  setupBy=Idep$setupBy)
+```
 
 ## Create media
+[Single Camera]
 Using deployment and observation data (e.g., Vdep and Vobs), media (tibble data) was created as below,
 ```{r}
 ##settings
@@ -83,20 +109,58 @@ media<-create_media( mediaID=mediaID,
                      captureMethod="activityDetection",
                      fileName=fileName)
 ```
+[Multiple Cameras]
+Using deployment and observation data (e.g., Idep and Iobs), media (tibble data) was created as below,
+```{r}
+##settings
+#media ID
+mediaID<-paste(Iobs$institutionCode,
+               Iobs$collectionCode,
+               Iobs$locationID,
+               as.numeric(factor(Vobs$filename)),
+               sep="_")
+#capture method
+capturemethod<-"activityDetection"
+nmedia<-length(mediaID)
+captureMethod<-rep(capturemethod,nmedia)
+
+#filePath
+filePath<-paste("Video")
+
+#fileName
+fileName<-Iobs$filename
+filetype<-tolower(unlist(lapply(strsplit(fileName,"\\."),"[",2)))
+
+#filePublic
+fileMediatype<-paste("Iobs",filetype,sep="/")
+filePublic<-!grepl("ヒト",fileName)
+
+##create media
+media<-create_media( mediaID=mediaID,
+                     deploymentID=Idep$deploymentID,
+                     timestamp_date=Iobs$date,
+                     timestamp_time=Iobs$time,
+                     filePath=filePath,
+                     filePublic=filePublic,
+                     fileMediatype=fileMediatype,
+                     captureMethod="activityDetection",
+                     fileName=fileName)
+```
 
 ## Create observation
+[Single Camera]
 Using observation data (e.g., Vobs), observation (tibble data) was created as below,
 ```{r}
 #If the observations were media-based observations, observationLevel expressed as "media"
 observationLevel<-"media"
 
-#If the observations classified by human, classificationmethod expressed as "humam" 
+#If the observations classified by human, classificationmethod expressed as "human" 
 classificationmethod<-"human"
 #classificationprobability is the degree of certainty of the classification of the observed object (1=maximum certainty)
 classificationprobability<-1
 
 #create observationIDs that express the unique identifier of the observation 
-observationID<-paste(mediaID,Vobs$pictID,sep="_")
+observationID<-paste(mediaID,Vobs$VideoID,sep="_")
 #deploymentID is belong to deployment
 deploymentID<-Vdep$deploymentID
 #mediaID is belong to media
@@ -120,6 +184,57 @@ observations<-create_observations(observationID=observationID,
                                        mediaID=mediaID,
                                        eventStart=timestamp,
                                        eventEnd=timestamp,
+                                       observationLevel=observationLevel,
+                                       observationType=observationType,
+                                       scientificName=scientificName,
+                                       count=Vobs$individualCount,
+                                       classificationMethod=classificationmethod,
+                                       classificationProbability=classificationprobability
+)
+
+```
+
+[Multiple Camera]
+Using observation data (e.g., Iobs), observation (tibble data) was created as below,
+```{r}
+#If the observations were event-based observations, observationLevel expressed as "event"
+observationLevel<-"event"
+
+#If the observations classified by human, classificationmethod expressed as "humam" 
+classificationmethod<-"human"
+#classificationprobability is the degree of certainty of the classification of the observed object (1=maximum certainty)
+classificationprobability<-1
+
+#create observationIDs that express the unique identifier of the observation
+observationID<-paste(mediaID,Iobs$obsID,sep="_")
+#deploymentID is belong to deployment
+deploymentID<-Vdep$deploymentID
+#eventID is belong to the event
+eventID<-Iobs$eventID
+
+#Timestamp (date and time) at which the observation started (e.g., the timestamp when the video or photo was taken) and event start time and event end time (evnt-based observation)
+tz="Japan"
+timeDF<-Iobs%>%
+  mutate(timestamp=paste(Iobs$date,Iobs$time))%>%
+  group_by(eventID)%>%
+  summarise(eventStart=min(timestamp),
+         eventEnd=max(timestamp))
+Iobs<-Iobs%>%left_join(timeDF,by=c("eventID"))
+
+#categorized observationType (animal, human, vehicle, blank, unknown, or unclassified)
+observationType<-ifelse(Iobs$object=="hito","human",
+                        ifelse(Iobs$object=="none","blank",
+                               ifelse(Iobs$object=="unidentifiable","unknown","animal")))
+
+#Scientific name of the animals observed
+scientificName<-ifelse(is.na(Iobs$genus),Iobs$class,paste(Iobs$genus,Iobs$species))
+
+#create observations
+observations<-create_observations(observationID=observationID,
+                                  deploymentID=deploymentID,
+                                       mediaID=mediaID,
+                                       eventStart=Iobs$eventStart,
+                                       eventEnd=Iobs$eventEnd,
                                        observationLevel=observationLevel,
                                        observationType=observationType,
                                        scientificName=scientificName,

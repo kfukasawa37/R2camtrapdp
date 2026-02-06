@@ -24,3 +24,21 @@ library(R2camtrapdp)
 vignette("Vignette_R2camtrapdp")
 ```
 
+## Data
+
+#R2camtrapdp have deployments and observation data to try R2camtrapdp.
+
+[Single camera trap data]
+-Vdep is the deployment data of one camera trap, located in NIES (National Institute for Studies in Japan).
+-Vobs is the video data regarding to Vdep.
+
+[Multiple camera trap data/ This data is dummy]
+-Idep is the deployment data of 10 camera trap as dummy data.
+-Iobs is the image data regarding to Vdep02.
+
+#Rscamtrapdp also has the camtrapDP data
+[Single camra trap data]
+-datapackageVdata is the camtrap DP data using Vobs and Vdep
+[Multiple camera trap data]
+-datapackageVdata02 is the camtrap DP data using Vobs02 and Vdep02
+
