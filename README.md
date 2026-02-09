@@ -36,7 +36,7 @@ R2camtrapdp have deployments and observation data to try R2camtrapdp.
 -Idep is the deployment data of 10 camera trap as dummy data.
 -Iobs is the image data regarding to Idep.
 
-#Rscamtrapdp also has the camtrapDP data
+R2camtrapdp also has the camtrapDP data
 
 [Single camra trap data]
 -datapackageVdata is the camtrap DP data using Vobs and Vdep
