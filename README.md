@@ -42,5 +42,5 @@ R2camtrapdp have deployments and observation data to try R2camtrapdp.
 -datapackageVdata is the camtrap DP data using Vobs and Vdep
 
 [Multiple camera trap data]
--datapackageVdata02 is the camtrap DP data using Vobs02 and Vdep02
+-datapackageVdata02 is the camtrap DP data using Iobs and Idep
 
