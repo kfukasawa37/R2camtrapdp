@@ -33,3 +33,9 @@ NULL
 #' @docType data
 #' @keywords data
 NULL
+
+#' Camtrap DP objects have been created from Idep and Iobs
+#' @name datapackageIdata
+#' @docType data
+#' @keywords data camtrapDP
+NULL
