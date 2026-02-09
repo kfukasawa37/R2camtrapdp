@@ -209,7 +209,7 @@ classificationprobability<-1
 #create observationIDs that express the unique identifier of the observation
 observationID<-paste(mediaIDi,Iobs$obsID,sep="_")
 #deploymentID is belong to deployment
-deploymentID<-Vdep$deploymentID
+deploymentID<-Iobs$deploymentID
 #eventID is belong to the event
 eventID<-Iobs$eventID
 
@@ -227,13 +227,13 @@ scientificName<-ifelse(is.na(Iobs$genus),Iobs$class,paste(Iobs$genus,Iobs$specie
 #create observations
 observations<-create_observations(observationID=observationID,
                                   deploymentID=deploymentID,
-                                       mediaID=mediaID,
+                                       eventID = eventID,
                                        eventStart=Iobs$eventStart,
                                        eventEnd=Iobs$eventEnd,
                                        observationLevel=observationLevel,
                                        observationType=observationType,
                                        scientificName=scientificName,
-                                       count=Vobs$individualCount,
+                                       count=Iobs$individualCount,
                                        classificationMethod=classificationmethod,
                                        classificationProbability=classificationprobability
 )
