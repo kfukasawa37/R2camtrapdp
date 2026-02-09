@@ -213,14 +213,8 @@ deploymentID<-Vdep$deploymentID
 #eventID is belong to the event
 eventID<-Iobs$eventID
 
-#Timestamp (date and time) at which the observation started (e.g., the timestamp when the video or photo was taken) and event start time and event end time (evnt-based observation)
+#Time zone for time stamp (date and time) at which the observation started and ended and ended ( start and end time need for event-based observation)
 tz="Japan"
-timeDF<-Iobs%>%
-  mutate(timestamp=paste(Iobs$date,Iobs$time))%>%
-  group_by(eventID)%>%
-  summarise(eventStart=min(timestamp),
-         eventEnd=max(timestamp))
-Iobs<-Iobs%>%left_join(timeDF,by=c("eventID"))
 
 #categorized observationType (animal, human, vehicle, blank, unknown, or unclassified)
 observationType<-ifelse(Iobs$object=="hito","human",
