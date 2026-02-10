@@ -21,35 +21,13 @@ library(R2camtrapdp)
 ## Data
 If you have deployment and observation data.
 ```{r}
-#for the single deployment with video data
-data("Vdep")
-data("Vobs")
+
 #for the multiple deployments with images data
 data("Idep")
 data("Iobs")
 ```
 
 ## Create deployment
-[Single Camera]
-Using deployment data (e.g., Vdep), deployment (tibble data) was created as below,
-```{r}
-##create deployment
-deployments<-create_deployments(
-  deploymentID=Vdep$deploymentID,
-  longitude=Vdep$longitude,
-  latitude=Vdep$latitude,
-  locationID=Vdep$locationID,
-  deploymentStart_date=Vdep$startDate,
-  deploymentStart_time=Vdep$startTime,
-  deploymentEnd_date=Vdep$endDate,
-  deploymentEnd_time=Vdep$endTime,
-  cameraID=Vdep$cameraID,
-  cameraModel=Vdep$cameraModel,
-  cameraDelay=Vdep$Delay,
-  cameraHeight=Vdep$Height,
-  baitUse=Vdep$bait,
-  setupBy=Vdep$setupBy)
-```
 [Multiple Camera]
 Using deployment data (e.g., Idep), deployment (tibble data) was created as below,
 ```{r}
@@ -72,43 +50,6 @@ deployments<-create_deployments(
 ```
 
 ## Create media
-[Single Camera]
-Using deployment and observation data (e.g., Vdep and Vobs), media (tibble data) was created as below,
-```{r}
-##settings
-#media ID
-mediaIDv<-paste(Vobs$institutionCode,
-               Vobs$collectionCode,
-               Vobs$locationID,
-               as.numeric(factor(Vobs$filename)),
-               sep="_")
-#capture method
-capturemethod<-"activityDetection"
-nmedia<-length(mediaIDv)
-captureMethod<-rep(capturemethod,nmedia)
-
-#filePath
-filePath<-paste("Video")
-
-#fileName
-fileName<-Vobs$filename
-filetype<-tolower(unlist(lapply(strsplit(fileName,"\\."),"[",2)))
-
-#filePublic
-fileMediatype<-paste("video",filetype,sep="/")
-filePublic<-!grepl("ヒト",fileName)
-
-##create media
-media<-create_media( mediaID=mediaIDv,
-                     deploymentID=Vdep$deploymentID,
-                     timestamp_date=Vobs$date,
-                     timestamp_time=Vobs$time,
-                     filePath=filePath,
-                     filePublic=filePublic,
-                     fileMediatype=fileMediatype,
-                     captureMethod="activityDetection",
-                     fileName=fileName)
-```
 [Multiple Cameras]
 Using deployment and observation data (e.g., Idep and Iobs), media (tibble data) was created as below,
 ```{r}
@@ -149,52 +90,6 @@ media<-create_media( mediaID=mediaIDi,
 ```
 
 ## Create observation
-[Single Camera]
-Using observation data (e.g., Vobs), observation (tibble data) was created as below,
-```{r}
-#If the observations were media-based observations, observationLevel expressed as "media"
-observationLevel<-"media"
-
-#If the observations classified by human, classificationmethod expressed as "human" 
-classificationmethod<-"human"
-#classificationprobability is the degree of certainty of the classification of the observed object (1=maximum certainty)
-classificationprobability<-1
-
-#create observationIDs that express the unique identifier of the observation 
-observationID<-paste(mediaIDv,Vobs$VideoID,sep="_")
-#deploymentID is belong to deployment
-deploymentID<-Vdep$deploymentID
-#mediaID is belong to media
-mediaID<-mediaIDv
-
-#Timestamp (date and time) at which the observation started (e.g., the timestamp when the video or photo was taken)
-tz="Japan"
-timestamp<-paste(Vobs$date,Vobs$time)
-
-#categorized observationType (animal, human, vehicle, blank, unknown, or unclassified)
-observationType<-ifelse(Vobs$object=="hito","human",
-                        ifelse(Vobs$object=="none","blank",
-                               ifelse(Vobs$object=="unidentifiable","unknown","animal")))
-
-#Scientific name of the animals observed
-scientificName<-ifelse(is.na(Vobs$genus),Vobs$class,paste(Vobs$genus,Vobs$species))
-
-#create observations
-observations<-create_observations(observationID=observationID,
-                                  deploymentID=deploymentID,
-                                       mediaID=mediaID,
-                                       eventStart=timestamp,
-                                       eventEnd=timestamp,
-                                       observationLevel=observationLevel,
-                                       observationType=observationType,
-                                       scientificName=scientificName,
-                                       count=Vobs$individualCount,
-                                       classificationMethod=classificationmethod,
-                                       classificationProbability=classificationprobability
-)
-
-```
-
 [Multiple Camera]
 Using observation data (e.g., Iobs), observation (tibble data) was created as below,
 ```{r}
@@ -383,29 +278,29 @@ The "set_properties()" function can be used to list some additional information 
 **bibliographicCitation**: A bibliographical reference for the resource.  
 **coordinatePrecision**: Least precise coordinate precision of the latitude and longitude of "deployment".
 ```{r}
-datapackage$set_properties(name=c("Testdata-NIES"),
+datapackage$set_properties(name=c("Dummy-NIES"),
                            homepage = c("https://www.nies.go.jp/biology/snapshot_japan/index.html"))
 ```
 
 **3-2-4.Source**  
 The "add_sources()" function can be used to list the sources of "datapackage". The values of title (title of the sources), path (path or URL to the source), email (an email address), and version (the version of "datapackage") are available for this function.
 ```{r}
-datapackage$add_sources(title=c("TestdatainNIES"))
+datapackage$add_sources(title=c("DummyData"))
 ```
 
 **3-2-5.Reference**  
 List of references related to the "package". References preferably include a DOI.
 ```{r}
-datapackage$add_references(reference=c("TestdatainNIES https://doi.org/xxxxx"))
+datapackage$add_references(reference=c("DummuyNIES https://doi.org/xxxxx"))
 ```
 
 **3-2-6.Custom Information**  
 If you have some of the "datapackage" information as metadata, but it is not listed in the above sections, the "set_custom()" function will help. This function can be used to list new data from a data frame, and the values of name, description , and of course data frame are required.  
 For example,suppose you have a data frame for estimating animal abundance based on the REST method. The code is as follows, 
-```{r,eval=FALSE}
+```{r}
 #data frame of REST data (This is dummy data)
-RD<-data.frame(id=seq(1:38),
-               Time=sample(1:29,38,replace=T))
+RD<-data.frame(id=seq(1:388),
+               Time=sample(1:29,388,replace=T))
 ##add REST data as medatada
 datapackage$set_custom(name=c("REST"),
                        description = c("dataforRESTmethod"),

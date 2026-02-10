@@ -298,7 +298,7 @@ datapackage$add_references(reference=c("TestdatainNIES https://doi.org/xxxxx"))
 **3-2-6.Custom Information**  
 If you have some of the "datapackage" information as metadata, but it is not listed in the above sections, the "set_custom()" function will help. This function can be used to list new data from a data frame, and the values of name, description , and of course data frame are required.  
 For example,suppose you have a data frame for estimating animal abundance based on the REST method. The code is as follows, 
-```{r,eval=FALSE}
+```{r}
 #data frame of REST data (This is dummy data)
 RD<-data.frame(id=seq(1:38),
                Time=sample(1:29,38,replace=T))
