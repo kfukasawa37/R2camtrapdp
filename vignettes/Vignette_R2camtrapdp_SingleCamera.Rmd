@@ -272,7 +272,7 @@ The "set_properties()" function can be used to list some additional information 
 **bibliographicCitation**: A bibliographical reference for the resource.  
 **coordinatePrecision**: Least precise coordinate precision of the latitude and longitude of "deployment".
 ```{r}
-datapackage$set_properties(name=c("Testdata-NIES"),
+datapackage$set_properties(name=c("testdata-nies"),
                            homepage = c("https://www.nies.go.jp/biology/snapshot_japan/index.html"))
 ```
 
