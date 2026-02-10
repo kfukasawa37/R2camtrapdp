@@ -294,7 +294,7 @@ For example,suppose you have a data frame for estimating animal abundance based 
 RD<-data.frame(id=seq(1:388),
                Time=sample(1:29,388,replace=T))
 ##add REST data as medatada
-datapackage$set_custom(name=c("REST"),
+datapackage$set_custom(name=c("rest"),
                        description = c("dataforRESTmethod"),
                        data=RD)
 ```
