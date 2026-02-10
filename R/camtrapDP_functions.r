@@ -1163,6 +1163,7 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							  uritemplate<-sub("[0-9].*$","",taxadb::get_ids("Homo sapiens",taxonDB,format="uri"))
 								sciname<-self$data$observations$scientificName
 								unique.sciname<-unique(sciname)%>%na.omit()
+								unique.sciname<-unique.sciname[!(unique.sciname==" ")]
 								ntaxa<-length(unique.sciname)
 								unique.sciname.clean<-sub(" sp\\.$","",unique.sciname)
 								taxonIDtable<-taxadb::filter_name(unique.sciname.clean,taxonDB)%>%dplyr::group_by(scientificName)%>%

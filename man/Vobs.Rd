@@ -8,6 +8,6 @@
 Observation data of videos which collected by a camera-trap
 }
 \references{
-Originally data can be used doi.xxx.xxx
+Originally data can be used from https://doi.org/10.34462/0002000233
 }
 \keyword{data}

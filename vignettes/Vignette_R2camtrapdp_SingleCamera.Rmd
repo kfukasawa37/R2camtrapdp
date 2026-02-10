@@ -1,8 +1,8 @@
 ---
-title: "Vignette_R2camtrapdp"
+title: "Vignette_R2camtrapdp_SingleCamera"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette_R2camtrapdp}
+  %\VignetteIndexEntry{Vignette_R2camtrapdp_SingleCamera}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,67 +21,66 @@ library(R2camtrapdp)
 ## Data
 If you have deployment and observation data.
 ```{r}
+#for the single deployment with video data
+data("Vdep")
+data("Vobs")
 
-#for the multiple deployments with images data
-data("Idep")
-data("Iobs")
 ```
 
 ## Create deployment
-[Multiple Camera]
-Using deployment data (e.g., Idep), deployment (tibble data) was created as below,
+[Single Camera]
+Using deployment data (e.g., Vdep), deployment (tibble data) was created as below,
 ```{r}
 ##create deployment
 deployments<-create_deployments(
-  deploymentID=Idep$deploymentID,
-  longitude=Idep$longitude,
-  latitude=Idep$latitude,
-  locationID=Idep$locationID,
-  deploymentStart_date=Idep$startDate,
-  deploymentStart_time=Idep$startTime,
-  deploymentEnd_date=Idep$endDate,
-  deploymentEnd_time=Idep$endTime,
-  cameraID=Idep$cameraID,
-  cameraModel=Idep$cameraModel,
-  cameraDelay=Idep$Delay,
-  cameraHeight=Idep$Height,
-  baitUse=Idep$bait,
-  setupBy=Idep$setupBy)
+  deploymentID=Vdep$deploymentID,
+  longitude=Vdep$longitude,
+  latitude=Vdep$latitude,
+  locationID=Vdep$locationID,
+  deploymentStart_date=Vdep$startDate,
+  deploymentStart_time=Vdep$startTime,
+  deploymentEnd_date=Vdep$endDate,
+  deploymentEnd_time=Vdep$endTime,
+  cameraID=Vdep$cameraID,
+  cameraModel=Vdep$cameraModel,
+  cameraDelay=Vdep$Delay,
+  cameraHeight=Vdep$Height,
+  baitUse=Vdep$bait,
+  setupBy=Vdep$setupBy)
 ```
 
 ## Create media
-[Multiple Cameras]
-Using deployment and observation data (e.g., Idep and Iobs), media (tibble data) was created as below,
+[Single Camera]
+Using deployment and observation data (e.g., Vdep and Vobs), media (tibble data) was created as below,
 ```{r}
 ##settings
 #media ID
-mediaIDi<-paste(Iobs$institutionCode,
-               Iobs$collectionCode,
-               Iobs$locationID,
+mediaIDv<-paste(Vobs$institutionCode,
+               Vobs$collectionCode,
+               Vobs$locationID,
                as.numeric(factor(Vobs$filename)),
                sep="_")
-
 #capture method
 capturemethod<-"activityDetection"
-nmedia<-length(mediaIDi)
+nmedia<-length(mediaIDv)
 captureMethod<-rep(capturemethod,nmedia)
 
 #filePath
-filePath<-paste("Image")
+filePath<-paste("Video")
 
 #fileName
-fileName<-Iobs$filename
+fileName<-Vobs$filename
 filetype<-tolower(unlist(lapply(strsplit(fileName,"\\."),"[",2)))
 
 #filePublic
-fileMediatype<-paste("image",filetype,sep="/")
+fileMediatype<-paste("video",filetype,sep="/")
 filePublic<-!grepl("ヒト",fileName)
 
 ##create media
-media<-create_media( mediaID=mediaIDi,
-                     deploymentID=Iobs$deploymentID,
-                     timestamp_date=Iobs$date,
-                     timestamp_time=Iobs$time,
+media<-create_media( mediaID=mediaIDv,
+                     deploymentID=Vdep$deploymentID,
+                     timestamp_date=Vobs$date,
+                     timestamp_time=Vobs$time,
                      filePath=filePath,
                      filePublic=filePublic,
                      fileMediatype=fileMediatype,
@@ -90,50 +89,52 @@ media<-create_media( mediaID=mediaIDi,
 ```
 
 ## Create observation
-[Multiple Camera]
-Using observation data (e.g., Iobs), observation (tibble data) was created as below,
+[Single Camera]
+Using observation data (e.g., Vobs), observation (tibble data) was created as below,
 ```{r}
-#If the observations were event-based observations, observationLevel expressed as "event"
-observationLevel<-"event"
+#If the observations were media-based observations, observationLevel expressed as "media"
+observationLevel<-"media"
 
-#If the observations classified by human, classificationmethod expressed as "humam" 
+#If the observations classified by human, classificationmethod expressed as "human" 
 classificationmethod<-"human"
 #classificationprobability is the degree of certainty of the classification of the observed object (1=maximum certainty)
 classificationprobability<-1
 
-#create observationIDs that express the unique identifier of the observation
-observationID<-paste(mediaIDi,Iobs$obsID,sep="_")
+#create observationIDs that express the unique identifier of the observation 
+observationID<-paste(mediaIDv,Vobs$VideoID,sep="_")
 #deploymentID is belong to deployment
-deploymentID<-Iobs$deploymentID
-#eventID is belong to the event
-eventID<-Iobs$eventID
+deploymentID<-Vdep$deploymentID
+#mediaID is belong to media
+mediaID<-mediaIDv
 
-#Time zone for time stamp (date and time) at which the observation started and ended and ended ( start and end time need for event-based observation)
+#Timestamp (date and time) at which the observation started (e.g., the timestamp when the video or photo was taken)
 tz="Japan"
+timestamp<-paste(Vobs$date,Vobs$time)
 
 #categorized observationType (animal, human, vehicle, blank, unknown, or unclassified)
-observationType<-ifelse(Iobs$object=="hito","human",
-                        ifelse(Iobs$object=="none","blank",
-                               ifelse(Iobs$object=="unidentifiable","unknown","animal")))
+observationType<-ifelse(Vobs$object=="hito","human",
+                        ifelse(Vobs$object=="none","blank",
+                               ifelse(Vobs$object=="unidentifiable","unknown","animal")))
 
 #Scientific name of the animals observed
-scientificName<-ifelse(is.na(Iobs$genus),Iobs$class,paste(Iobs$genus,Iobs$species))
+scientificName<-ifelse(is.na(Vobs$genus),Vobs$class,paste(Vobs$genus,Vobs$species))
 
 #create observations
 observations<-create_observations(observationID=observationID,
                                   deploymentID=deploymentID,
-                                       eventID = eventID,
-                                       eventStart=Iobs$eventStart,
-                                       eventEnd=Iobs$eventEnd,
+                                       mediaID=mediaID,
+                                       eventStart=timestamp,
+                                       eventEnd=timestamp,
                                        observationLevel=observationLevel,
                                        observationType=observationType,
                                        scientificName=scientificName,
-                                       count=Iobs$individualCount,
+                                       count=Vobs$individualCount,
                                        classificationMethod=classificationmethod,
                                        classificationProbability=classificationprobability
 )
 
 ```
+
 
 ## Create datapackages
 **1.Create an R6 object with named "datapackage"**
@@ -195,14 +196,15 @@ The information of Camera trap project or study that originated the package. For
 **path**: Path for project website.
 
 The function "set_project()" can be used to import for project into "datapackage".
-[For event based observation]
+[For media based observation]
 ```{r}
-datapackage$set_project(title=c("DummyData"),
+datapackage$set_project(title=c("TestdatainNIES"),
                         samplingDesign = c("simpleRandom"),
                         captureMethod = c("activityDetection"),
                         individualAnimals = F,
-                        observationLevel = c("event"))
+                        observationLevel = c("media"))
 ```
+
 **3-1-3.Spatial and temporal**  
 Spatial and temporal coverage of the "package".  
 The function "set_st()" collects spatial and temporal data from "deployment" and can be imported into "datapackage".
@@ -250,7 +252,7 @@ The function "add_relatedIdentifiers()" can be used to import related identifier
 **relatedIdentifierType**: Type of the RelatedIdentifier. Available from ARK, arXiv, bibcode, DOI, EAN13, EISSN, Handle, IGSN, ISBN, ISSN, ISTC, LISSN, LSID, PMID, PURL, UPC, URL, URN, and w3id.
 ```{r}
 datapackage$add_relatedIdentifiers(relationType = c("IsSupplementTo"),
-                                   relatedIdentifier =as.character(c("https://doi.xxxx")) ,
+                                   relatedIdentifier =as.character(c("https://doi.org/10.34462/0002000233")) ,
                                    relatedIdentifierType = c("DOI"),
                                    resourceTypeGeneral = c("JournalArticle"))
 ```
@@ -270,20 +272,20 @@ The "set_properties()" function can be used to list some additional information 
 **bibliographicCitation**: A bibliographical reference for the resource.  
 **coordinatePrecision**: Least precise coordinate precision of the latitude and longitude of "deployment".
 ```{r}
-datapackage$set_properties(name=c("dummy-nies"),
+datapackage$set_properties(name=c("testdata-nies"),
                            homepage = c("https://www.nies.go.jp/biology/snapshot_japan/index.html"))
 ```
 
 **3-2-4.Source**  
 The "add_sources()" function can be used to list the sources of "datapackage". The values of title (title of the sources), path (path or URL to the source), email (an email address), and version (the version of "datapackage") are available for this function.
 ```{r}
-datapackage$add_sources(title=c("DummyData"))
+datapackage$add_sources(title=c("TestdatainNIES"))
 ```
 
 **3-2-5.Reference**  
 List of references related to the "package". References preferably include a DOI.
 ```{r}
-datapackage$add_references(reference=c("DummuyNIES https://doi.org/xxxxx"))
+datapackage$add_references(reference=c("TestdatainNIES https://doi.org/10.34462/0002000233"))
 ```
 
 **3-2-6.Custom Information**  
@@ -291,8 +293,8 @@ If you have some of the "datapackage" information as metadata, but it is not lis
 For example,suppose you have a data frame for estimating animal abundance based on the REST method. The code is as follows, 
 ```{r}
 #data frame of REST data (This is dummy data)
-RD<-data.frame(id=seq(1:388),
-               Time=sample(1:29,388,replace=T))
+RD<-data.frame(id=seq(1:38),
+               Time=sample(1:29,38,replace=T))
 ##add REST data as medatada
 datapackage$set_custom(name=c("rest"),
                        description = c("dataforRESTmethod"),

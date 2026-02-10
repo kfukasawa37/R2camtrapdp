@@ -8,7 +8,7 @@
 Camtrap DP objects have been created from Vdep and Vobs
 }
 \references{
-Originally data can be used doi.xxx.xxx
+Originally data can be used from https://doi.org/10.34462/0002000233
 }
 \keyword{camtrapDP}
 \keyword{data}
