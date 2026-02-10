@@ -204,14 +204,7 @@ datapackage$set_project(title=c("TestdatainNIES"),
                         individualAnimals = F,
                         observationLevel = c("media"))
 ```
-[For event based observation]
-```{r}
-datapackage$set_project(title=c("DummyData"),
-                        samplingDesign = c("simpleRandom"),
-                        captureMethod = c("activityDetection"),
-                        individualAnimals = F,
-                        observationLevel = c("event"))
-```
+
 **3-1-3.Spatial and temporal**  
 Spatial and temporal coverage of the "package".  
 The function "set_st()" collects spatial and temporal data from "deployment" and can be imported into "datapackage".
@@ -259,7 +252,7 @@ The function "add_relatedIdentifiers()" can be used to import related identifier
 **relatedIdentifierType**: Type of the RelatedIdentifier. Available from ARK, arXiv, bibcode, DOI, EAN13, EISSN, Handle, IGSN, ISBN, ISSN, ISTC, LISSN, LSID, PMID, PURL, UPC, URL, URN, and w3id.
 ```{r}
 datapackage$add_relatedIdentifiers(relationType = c("IsSupplementTo"),
-                                   relatedIdentifier =as.character(c("https://doi.xxxx")) ,
+                                   relatedIdentifier =as.character(c("https://doi.org/10.34462/0002000233")) ,
                                    relatedIdentifierType = c("DOI"),
                                    resourceTypeGeneral = c("JournalArticle"))
 ```
@@ -292,7 +285,7 @@ datapackage$add_sources(title=c("TestdatainNIES"))
 **3-2-5.Reference**  
 List of references related to the "package". References preferably include a DOI.
 ```{r}
-datapackage$add_references(reference=c("TestdatainNIES https://doi.org/xxxxx"))
+datapackage$add_references(reference=c("TestdatainNIES https://doi.org/10.34462/0002000233"))
 ```
 
 **3-2-6.Custom Information**  

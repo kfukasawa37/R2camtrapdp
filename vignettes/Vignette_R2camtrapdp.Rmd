@@ -195,14 +195,6 @@ The information of Camera trap project or study that originated the package. For
 **path**: Path for project website.
 
 The function "set_project()" can be used to import for project into "datapackage".
-[For media based observation]
-```{r}
-datapackage$set_project(title=c("TestdatainNIES"),
-                        samplingDesign = c("simpleRandom"),
-                        captureMethod = c("activityDetection"),
-                        individualAnimals = F,
-                        observationLevel = c("media"))
-```
 [For event based observation]
 ```{r}
 datapackage$set_project(title=c("DummyData"),
