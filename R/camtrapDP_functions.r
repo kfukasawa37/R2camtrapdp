@@ -1170,7 +1170,10 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 								                tidyr::nest()%>%
 								                dplyr::mutate(data2=purrr::map(data,~dplyr::arrange(.,.$taxonomicStatus)[1,]))%>%
 								                dplyr::select(-data)%>%
-								                tidyr::unnest(cols=data2)
+								                tidyr::unnest(cols=data2)%>%
+								                dplyr::mutate(order=ifelse(is.na(order)," ",order))%>%
+								                dplyr::mutate(family=ifelse(is.na(family)," ",family))%>%
+								                dplyr::mutate(genus=ifelse(is.na(genus)," ",genus))
 								colnames(taxonIDtable)[1]<-"sciname.clean"
 								
 								taxonIDtable<-tibble(sciname=unique.sciname,sciname.clean=unique.sciname.clean)%>%left_join(taxonIDtable,by="sciname.clean")
