@@ -851,7 +851,12 @@ R6_CamtrapDP<-R6::R6Class(	"CamtrapDP",
 							#' @param coordinatePrecision Least precise coordinate precision of the deployments.latitude and deployments.longitude
 							#' 
 							set_properties = function(directory=getwd(),name=NULL,id=NULL,title=NULL,description=NULL,profile="https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json",version="1.0.1",keywords=NULL,image=NULL,homepage=NULL,bibliographicCitation=NULL,coordinatePrecision=NULL){
-								self$name<-name
+							  if(!is.null(name)){
+							    if (any(grepl("[^a-z0-9._-]", name))) {
+							      stop("エラー: nameで使用できる文字は小文字、数字、'._-'のみです")
+							    }
+							  }
+							  self$name<-name
 								self$id<-id
 								self$title<-title
 								self$description<-description
