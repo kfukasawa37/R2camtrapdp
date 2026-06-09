@@ -1,0 +1,611 @@
+---
+title: "R2camtrapdp: スキーマ駆動ワークフロー（日本語）"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{R2camtrapdp schema-driven workflow (Japanese)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(R2camtrapdp)
+```
+
+# 概要
+
+`R2camtrapdp` は、任意のスプレッドシート形式で保持したカメラトラップデータを
+[Camera Trap Data Package (Camtrap DP)](https://camtrap-dp.tdwg.org/) へ変換します。
+
+本バージョンは **スキーマ駆動** です。出力テーブルの構造・型・制約は、指定した
+Camtrap DP バージョンの公式 Frictionless *table schema* から読み取られます。
+その結果、本パッケージは
+
+* **任意の Camtrap DP バージョン**（`1.0`, `1.0.1`, `1.0.2`）に対応し、さらに
+  bioacoustics 拡張のような**別のスキーマフレーバー**にも、正しいスキーマを指す
+  だけで対応します（§8）。
+* スキーマが定義する**独自列・追加列**を理解します。
+* すべての値をスキーマの制約（`required`, `unique`, `enum`, `minimum`/`maximum`,
+  `pattern`, 日付・日時の **format** ほか）に照らして検査します。
+* テーブル間の**リレーション**（主キー・外部キー）を検査します。
+* スキーマ内の**URL で指定された参照**（意味マッピングや description 内リンク）を
+  すべて可視化し、見落としを防ぎます（§1）。
+* Python の **Frictionless** バリデータを実行し、エラーを R 側へ返します。
+
+旧来のヘルパ関数（`create_deployments()`, `create_media()`,
+`create_observations()`）と `R6_CamtrapDP` クラスは名前・引数とも従来どおりで、
+既存スクリプトはそのまま動作します。スキーマ駆動の挙動はその上に追加されています。
+
+> **ネットワークについて。** テーブルを登録する（`set_deployments()` 等）と、
+> 指定バージョンの table schema を初回に GitHub から取得し、以後はキャッシュします。
+> オフライン環境では `local_schema =` 引数でローカルのスキーマファイルを渡せます。
+
+# データ
+
+本パッケージには、画像記録を伴う複数デプロイメントの例データが同梱されています。
+
+```{r}
+# 複数デプロイメント・画像データ
+data("Idep")   # デプロイメント表
+data("Iobs")   # 観察表
+```
+
+`Idep` はデプロイメント（カメラ設置）1 件につき 1 行で、`deploymentID`,
+`longitude`, `latitude`, `locationID`, `startDate`/`startTime`,
+`endDate`/`endTime`, `cameraID`, `cameraModel`, `Delay`, `Height`, `bait`,
+`setupBy` などの列を持ちます。`Iobs` は観察 1 件につき 1 行で、機関／コレクション
+コード、`filename`, `deploymentID`, `date`/`time`, `obsID`, `eventID`,
+`eventStart`/`eventEnd`, `object`, `genus`, `species`, `class`,
+`individualCount` を持ちます。
+
+# 1. バージョンの選択とスキーマの確認（任意）
+
+パイプライン全体は選択したバージョンのスキーマで駆動されます。Camtrap DP の
+`1.0` / `1.0.1` / `1.0.2` はすべて対応しており、これらの table schema は列名・型・
+制約が共通であるため、実質的な差は `1.0.2` が欠損値トークン（`NA`, `NaN`, `nan`）
+を追加で認識する点のみです。任意バージョンのスキーマは `TableSchema` で直接確認
+できます。
+
+（注: 公式の `1.0` *profile*（メタデータの JSON Schema）には上流のバグ（不正な内部
+`$ref`）があり、新しい Frictionless が拒否します。このため `version = "1.0"` を指定
+すると警告が表示されます。`validate_frictionless()` が自動で回避しますが、`1.0.1`
+以降の利用を推奨します。）
+
+```{r, eval = FALSE}
+version <- "1.0.1"
+
+dep_schema <- TableSchema$new("deployments", version = version)
+dep_schema$field_names()           # スキーマが定義する全列
+dep_schema$required_field_names()  # 必須（存在かつ非欠損）の列
+dep_schema$empty_table()           # 型付き 0 行の「殻」テーブル
+```
+
+通常は手作業で確認する必要はありません（`R6_CamtrapDP` が適切なスキーマを自動取得・
+キャッシュします）が、当該バージョンが何を要求するかの把握に役立ちます。
+
+`check_schema()` は、スキーマ自体が well-formed な Frictionless Table Schema か
+（サポートされる `type`、型ごとに妥当な制約、定義済みフィールドを指す主キー・外部
+キー）を確認します。新規・手編集のスキーマを採用する前の点検に有用です。
+
+```{r, eval = FALSE}
+dep_schema$check_schema()
+```
+
+## スキーマ内の外部（URL）参照
+
+Camtrap DP の情報の一部は、機械検証可能な制約ではなく **URL** で指定されます。
+具体的には意味マッピング（`skos:exactMatch` / `broadMatch` / `narrowMatch` による
+Darwin Core, Audubon Core 等の用語への対応）や、フィールドの description 内の参照
+URL（例: `fileMediatype` の IANA メディアタイプ登録簿、`individualSpeed` の手法 DOI）
+です。本パッケージが強制するのは構造化された制約のみで、**URL で参照される意味は
+検証されません**。バージョンや新フレーバーを採用する際にこうした指定を見落とさない
+よう、次で一覧化できます。
+
+```{r, eval = FALSE}
+dep_schema$external_references()   # スキーマが宣言する全 URL（skos・description・schema URL）
+dep_schema$semantic_only_fields()  # 意味が URL でのみ定義され、値域を機械検証できない列
+```
+
+`external_references()` は整形済みの表（`resource`, `field`, `key`, `category`,
+`url`）を返します。`semantic_only_fields()` は、参照先の権威に照らして手動確認が
+必要な列を示します。パッケージ全体は `datapackage$external_references()` で一括
+スキャンできます。
+
+# 2. 3 つの中核テーブルの作成
+
+## デプロイメントの作成
+
+デプロイメントデータ（`Idep`）を用い、従来どおりに作成します。
+`create_deployments()` は結合済みの日時、または日付列・時刻列の別指定の両方を
+受け付けます。
+
+```{r}
+deployments <- create_deployments(
+  deploymentID         = Idep$deploymentID,
+  longitude            = Idep$longitude,
+  latitude             = Idep$latitude,
+  locationID           = Idep$locationID,
+  deploymentStart_date = Idep$startDate,
+  deploymentStart_time = Idep$startTime,
+  deploymentEnd_date   = Idep$endDate,
+  deploymentEnd_time   = Idep$endTime,
+  cameraID             = Idep$cameraID,
+  cameraModel          = Idep$cameraModel,
+  cameraDelay          = Idep$Delay,
+  cameraHeight         = Idep$Height,
+  baitUse              = Idep$bait,
+  setupBy              = Idep$setupBy)
+```
+
+`create_deployments()` は上記以外に次の引数も受け付けます: `deploymentStart` /
+`deploymentEnd`（結合済み日時。`*_date` / `*_time` の組の代わりに使用）、
+`locationName`、`coordinateUncertainty`、`cameraDepth`（`cameraHeight` と同時指定
+不可）、`cameraTilt`、`cameraHeading`、`detectionDistance`、`timestampIssues`、
+`featureType`、`habitat`、`deploymentGroups`、`deploymentTags`、
+`deploymentComments`、`tz`（タイムゾーン、既定 `"Japan"`）。
+
+## メディアの作成
+
+```{r}
+# メディア ID
+mediaIDi <- paste(Iobs$institutionCode,
+                  Iobs$collectionCode,
+                  Iobs$locationID,
+                  as.numeric(factor(Iobs$filename)),
+                  sep = "_")
+
+# ファイル情報
+fileName      <- Iobs$filename
+filetype      <- tolower(unlist(lapply(strsplit(fileName, "\\."), "[", 2)))
+fileMediatype <- paste("image", filetype, sep = "/")
+filePublic    <- !grepl("ヒト", fileName)   # ヒト画像は非公開にする
+
+media <- create_media(
+  mediaID        = mediaIDi,
+  deploymentID   = Iobs$deploymentID,
+  timestamp_date = Iobs$date,
+  timestamp_time = Iobs$time,
+  filePath       = "Image",
+  filePublic     = filePublic,
+  fileMediatype  = fileMediatype,
+  captureMethod  = "activityDetection",
+  fileName       = fileName)
+```
+
+`create_media()` は上記以外に次の引数も受け付けます: `timestamp`（結合済み日時。
+`timestamp_date` / `timestamp_time` の代わり）、`exifData`、`favorite`、
+`mediaComments`、`tz`、`omitduplicate`（重複 `mediaID` を除外。既定 `TRUE`）。
+
+## observationの作成
+
+```{r}
+# イベント単位の観察
+observationLevel <- "event"
+
+# observationType はスキーマの enum 値のいずれか
+observationType <- ifelse(Iobs$object == "hito", "human",
+                   ifelse(Iobs$object == "none", "blank",
+                   ifelse(Iobs$object == "unidentifiable", "unknown", "animal")))
+
+# 学名
+scientificName <- ifelse(is.na(Iobs$genus), Iobs$class, paste(Iobs$genus, Iobs$species))
+
+# 一意の観察 ID
+observationID <- paste(mediaIDi, Iobs$obsID, sep = "_")
+
+observations <- create_observations(
+  observationID             = observationID,
+  deploymentID              = Iobs$deploymentID,
+  eventID                   = Iobs$eventID,
+  eventStart                = Iobs$eventStart,
+  eventEnd                  = Iobs$eventEnd,
+  observationLevel          = observationLevel,
+  observationType           = observationType,
+  scientificName            = scientificName,
+  count                     = Iobs$individualCount,
+  classificationMethod      = "human",
+  classificationProbability = 1)
+```
+
+`create_observations()` は上記以外に次の引数も受け付けます: `mediaID`、
+`eventStart_date` / `eventStart_time` と `eventEnd_date` / `eventEnd_time` の組
+（結合済み `eventStart` / `eventEnd` の代わり）、`cameraSetupType`、`lifeStage`、
+`sex`、`behavior`、`individualID`、`individualPositionRadius`、
+`individualPositionAngle`、`individualSpeed`、`bboxX`、`bboxY`、`bboxWidth`、
+`bboxHeight`、`classifiedBy`、`classificationTimestamp`、`observationTags`、
+`observationComments`、`tz`、`omitduplicate`。
+
+# 3. データパッケージの組み立て
+
+## R6 オブジェクトの作成（バージョン指定）
+
+```{r}
+datapackage <- R6_CamtrapDP$new(version = "1.0.1")
+```
+
+ここで与える `version` が、検証および `datapackage.json` に使われるスキーマを
+選択します。別の Camtrap DP リリースを対象にする場合は変更してください。
+
+## テーブルの登録（スキーマ検証付き）
+
+`set_deployments()`, `set_media()`, `set_observations()` は名前を維持しつつ、
+各々が**スキーマ型への変換と、選択バージョンのスキーマに対する検証**を行います。
+問題は要約として表示され、`validate = FALSE` で表示を抑制できます。
+
+```{r, eval = FALSE}
+datapackage$set_deployments(deployments)
+datapackage$set_media(media)
+datapackage$set_observations(observations)
+```
+
+*（スキーマの取得、ファイル書き出し、分類検索、Python 呼び出しを伴うチャンクは、
+本 vignette のビルド時には表示のみで実行されません。そのため出力は表示されません。）*
+
+検証の要約は、各問題について、ファイル・列・行・違反した規則・メッセージを示します。
+例えば `enum` に反する値、`minimum`/`maximum` の範囲外の数値、必要な書式に一致しない
+日時などです。列の型にすら適合しない値（例: `number` 列の非数値文字列）は、無言で
+`NA` に変換されるのではなく `type` エラーとして報告されます。
+
+## テーブル間リレーションの検査
+
+外部キー（例: `media.deploymentID` は `deployments` に、`observations.mediaID` は
+`media` に存在する必要がある）と主キーの一意性は、各テーブルのスキーマから読み取られ、
+登録済みのテーブル間で検査されます。
+
+```{r, eval = FALSE}
+datapackage$check_relations()
+```
+
+主キーまたは必須の外部キー列が、格納後のテーブルで**まるごと欠損**している場合
+（多くは列名不一致で型変換が `NA` 補完したケース）、`check_relations()` は警告を出し
+データを指し示します（例: `datapackage$data$observations has 'deploymentID' entirely missing ...`）。
+`datapackage$data$<resource>` を直接確認できます。
+
+# 4. メタデータ
+
+Camtrap DP は 5 つの必須メタデータ（contributors, project, spatial, temporal,
+taxonomic）と `created` を必要とします。さらに 6 つの任意プロパティがあります。
+メタデータ関数は従来版から変更ありません。
+
+## どのメタデータが必須かを profile で確認する
+
+必須メタデータ自体は、パッケージ **profile**（JSON Schema）から読み取られます。
+`metadata_requirements()` は必須トップレベルプロパティ・それを設定するメソッド・
+現在の設定状況を一覧化し、`check_metadata()` は現在のオブジェクトを profile に
+照合して不足（`project.samplingDesign` のようなネストしたキーを含む）を報告します。
+
+```{r, eval = FALSE}
+datapackage$metadata_requirements()   # チェックリスト: property, required, set_with, currently_set
+datapackage$check_metadata()          # 不足している必須メタデータを報告
+```
+
+これは Frictionless が行うメタデータ（profile）検証（§6）に相当する R 側の事前
+チェックで、パッケージを書き出して Python を呼ぶ**前に**必須構造を確認できます。
+
+## 必須メタデータ
+
+### 貢献者（Contributors）
+
+`add_contributors()` は `title`, `email`, `path`, `role`, `organization` 列を持つ
+データフレームを取り込みます。`role` は `contact`, `principalInvestigator`,
+`rightsHolder`, `publisher`, `contributor` のいずれかです。
+
+```{r}
+cd <- data.frame(
+  title        = c("Keita Fukasawa", "Kana Terayama"),
+  email        = c("fukasawa@nies.go.jp", "terayama.kana@nies.go.jp"),
+  path         = c("https://orcid.org/0000-0003-0272-9180",
+                   "https://orcid.org/0000-0001-6935-7233"),
+  role         = c("contact", "principalInvestigator"),
+  organization = c("National Institute for Environmental Studies (NIES)",
+                   "National Institute for Environmental Studies (NIES)"))
+datapackage$add_contributors(cd)
+```
+
+### プロジェクト（Project）
+
+```{r}
+datapackage$set_project(
+  title            = "DummyData",
+  samplingDesign   = "simpleRandom",
+  captureMethod    = "activityDetection",
+  individualAnimals = FALSE,
+  observationLevel = "event")
+```
+
+`samplingDesign` は `simpleRandom`, `systematicRandom`, `clusteredRandom`,
+`experimental`, `targeted`, `opportunistic` のいずれか、`captureMethod` は
+`activityDetection` または `timeLapse`、`observationLevel` は `media` または
+`event` です。任意で `id`, `acronym`, `description`, `path` も指定できます。
+
+### 空間・時間（Spatial and temporal）
+
+`set_st()` はデプロイメントから空間・時間範囲を導出するため、
+`set_deployments()` の後に呼び出します。
+
+```{r, eval = FALSE}
+datapackage$set_st()
+```
+
+### 分類（Taxonomic）
+
+`set_taxon()` は観察の一意な `scientificName` を列挙し、`taxonID`, `taxonRank` と
+上位分類を分類データベース（既定は `gbif`。`itis` / `ncbi` も可。`taxadb::get_ids`
+参照）から取得します。CamtrapDP の `taxonomic` には `taxonID`（GBIF/IUCN 等の識別子・
+URI）が必要なため、`taxadb` は R2camtrapdp の**必須依存**（パッケージと共に導入）です。
+本処理にはインターネット接続も必要です。
+
+```{r, eval = FALSE}
+datapackage$set_taxon()
+```
+
+マッチできない名前は `taxonID = NA`（出力では省略。`<uri>NA` のような不正値にはなりません）。
+`set_taxon()` は、`scientificName` に不要な空白がある場合と、選択した DB に `taxonID` が
+無い場合に**警告**を出すので、対象の名前を修正・確認できます。
+
+### 作成日時（Created）
+
+```{r}
+datapackage$update_created(tz = "Japan")
+```
+
+## 任意メタデータ
+
+### ライセンス（Licenses）
+
+Camtrap DP はデータ用とメディア用に各 1 つ以上のライセンスを想定します。
+
+```{r}
+datapackage$add_license(name = "CC-BY-4.0",
+                        path = "http://creativecommons.org/licenses/by/4.0/",
+                        scope = "data")
+datapackage$add_license(name = "CC-BY-4.0",
+                        path = "http://creativecommons.org/licenses/by/4.0/",
+                        scope = "media")
+```
+
+### 関連識別子（Related identifiers）
+
+```{r}
+datapackage$add_relatedIdentifiers(
+  relationType          = "IsSupplementTo",
+  relatedIdentifier     = "https://doi.org/xxxx",
+  relatedIdentifierType = "DOI",
+  resourceTypeGeneral   = "JournalArticle")
+```
+
+### プロパティ・ソース・参考文献
+
+```{r}
+datapackage$set_properties(
+  name     = "dummy-nies",
+  homepage = "https://www.nies.go.jp/biology/snapshot_japan/index.html")
+datapackage$add_sources(title = "DummyData")
+datapackage$add_references(reference = "DummyNIES https://doi.org/xxxxx")
+```
+
+### カスタムリソース
+
+`set_custom()` は追加のリソース（例: 個体数推定に使うデータ）をメタデータとして
+付加します。3 つの中核テーブルを登録した後に呼び出します。
+
+```{r}
+RD <- data.frame(id = seq_len(388), Time = sample(1:29, 388, replace = TRUE))
+```
+```{r, eval = FALSE}
+datapackage$set_custom(name = "rest",
+                       description = "data for the REST method",
+                       data = RD)
+```
+
+# 5. データパッケージの出力
+
+```{r, eval = FALSE}
+# camtrapdp オブジェクトを返す
+data_camtrapdp <- datapackage$out_camtrapdp()
+
+# あるいは deployments.csv / media.csv / observations.csv + datapackage.json を書き出す
+datapackage$out_camtrapdp(write = TRUE, directory = path)
+```
+
+書き出し時、CSV は全スキーマ列を含み、boolean は `true`/`false`（小文字）で出力され、
+未設定のメタデータは省略されるため、空のプレースホルダが偽の検証エラーを引き起こす
+ことはありません。
+
+# 6. Frictionless による検証
+
+## 適合の事前チェック（Python を呼ぶ前に）
+
+Python を実行する前に、パッケージがそもそも well-formed な Frictionless データ
+パッケージか、また CamtrapDP 形式かを R 側で確認できます。Frictionless が行う構造
+チェックを R で再現するもので、新規・特殊なスキーマの問題を早期に発見できます。
+
+```{r, eval = FALSE}
+datapackage$check_descriptor()        # 記述子＋各 table schema の構造（Frictionless 仕様）
+datapackage$check_camtrap_profile()   # profile が CamtrapDP でなければ警告
+```
+
+パッケージは **Frictionless** として妥当でも、**CamtrapDP** 形式とは限りません。
+それは `profile` が CamtrapDP プロファイル（既定）かどうかで決まります。GeoJSON
+妥当性や物理ファイル構造を含む権威ある判定は、下記の Frictionless 実行が担います。
+
+## Frictionless の実行
+
+書き出したパッケージを公式スキーマに照らして、Python の
+[Frictionless](https://framework.frictionlessdata.io/docs/guides/validating-data.html)
+で確認できます。`frictionless` を導入した Python が必要です
+（`pip install frictionless`）。
+
+```{r, eval = FALSE}
+issues <- datapackage$validate_frictionless(directory = path, python = "python")
+ctdp_is_valid(issues)   # error が無ければ TRUE
+```
+
+**注意 — `path` を上書きします。** `validate_frictionless()` は既定で
+`write = TRUE` のため、検証前に `out_camtrapdp()` を呼んで `directory` 内の
+`datapackage.json` と CSV を**現在のオブジェクトの内容で上書き**します。すでに
+ディスク上にある datapackage を**上書きせず検証だけ**したい場合は `write = FALSE`、
+または R6 オブジェクト不要の検証専用関数を使ってください:
+
+```{r, eval = FALSE}
+ctdp_validate_frictionless("path/to/existing/package", python = "python")
+```
+
+`issues` は問題 1 件につき 1 行の整形済み表で、`source`（ファイル）、`field`（列／
+プロパティパス）、`row`（行）、違反した `constraint`、問題の `value`（実値）、
+`message` を与えるため、エラー箇所を正確に把握できます。セルエラーの `value` は不正な
+セル値、メタデータ（profile）エラーの `value` は note 内のプロパティパス（例
+`contributors[].email`）で `datapackage.json` を辿って解決した実値です。R 側のスキーマ検査・リレーション検査・メタデータ（profile）検査・
+適合事前チェック・（任意で）Frictionless レポートは、1 回の呼び出しで集約する
+こともできます。
+
+```{r, eval = FALSE}
+datapackage$validate(relations = TRUE, metadata = TRUE, conformance = TRUE,
+                     frictionless = TRUE, directory = path, python = "python")
+```
+
+# 7. 任意のスプレッドシートを直接変換する
+
+上記のヘルパは変数を事前に命名済みであることを前提とします。独自の列名を持つ生の
+スプレッドシートがある場合は、`ctdp_build_table()` でマッピング・日時結合・型変換・
+検証を一括実行できます（任意バージョン対応）。
+
+```{r, eval = FALSE}
+version    <- "1.0.1"
+dep_schema <- TableSchema$new("deployments", version = version)
+
+# 任意の列名＋独自列を持つ生データの例
+raw <- data.frame(
+  station   = c("A01", "A02"),
+  lat       = c(35.1, 36.2),
+  lon       = c(139.5, 140.1),
+  start_day = c("2023-04-01", "2023-04-02"),
+  start_clk = c("09:00:00", "10:30:00"),
+  end_day   = c("2023-05-01", "2023-05-02"),
+  end_clk   = c("09:00:00", "10:30:00"),
+  myNote    = c("独自列として保持", "これも保持"),
+  stringsAsFactors = FALSE)
+
+# マッピング：生データで使用されている列名とCamtrapDPのフィールド名との関係（マッピング）を作成
+mapping <- c(station = "deploymentID", lat = "latitude", lon = "longitude")
+
+built <- ctdp_build_table(
+  dep_schema, raw, mapping = mapping,
+  datetime_merges = list(
+    list(date_col = "start_day", time_col = "start_clk", target = "deploymentStart"),
+    list(date_col = "end_day",   time_col = "end_clk",   target = "deploymentEnd")))
+
+ctdp_summarize_validation(built$issues)   # スキーマ上の問題
+datapackage$set_deployments(built$data)   # 結果をパッケージへ投入
+```
+
+`myNote` のような独自列は保持されます。パッケージ書き出し時、独自列は
+`datapackage.json` 内のインライン拡張スキーマとして宣言されるため、Frictionless が
+受理します。
+
+# 8. 別のスキーマフレーバー（例: bioacoustics）
+
+各テーブルは指し示したスキーマで駆動されるため、本パッケージは TDWG がホストする
+カメラトラップのスキーマに限定されません。別フレーバー——例えば Camtrap DP の
+[bioacoustics 拡張](https://github.com/camera-traps/bioacoustics)——を対象にする
+には、テーブルおよび profile の URL を明示します。これらのスキーマは別リポジトリに
+あり、独自の列構成（例: `cameraID` の代わりに `deviceID`、さらに
+`samplingFrequency`, `frequencyLow`/`frequencyHigh` など）と、テーブルごとに異なる
+日時書式（`media` / `observations` のイベント時刻は小数秒付き
+`%Y-%m-%dT%H:%M:%S.%f%z`、`deployments` の時刻は小数秒なし）を用います。スキーマ駆動
+の検証はこれらすべてに自動的に適応します。生データの `media` / `observations` の
+タイムスタンプに小数秒が無い場合は、スキーマの `%f` 書式に合うよう **`.000` を自動
+付与**します。
+
+`set_properties()` でフレーバーを一度指定すれば、あとは通常どおりテーブルを追加
+できます（`set_*()` は設定済みの `schema_urls` を使うため、各呼び出しに `schema =`
+を渡す必要はありません）。
+
+```{r, eval = FALSE}
+ba <- "https://raw.githubusercontent.com/camera-traps/bioacoustics/main/camtrap-dp/1.0.2/%s"
+
+dp <- R6_CamtrapDP$new(version = "1.0.2")
+dp$set_properties(
+  version     = "1.0.2",
+  profile     = sprintf(ba, "camtrap-dp-profile-acoustic.json"),
+  schema_urls = list(
+    deployments  = sprintf(ba, "deployments-table-schema-acoustic.json"),
+    media        = sprintf(ba, "media-table-schema-acoustic.json"),
+    observations = sprintf(ba, "observations-table-schema-acoustic.json")))
+
+# 音響のタイムスタンプは、音響スキーマの書式に合わせて小数秒を付与する
+dp$set_media(data.frame(
+  mediaID = "m1", deploymentID = "D1",
+  timestamp = "2023-04-01T09:05:00.000+0900",
+  filePath = "audio/m1.wav", filePublic = TRUE, fileMediatype = "audio/wav",
+  samplingFrequency = 48000L, channels = 1L,
+  stringsAsFactors = FALSE))
+```
+
+## カメラトラップの列を音響フレーバーへ対応づける
+
+マッピングが必要なのは、**名前が音響フィールドと異なる列だけ**です。すでに音響
+フィールド名と同じ列（`deploymentID`, `latitude`, `deploymentStart` など）は自動的に
+対応づけられ、**マッピングは不要**です。deployments では、カメラトラップの `camera*`
+列が `device*` に改名され、カメラ専用列は音響に対応が無いため除外し、音響固有の列は
+データがあれば設定します。
+
+```{r, eval = FALSE}
+library(dplyr)
+
+# カメラトラップ deployments -> 音響 deployments（改名が必要な列だけ）
+mapping <- c(
+  cameraID      = "deviceID",
+  cameraModel   = "deviceModel",
+  cameraDelay   = "deviceDelay",
+  cameraHeight  = "deviceHeight",
+  cameraDepth   = "deviceDepth",
+  cameraTilt    = "deviceTilt",
+  cameraHeading = "deviceHeading")
+
+dep_acoustic <- camtrap_deployments %>%
+  select(-any_of(c("featureType", "timestampIssues")))   # カメラ専用: 音響に対応列なし
+
+dp$set_deployments(dep_acoustic, mapping = mapping)
+```
+
+列の対応 — **deployments**:
+
+| カメラトラップの列 | 音響の列 | 対応 |
+|---|---|---|
+| `deploymentID`, `locationID`, `locationName`, `latitude`, `longitude`, `coordinateUncertainty`, `deploymentStart`, `deploymentEnd`, `setupBy`, `detectionDistance`, `baitUse`, `habitat`, `deploymentGroups`, `deploymentTags`, `deploymentComments` | *同名* | **マッピング不要** |
+| `cameraID` / `cameraModel` / `cameraDelay` / `cameraHeight` / `cameraDepth` / `cameraTilt` / `cameraHeading` | `deviceID` / `deviceModel` / `deviceDelay` / `deviceHeight` / `deviceDepth` / `deviceTilt` / `deviceHeading` | **マップ** |
+| `featureType`, `timestampIssues` | — | **除外** |
+| — | `elevation`, `devicePlatform`, `recordingSchedule`, `locationType` | 音響固有（あれば設定） |
+
+**observations** で改名が必要なのは `cameraSetupType` → `deviceSetupType` のみです
+（音響は `frequencyLow` / `frequencyHigh` / `classificationConfirmation` も追加）。
+**media** に改名はなく、追加フィールド（`duration`, `bitDepth`, `samplingFrequency`,
+`gain`, `channels`）のみです。
+
+フレーバーのスキーマも、他のスキーマと同様に確認できます。なお
+`TableSchema$new("deployments", version = "1.0.2")` を `url_template` **なし**で
+呼ぶと*カメラトラップ*用の deployments スキーマが読み込まれます。音響の要件を確認
+するには音響 URL を渡してください。`requirements()` は各フィールドの型・書式・制約を
+表で返します。
+
+```{r, eval = FALSE}
+acoustic_dep <- TableSchema$new(
+  "deployments", version = "1.0.2",
+  url_template = sprintf(ba, "deployments-table-schema-acoustic.json"))
+acoustic_dep$field_names()
+acoustic_dep$required_field_names()
+acoustic_dep$requirements()        # field / type / format / required / enum / min / max / pattern
+acoustic_dep$external_references()
+```
+
+> `create_deployments()`, `create_media()`, `create_observations()` はカメラ
+> トラップのスキーマに合わせて作られています。別フレーバー（または将来版の新規列）
+> では、`create_*()` ではなくスキーマ駆動の経路（`ctdp_build_table()` か、カスタム
+> `schema =` を渡した `set_*()` メソッド）でテーブルを構築してください。
