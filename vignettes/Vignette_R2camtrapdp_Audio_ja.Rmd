@@ -1,0 +1,194 @@
+---
+title: "R2camtrapdp: 音声（音響）データ（日本語）"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{R2camtrapdp acoustic (audio) data (Japanese)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(R2camtrapdp)
+```
+
+# 概要
+
+音声（音響）録音は Camtrap DP の **bioacoustics フレーバー**で扱います。音声データは
+**メディアベース**（`observationLevel = "media"`）で、各観察はメディアファイル
+（`mediaID`）を参照します。カメラトラップとの差分は音響スキーマから自動的に読み取られ、
+主な点は次のとおりです。
+
+* **deployments** は `camera*` の代わりに **`device*`** 列（`deviceID`,
+  `deviceModel` など）＋ `elevation`, `devicePlatform`, `recordingSchedule`,
+  `locationType`。
+* **media** は `duration`, `samplingFrequency`, `bitDepth`, `gain`, `channels`
+  を追加。`fileMediatype` は `audio/wav` 等の音声タイプ。
+* **observations** は `frequencyLow`, `frequencyHigh` を追加。`cameraSetupType`
+  は `deviceSetupType` に。
+* **日時書式はテーブルごとに異なる**: `deployments` は `%Y-%m-%dT%H:%M:%S%z`
+  （小数秒なし）、`media` / `observations` の時刻は小数秒付き
+  `%Y-%m-%dT%H:%M:%S.%f%z`。
+* `project$captureMethod` の音声向けの値は `activityDetection` / `continuous` /
+  `recordingSchedule`（`timeLapse` は不可）。
+
+> **ヒント — 日時は `POSIXct` で渡す。** そうすれば各テーブルの書式へ正しく整形され
+> （オフセット `+0900`、必要な箇所には小数秒 `.000`）。`"2026/6/12 12:00:00"` の
+> ような生文字列はそのまま書き出され検証に失敗します。
+
+この例では、野帳が **設置情報の野帳**と**観察情報の野帳**の2つだけあり、観察野帳に
+音声の**ファイル名**が記録されている前提で、そこから `media` を作成します。
+
+# データ
+
+```{r}
+data("Adep")   # 設置情報の野帳（デバイス設置1件＝1行）
+data("Aobs")   # 観察情報の野帳（観察1件＝1行。`filename` を持つ）
+str(Adep, vec.len = 2)
+str(Aobs, vec.len = 2)
+```
+
+`Adep` は `deploymentID`、座標、`startDate`/`startTime`、`endDate`/`endTime`、
+`deviceID`、`deviceModel`、録音設定（`samplingFrequency`, `bitDepth`,
+`channels`）、`setupBy` を持ちます。`Aobs` は `deploymentID`、`filename`、
+`date`/`time`、`duration`、分類（`class`/`genus`/`species`）、`individualCount`、
+`frequencyLow`/`frequencyHigh`、`eventStart`/`eventEnd` を持ちます。
+
+# 1. bioacoustics フレーバーを指定
+
+```{r, eval = FALSE}
+ba <- "https://raw.githubusercontent.com/camera-traps/bioacoustics/main/camtrap-dp/1.0.2/%s"
+
+dp <- R6_CamtrapDP$new(version = "1.0.2",
+  title = "音響調査の例", description = "AudioMoth 録音",
+  id = "https://example.org/dataset/acoustic-1")
+
+dp$set_properties(
+  version     = "1.0.2",
+  profile     = sprintf(ba, "camtrap-dp-profile-acoustic.json"),
+  schema_urls = list(
+    deployments  = sprintf(ba, "deployments-table-schema-acoustic.json"),
+    media        = sprintf(ba, "media-table-schema-acoustic.json"),
+    observations = sprintf(ba, "observations-table-schema-acoustic.json")))
+```
+
+# 2. deployments（設置野帳から）
+
+`Adep` から deployments を作成します。日付列と時刻列を `POSIXct` に結合して渡すと、
+正しい日時書式で書き出されます。
+
+```{r}
+deployments <- data.frame(
+  deploymentID    = Adep$deploymentID,
+  latitude        = Adep$latitude,
+  longitude       = Adep$longitude,
+  locationID      = Adep$locationID,
+  deploymentStart = as.POSIXct(paste(Adep$startDate, Adep$startTime), tz = "Japan"),
+  deploymentEnd   = as.POSIXct(paste(Adep$endDate,   Adep$endTime),   tz = "Japan"),
+  deviceID        = Adep$deviceID,
+  deviceModel     = Adep$deviceModel,
+  setupBy         = Adep$setupBy,
+  stringsAsFactors = FALSE)
+```
+```{r, eval = FALSE}
+dp$set_deployments(deployments)
+```
+
+# 3. media（観察野帳のファイル名から生成）
+
+メディア用の野帳は無いので、`Aobs` のユニークな `filename`（音声ファイル1件＝1行）から
+`media` を作り、録音設定は `Adep` から結合します。
+
+```{r}
+files <- Aobs[!duplicated(Aobs$filename), ]   # 音声ファイルごとに1行
+
+media <- data.frame(
+  mediaID       = files$filename,             # ファイル名をメディア識別子に
+  deploymentID  = files$deploymentID,
+  timestamp     = as.POSIXct(paste(files$date, files$time), tz = "Japan"),
+  filePath      = file.path("audio", files$filename),
+  filePublic    = TRUE,
+  fileMediatype = paste0("audio/", tolower(tools::file_ext(files$filename))),  # "audio/wav"
+  duration      = files$duration,
+  stringsAsFactors = FALSE)
+
+# 録音設定（samplingFrequency / bitDepth / channels）を Adep から付与
+media <- merge(media, Adep[, c("deploymentID", "samplingFrequency", "bitDepth", "channels")],
+               by = "deploymentID", all.x = TRUE)
+head(media)
+```
+```{r, eval = FALSE}
+dp$set_media(media)
+```
+
+`timestamp` は `POSIXct` なので、音響 `media` の書式に合わせて小数秒付き
+（例 `2026-06-12T06:00:00.000+0900`）で自動的に書き出されます。
+
+# 4. observations（観察野帳から）
+
+```{r}
+observations <- data.frame(
+  observationID    = paste(Aobs$deploymentID, Aobs$eventID, Aobs$obsID, sep = "_"),
+  deploymentID     = Aobs$deploymentID,
+  mediaID          = Aobs$filename,           # media へのリンク（mediaID = filename）
+  eventStart       = as.POSIXct(Aobs$eventStart, tz = "Japan"),
+  eventEnd         = as.POSIXct(Aobs$eventEnd,   tz = "Japan"),
+  observationLevel = "media",
+  observationType  = ifelse(Aobs$object == "none", "blank",
+                     ifelse(Aobs$object == "hito", "human", "animal")),
+  scientificName   = ifelse(is.na(Aobs$genus), Aobs$class, paste(Aobs$genus, Aobs$species)),
+  count            = Aobs$individualCount,    # blank（none）の行は NA
+  frequencyLow     = Aobs$frequencyLow,
+  frequencyHigh    = Aobs$frequencyHigh,
+  stringsAsFactors = FALSE)
+```
+```{r, eval = FALSE}
+dp$set_observations(observations)
+```
+
+# 5. メタデータ・リレーション・書き出し・検証
+
+```{r, eval = FALSE}
+dp$add_contributors(data.frame(title = "Jane Doe", role = "contact",
+                               organization = "NIES", stringsAsFactors = FALSE))
+dp$add_license(name = "CC0-1.0",   scope = "data")
+dp$add_license(name = "CC-BY-4.0", scope = "media")
+dp$set_project(title = "音響調査", samplingDesign = "systematicRandom",
+               captureMethod = "recordingSchedule", individualAnimals = FALSE,
+               observationLevel = "media")
+dp$set_st()
+# dp$set_taxon()   # GBIF/ITIS/NCBI から taxonID。taxadb パッケージ＋ネット接続が必要
+
+dp$check_relations()   # PK/FK。キー列が欠損なら datapackage$data$... を指す警告を出す
+
+path <- file.path(tempdir(), "acoustic-package")
+dp$out_camtrapdp(write = TRUE, directory = path)
+
+issues <- dp$validate_frictionless(directory = path, python = "python")  # 要 pip install frictionless
+ctdp_is_valid(issues)
+```
+
+既にディスク上にあるパッケージを**上書きせず検証だけ**する場合:
+
+```{r, eval = FALSE}
+ctdp_validate_frictionless("path/to/existing/acoustic-package", python = "python")
+```
+
+# 6. 音響スキーマの要件確認
+
+```{r, eval = FALSE}
+ba <- "https://raw.githubusercontent.com/camera-traps/bioacoustics/main/camtrap-dp/1.0.2/%s"
+acoustic_media <- TableSchema$new(
+  "media", version = "1.0.2",
+  url_template = sprintf(ba, "media-table-schema-acoustic.json"))
+
+acoustic_media$field_names()
+acoustic_media$requirements()                 # 各列の type / format / required / enum
+acoustic_media$field("timestamp")$format      # "%Y-%m-%dT%H:%M:%S.%f%z"
+```
