@@ -24,7 +24,7 @@ The remaining NOTE is from "checking CRAN incoming feasibility":
 
 * Local: Windows 11, R <4.4.1>
 * win-builder: R Under development (unstable) (R-devel), x86_64-w64-mingw32
-* GitHub Actions (r-lib/actions "check-standard"):
+* GitHub Actions (r-lib/actions "check-standard"), all passing:
   * macOS-latest, R release
   * Windows-latest, R release
   * Ubuntu-latest, R devel
