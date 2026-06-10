@@ -1,0 +1,639 @@
+---
+title: "R2camtrapdp: schema-driven workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{R2camtrapdp: schema-driven workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(R2camtrapdp)
+```
+
+# Overview
+
+`R2camtrapdp` converts camera-trap data held in an arbitrary spreadsheet into a
+[Camera Trap Data Package (Camtrap DP)](https://camtrap-dp.tdwg.org/).
+
+This version is **schema-driven**: the structure, types and constraints of the
+output tables are read from the official Frictionless *table schemas* of the
+Camtrap DP version you choose. As a result the package
+
+* works with **any Camtrap DP version** (`1.0`, `1.0.1`, `1.0.2`) — and with
+  other **schema flavors** such as the bioacoustics extension (see §8) — simply
+  by pointing it at the right schema,
+* understands **custom / extra columns** that a particular schema (or your own
+  project) defines,
+* checks every value against the schema constraints
+  (`required`, `unique`, `enum`, `minimum`/`maximum`, `pattern`, date/datetime
+  **format**, ...),
+* checks the **relations** between tables (primary keys and foreign keys),
+* surfaces every **URL-specified reference** in a schema (semantic mappings and
+  description links) so nothing is overlooked (see §1), and
+* can run the Python **Frictionless** validator and report the errors back in R.
+
+The classic helper functions (`create_deployments()`, `create_media()`,
+`create_observations()`) and the `R6_CamtrapDP` class keep the same names and
+arguments as before, so existing scripts continue to work. The new
+schema-driven behaviour is added on top.
+
+> **Note on internet access.** Setting a table (`set_deployments()` etc.)
+> downloads the table schema for the chosen `version` from GitHub the first time
+> it is needed, and then caches it. If you work offline, pass a downloaded
+> schema file with the `local_schema =` argument.
+
+# Data
+
+The package ships with example data for several deployments with image records.
+
+```{r}
+# multiple deployments with image data
+data("Idep")   # deployment table
+data("Iobs")   # observation table
+```
+
+`Idep` holds one row per deployment (camera placement) with columns such as
+`deploymentID`, `longitude`, `latitude`, `locationID`, `startDate`/`startTime`,
+`endDate`/`endTime`, `cameraID`, `cameraModel`, `Delay`, `Height`, `bait` and
+`setupBy`. `Iobs` holds one row per observation with the institution/collection
+codes, `filename`, `deploymentID`, `date`/`time`, `obsID`, `eventID`,
+`eventStart`/`eventEnd`, `object`, `genus`, `species`, `class` and
+`individualCount`.
+
+# 1. Choose a version and inspect its schema (optional)
+
+The whole pipeline is driven by the schema of the version you pick. Camtrap DP
+versions `1.0`, `1.0.1` and `1.0.2` are all supported; their table schemas share
+the same field names, types and constraints, so the only practical difference is
+that `1.0.2` recognises a few more missing-value tokens (`NA`, `NaN`, `nan`). You
+can inspect the schema of any version directly with `TableSchema`.
+
+(Note: the official `1.0` *profile* — the metadata JSON Schema — has an upstream
+bug, a malformed internal `$ref`, that newer Frictionless rejects. Specifying
+`version = "1.0"` therefore emits a warning; `validate_frictionless()` works
+around the bug automatically, but `1.0.1` or later is recommended.)
+
+```{r, eval = FALSE}
+version <- "1.0.1"
+
+dep_schema <- TableSchema$new("deployments", version = version)
+dep_schema$field_names()           # every column the schema defines
+dep_schema$required_field_names()  # columns that must be present and non-missing
+dep_schema$empty_table()           # a 0-row, correctly typed "shell" table
+```
+
+You rarely need to do this by hand — the `R6_CamtrapDP` object loads and caches
+the right schema for you — but it is useful for understanding what a given
+version expects.
+
+`check_schema()` confirms that the schema itself is a well-formed Frictionless
+Table Schema (supported field `type`s, constraints that are valid for each type,
+primary/foreign keys that reference defined fields) — useful before adopting a
+brand-new or hand-edited schema.
+
+```{r, eval = FALSE}
+dep_schema$check_schema()
+```
+
+## External (URL) references in a schema
+
+Some Camtrap DP information is specified not as a machine-checkable constraint
+but as a **URL**: semantic mappings (`skos:exactMatch` / `broadMatch` /
+`narrowMatch` to Darwin Core, Audubon Core, ... terms) and reference URLs in
+field descriptions (for example the IANA media-type registry for
+`fileMediatype`, or method DOIs for `individualSpeed`). The package only enforces
+the structured constraints; the URL-referenced meaning is *not* validated. To
+make sure you never overlook such a specification when adopting a version or a
+new schema flavor, list them with:
+
+```{r, eval = FALSE}
+dep_schema$external_references()   # every URL the schema declares (skos, descriptions, schema URL)
+dep_schema$semantic_only_fields()  # fields whose meaning is URL-defined and cannot be value-checked
+```
+
+`external_references()` returns a tidy table (`resource`, `field`, `key`,
+`category`, `url`); `semantic_only_fields()` flags the columns you should check
+against the referenced authority by hand. The whole package can be scanned at
+once with `datapackage$external_references()`.
+
+# 2. Build the three core tables
+
+## Create deployments
+
+Using the deployment data (`Idep`), the deployments table is created exactly as
+before. `create_deployments()` accepts either combined datetimes or separate
+date/time columns.
+
+```{r}
+deployments <- create_deployments(
+  deploymentID         = Idep$deploymentID,
+  longitude            = Idep$longitude,
+  latitude             = Idep$latitude,
+  locationID           = Idep$locationID,
+  deploymentStart_date = Idep$startDate,
+  deploymentStart_time = Idep$startTime,
+  deploymentEnd_date   = Idep$endDate,
+  deploymentEnd_time   = Idep$endTime,
+  cameraID             = Idep$cameraID,
+  cameraModel          = Idep$cameraModel,
+  cameraDelay          = Idep$Delay,
+  cameraHeight         = Idep$Height,
+  baitUse              = Idep$bait,
+  setupBy              = Idep$setupBy)
+```
+
+`create_deployments()` also accepts (not shown above): `deploymentStart` /
+`deploymentEnd` (combined datetimes, used instead of the `*_date` / `*_time`
+pairs), `locationName`, `coordinateUncertainty`, `cameraDepth` (mutually
+exclusive with `cameraHeight`), `cameraTilt`, `cameraHeading`,
+`detectionDistance`, `timestampIssues`, `featureType`, `habitat`,
+`deploymentGroups`, `deploymentTags`, `deploymentComments`, and `tz` (time zone,
+default `"Japan"`).
+
+## Create media
+
+```{r}
+# media ID
+mediaIDi <- paste(Iobs$institutionCode,
+                  Iobs$collectionCode,
+                  Iobs$locationID,
+                  as.numeric(factor(Iobs$filename)),
+                  sep = "_")
+
+# file information
+fileName      <- Iobs$filename
+filetype      <- tolower(unlist(lapply(strsplit(fileName, "\\."), "[", 2)))
+fileMediatype <- paste("image", filetype, sep = "/")
+filePublic    <- !grepl("ヒト", fileName)   # hide human images from the public
+
+media <- create_media(
+  mediaID        = mediaIDi,
+  deploymentID   = Iobs$deploymentID,
+  timestamp_date = Iobs$date,
+  timestamp_time = Iobs$time,
+  filePath       = "Image",
+  filePublic     = filePublic,
+  fileMediatype  = fileMediatype,
+  captureMethod  = "activityDetection",
+  fileName       = fileName)
+```
+
+`create_media()` also accepts (not shown above): `timestamp` (combined datetime,
+instead of `timestamp_date` / `timestamp_time`), `exifData`, `favorite`,
+`mediaComments`, `tz`, and `omitduplicate` (drop duplicate `mediaID`s, default
+`TRUE`).
+
+## Create observations
+
+```{r}
+# event-based observations
+observationLevel <- "event"
+
+# observationType must be one of the schema enum values
+observationType <- ifelse(Iobs$object == "hito", "human",
+                   ifelse(Iobs$object == "none", "blank",
+                   ifelse(Iobs$object == "unidentifiable", "unknown", "animal")))
+
+# scientific name
+scientificName <- ifelse(is.na(Iobs$genus), Iobs$class, paste(Iobs$genus, Iobs$species))
+
+# unique observation IDs
+observationID <- paste(mediaIDi, Iobs$obsID, sep = "_")
+
+observations <- create_observations(
+  observationID             = observationID,
+  deploymentID              = Iobs$deploymentID,
+  eventID                   = Iobs$eventID,
+  eventStart                = Iobs$eventStart,
+  eventEnd                  = Iobs$eventEnd,
+  observationLevel          = observationLevel,
+  observationType           = observationType,
+  scientificName            = scientificName,
+  count                     = Iobs$individualCount,
+  classificationMethod      = "human",
+  classificationProbability = 1)
+```
+
+`create_observations()` also accepts (not shown above): `mediaID`, the
+`eventStart_date` / `eventStart_time` and `eventEnd_date` / `eventEnd_time` pairs
+(instead of combined `eventStart` / `eventEnd`), `cameraSetupType`, `lifeStage`,
+`sex`, `behavior`, `individualID`, `individualPositionRadius`,
+`individualPositionAngle`, `individualSpeed`, `bboxX`, `bboxY`, `bboxWidth`,
+`bboxHeight`, `classifiedBy`, `classificationTimestamp`, `observationTags`,
+`observationComments`, `tz`, and `omitduplicate`.
+
+# 3. Assemble the data package
+
+## Create the R6 object (with a version)
+
+```{r}
+datapackage <- R6_CamtrapDP$new(version = "1.0.1")
+```
+
+The `version` you give here selects the schemas used for validation and written
+into `datapackage.json`. Change it to target a different Camtrap DP release.
+
+## Import the tables (now schema-validated)
+
+`set_deployments()`, `set_media()` and `set_observations()` keep their original
+names, but now each one **coerces the table to the schema types and validates it
+against the schema** for the chosen version. Any problems are printed as a
+summary; you can switch the printing off with `validate = FALSE`.
+
+```{r, eval = FALSE}
+datapackage$set_deployments(deployments)
+datapackage$set_media(media)
+datapackage$set_observations(observations)
+```
+
+*(The chunks that download a schema, write files, look up taxonomy, or call
+Python are shown but not executed when this vignette is built, so they produce
+no output here.)*
+
+The validation summary tells you, for every issue, the file, the column, the
+row, the violated rule and a message — for example a value that breaks an
+`enum`, a number outside its `minimum`/`maximum`, or a datetime that does not
+match the required format. A value that does not even fit the column type (e.g.
+a non-numeric string in a `number` field) is reported as a `type` error rather
+than being silently turned into `NA`.
+
+## Check relations between tables
+
+Foreign keys (e.g. `media.deploymentID` must exist in `deployments`, and
+`observations.mediaID` must exist in `media`) and primary-key uniqueness are
+read from each table's schema and checked across the tables you have added.
+
+```{r, eval = FALSE}
+datapackage$check_relations()
+```
+
+If a primary-key or a required foreign-key column is **entirely missing** in a
+stored table (often a column-name mismatch that coercion filled with `NA`),
+`check_relations()` warns and points at the data, e.g.
+`datapackage$data$observations has 'deploymentID' entirely missing ...`, so you
+can inspect `datapackage$data$<resource>` directly.
+
+# 4. Metadata
+
+Camtrap DP requires five metadata properties (contributors, project, spatial,
+temporal, taxonomic — plus `created`). Six further properties are optional. The
+metadata functions are unchanged from previous versions.
+
+## Check which metadata the profile requires
+
+The required metadata is itself read from the package **profile** (a JSON
+Schema). `metadata_requirements()` lists every required top-level property, the
+method that sets it, and whether it is currently set; `check_metadata()`
+validates the current object against the profile and reports anything missing
+(including nested keys such as `project.samplingDesign`).
+
+```{r, eval = FALSE}
+datapackage$metadata_requirements()   # checklist: property, required, set_with, currently_set
+datapackage$check_metadata()          # report missing required metadata
+```
+
+This is the R-side counterpart of the metadata (profile) validation that
+Frictionless performs (§6), so you can confirm the required structure *before*
+writing the package and calling Python.
+
+## Required metadata
+
+### Contributors
+
+`add_contributors()` imports a data frame with columns `title`, `email`, `path`,
+`role` and `organization`. `role` may be `contact`, `principalInvestigator`,
+`rightsHolder`, `publisher` or `contributor`.
+
+```{r}
+cd <- data.frame(
+  title        = c("Keita Fukasawa", "Kana Terayama"),
+  email        = c("fukasawa@nies.go.jp", "terayama.kana@nies.go.jp"),
+  path         = c("https://orcid.org/0000-0003-0272-9180",
+                   "https://orcid.org/0000-0001-6935-7233"),
+  role         = c("contact", "principalInvestigator"),
+  organization = c("National Institute for Environmental Studies (NIES)",
+                   "National Institute for Environmental Studies (NIES)"))
+datapackage$add_contributors(cd)
+```
+
+### Project
+
+```{r}
+datapackage$set_project(
+  title            = "DummyData",
+  samplingDesign   = "simpleRandom",
+  captureMethod    = "activityDetection",
+  individualAnimals = FALSE,
+  observationLevel = "event")
+```
+
+`samplingDesign` is one of `simpleRandom`, `systematicRandom`,
+`clusteredRandom`, `experimental`, `targeted` or `opportunistic`;
+`captureMethod` is `activityDetection` or `timeLapse`; `observationLevel` is
+`media` or `event`. The optional `id`, `acronym`, `description` and `path`
+arguments are also available.
+
+### Spatial and temporal
+
+`set_st()` derives the spatial and temporal coverage from the deployments, so it
+must be called after `set_deployments()`.
+
+```{r, eval = FALSE}
+datapackage$set_st()
+```
+
+### Taxonomic
+
+`set_taxon()` lists the unique `scientificName` values from the observations and
+looks up `taxonID`, `taxonRank` and the higher taxonomy from a taxonomic
+database (`gbif` by default; also `itis` / `ncbi`; see `taxadb::get_ids`). The
+Camtrap DP `taxonomic` block requires a `taxonID` (a GBIF / IUCN identifier or
+URI), so `taxadb` is a required dependency of R2camtrapdp (installed with it);
+this step also needs internet access.
+
+```{r, eval = FALSE}
+datapackage$set_taxon()
+```
+
+Names that cannot be matched get `taxonID = NA` (omitted from the output, not a
+bogus `<uri>NA`). `set_taxon()` warns about `scientificName` values with
+unnecessary whitespace and about names with no `taxonID` in the chosen database,
+so you can clean or check those names.
+
+### Created
+
+```{r}
+datapackage$update_created(tz = "Japan")
+```
+
+## Optional metadata
+
+### Licenses
+
+Camtrap DP expects at least one license for the data and one for the media.
+
+```{r}
+datapackage$add_license(name = "CC-BY-4.0",
+                        path = "http://creativecommons.org/licenses/by/4.0/",
+                        scope = "data")
+datapackage$add_license(name = "CC-BY-4.0",
+                        path = "http://creativecommons.org/licenses/by/4.0/",
+                        scope = "media")
+```
+
+### Related identifiers
+
+```{r}
+datapackage$add_relatedIdentifiers(
+  relationType          = "IsSupplementTo",
+  relatedIdentifier     = "https://doi.org/xxxx",
+  relatedIdentifierType = "DOI",
+  resourceTypeGeneral   = "JournalArticle")
+```
+
+### Properties, sources and references
+
+```{r}
+datapackage$set_properties(
+  name     = "dummy-nies",
+  homepage = "https://www.nies.go.jp/biology/snapshot_japan/index.html")
+datapackage$add_sources(title = "DummyData")
+datapackage$add_references(reference = "DummyNIES https://doi.org/xxxxx")
+```
+
+### Custom resources
+
+`set_custom()` attaches an extra resource (for example data used by an
+abundance estimator) as metadata. It must be called after the three core tables
+have been set.
+
+```{r}
+RD <- data.frame(id = seq_len(388), Time = sample(1:29, 388, replace = TRUE))
+```
+```{r, eval = FALSE}
+datapackage$set_custom(name = "rest",
+                       description = "data for the REST method",
+                       data = RD)
+```
+
+# 5. Output the data package
+
+```{r, eval = FALSE}
+# return the camtrapdp object
+data_camtrapdp <- datapackage$out_camtrapdp()
+
+# or also write deployments.csv / media.csv / observations.csv + datapackage.json
+datapackage$out_camtrapdp(write = TRUE, directory = path)
+```
+
+When written, the CSV files contain every schema column, booleans are written as
+`true`/`false`, and unset metadata is omitted so that empty placeholders do not
+cause spurious validation errors.
+
+# 6. Validate the written package with Frictionless
+
+## Conformance pre-checks (before calling Python)
+
+Before running Python, you can check on the R side whether the package is even a
+well-formed Frictionless data package — and whether it is Camtrap DP form. This
+mirrors, in R, the structural checks Frictionless performs, so problems with a
+brand-new or unusual schema surface early.
+
+```{r, eval = FALSE}
+datapackage$check_descriptor()        # package + table-schema structure (Frictionless spec)
+datapackage$check_camtrap_profile()   # warn if the profile is not a Camtrap DP profile
+```
+
+A package can be a valid *Frictionless* data package without being *Camtrap DP*
+form: that depends on whether its `profile` is the Camtrap DP profile (which is
+the default). The authoritative check, including GeoJSON validity and the
+physical file structure, is still the Frictionless run below.
+
+## Run Frictionless
+
+You can confirm the written package against the official schemas with the Python
+[Frictionless](https://framework.frictionlessdata.io/docs/guides/validating-data.html)
+validator. This requires Python with `frictionless` installed
+(`pip install frictionless`).
+
+```{r, eval = FALSE}
+issues <- datapackage$validate_frictionless(directory = path, python = "python")
+ctdp_is_valid(issues)   # TRUE if there are no errors
+```
+
+**Note — this rewrites `path`.** `validate_frictionless()` defaults to
+`write = TRUE`, so it calls `out_camtrapdp()` and **overwrites** the
+`datapackage.json` and CSVs in `directory` from the current object before
+validating. To validate a package that already exists on disk **without
+overwriting it**, use `write = FALSE`, or the standalone validate-only function
+(no R6 object needed):
+
+```{r, eval = FALSE}
+ctdp_validate_frictionless("path/to/existing/package", python = "python")
+```
+
+`issues` is a tidy table with one row per problem, giving the `source` file, the
+`field` (column or property path), the `row`, the violated `constraint`, the
+offending `value`, and a `message`, so you can see exactly where any error
+occurs. For cell errors `value` is the failing cell; for metadata (profile)
+errors it is resolved from `datapackage.json` via the property path in the note
+(e.g. `contributors[].email` → the actual email value(s)). You can also aggregate the R-side schema
+checks, the relation checks, the metadata (profile) checks, the conformance
+pre-checks and (optionally) the Frictionless report in one call:
+
+```{r, eval = FALSE}
+datapackage$validate(relations = TRUE, metadata = TRUE, conformance = TRUE,
+                     frictionless = TRUE, directory = path, python = "python")
+```
+
+# 7. Converting an arbitrary spreadsheet directly
+
+The helpers above assume you already named your variables. If instead you have a
+raw spreadsheet with its own column names, you can map and validate it in one
+step with `ctdp_build_table()`, which applies a column mapping, merges separate
+date/time columns, coerces to the schema types and validates — for any version.
+
+```{r, eval = FALSE}
+version    <- "1.0.1"
+dep_schema <- TableSchema$new("deployments", version = version)
+
+# an example raw sheet with arbitrary column names + a custom column
+raw <- data.frame(
+  station   = c("A01", "A02"),
+  lat       = c(35.1, 36.2),
+  lon       = c(139.5, 140.1),
+  start_day = c("2023-04-01", "2023-04-02"),
+  start_clk = c("09:00:00", "10:30:00"),
+  end_day   = c("2023-05-01", "2023-05-02"),
+  end_clk   = c("09:00:00", "10:30:00"),
+  myNote    = c("kept as a custom column", "kept too"),
+  stringsAsFactors = FALSE)
+
+# mapping: names are SOURCE columns, values are Camtrap DP FIELD names
+mapping <- c(station = "deploymentID", lat = "latitude", lon = "longitude")
+
+built <- ctdp_build_table(
+  dep_schema, raw, mapping = mapping,
+  datetime_merges = list(
+    list(date_col = "start_day", time_col = "start_clk", target = "deploymentStart"),
+    list(date_col = "end_day",   time_col = "end_clk",   target = "deploymentEnd")))
+
+ctdp_summarize_validation(built$issues)   # any schema problems
+datapackage$set_deployments(built$data)   # feed the result into the package
+```
+
+Custom columns such as `myNote` are kept; when the package is written, the
+custom column is declared in an inline extended schema in `datapackage.json` so
+that Frictionless accepts it.
+
+# 8. Other schema flavors (e.g. bioacoustics)
+
+Because every table is driven by the schema you point it at, the package is not
+limited to the camera-trap schemas hosted by TDWG. To target a different flavor —
+for instance the
+[bioacoustics extension](https://github.com/camera-traps/bioacoustics) of
+Camtrap DP — give the table and profile URLs explicitly. These schemas live in a
+different repository and use their own field set (e.g. `deviceID` instead of
+`cameraID`, plus `samplingFrequency`, `frequencyLow`/`frequencyHigh`, ...) and
+per-table datetime formats (the `media` / `observations` event timestamps use
+fractional seconds `%Y-%m-%dT%H:%M:%S.%f%z`, while the `deployments` times do
+not); the schema-driven validation adapts to all of this automatically. If your
+raw `media` / `observations` timestamps lack the fractional part, `.000` is
+added automatically so the value matches the schema's `%f` format.
+
+Point the package at the flavor once with `set_properties()`, then add tables as
+usual — the `set_*()` methods use the configured `schema_urls`, so you do not
+need to pass `schema =` to each call:
+
+```{r, eval = FALSE}
+ba <- "https://raw.githubusercontent.com/camera-traps/bioacoustics/main/camtrap-dp/1.0.2/%s"
+
+dp <- R6_CamtrapDP$new(version = "1.0.2")
+dp$set_properties(
+  version     = "1.0.2",
+  profile     = sprintf(ba, "camtrap-dp-profile-acoustic.json"),
+  schema_urls = list(
+    deployments  = sprintf(ba, "deployments-table-schema-acoustic.json"),
+    media        = sprintf(ba, "media-table-schema-acoustic.json"),
+    observations = sprintf(ba, "observations-table-schema-acoustic.json")))
+
+# audio timestamps carry fractional seconds to match the acoustic schema format
+dp$set_media(data.frame(
+  mediaID = "m1", deploymentID = "D1",
+  timestamp = "2023-04-01T09:05:00.000+0900",
+  filePath = "audio/m1.wav", filePublic = TRUE, fileMediatype = "audio/wav",
+  samplingFrequency = 48000L, channels = 1L,
+  stringsAsFactors = FALSE))
+```
+
+## Mapping camera-trap columns to the acoustic flavor
+
+You only need a mapping for columns whose **name differs** from the acoustic
+field. Columns that already use the acoustic field name (`deploymentID`,
+`latitude`, `deploymentStart`, ...) are matched automatically — no mapping
+needed. For deployments, the camera-trap `camera*` fields are renamed to
+`device*`; the camera-only fields have no acoustic equivalent and should be
+dropped; and a few acoustic-only fields can be set if you have the data.
+
+```{r, eval = FALSE}
+library(dplyr)
+
+# camera-trap deployments -> acoustic deployments (only the renamed columns)
+mapping <- c(
+  cameraID      = "deviceID",
+  cameraModel   = "deviceModel",
+  cameraDelay   = "deviceDelay",
+  cameraHeight  = "deviceHeight",
+  cameraDepth   = "deviceDepth",
+  cameraTilt    = "deviceTilt",
+  cameraHeading = "deviceHeading")
+
+dep_acoustic <- camtrap_deployments %>%
+  select(-any_of(c("featureType", "timestampIssues")))   # camera-only: no acoustic field
+
+dp$set_deployments(dep_acoustic, mapping = mapping)
+```
+
+Field correspondence — **deployments**:
+
+| Camera-trap field | Acoustic field | Action |
+|---|---|---|
+| `deploymentID`, `locationID`, `locationName`, `latitude`, `longitude`, `coordinateUncertainty`, `deploymentStart`, `deploymentEnd`, `setupBy`, `detectionDistance`, `baitUse`, `habitat`, `deploymentGroups`, `deploymentTags`, `deploymentComments` | *same name* | **no mapping** |
+| `cameraID` / `cameraModel` / `cameraDelay` / `cameraHeight` / `cameraDepth` / `cameraTilt` / `cameraHeading` | `deviceID` / `deviceModel` / `deviceDelay` / `deviceHeight` / `deviceDepth` / `deviceTilt` / `deviceHeading` | **map** |
+| `featureType`, `timestampIssues` | — | **drop** |
+| — | `elevation`, `devicePlatform`, `recordingSchedule`, `locationType` | acoustic-only (set if available) |
+
+For **observations** the only renamed field is `cameraSetupType` → `deviceSetupType`
+(acoustic also adds `frequencyLow` / `frequencyHigh` / `classificationConfirmation`).
+For **media** there are no renames, only extra fields (`duration`, `bitDepth`,
+`samplingFrequency`, `gain`, `channels`).
+
+Inspect a flavor the same way as any other schema. Note that
+`TableSchema$new("deployments", version = "1.0.2")` **without** `url_template`
+loads the *camera-trap* deployments schema; pass the acoustic URL to inspect the
+acoustic requirements. `requirements()` returns a tidy table of every field's
+type, format and constraints.
+
+```{r, eval = FALSE}
+acoustic_dep <- TableSchema$new(
+  "deployments", version = "1.0.2",
+  url_template = sprintf(ba, "deployments-table-schema-acoustic.json"))
+acoustic_dep$field_names()
+acoustic_dep$required_field_names()
+acoustic_dep$requirements()        # field / type / format / required / enum / min / max / pattern
+acoustic_dep$external_references()
+```
+
+> Note that `create_deployments()`, `create_media()` and `create_observations()`
+> are tailored to the camera-trap schema. For a different flavor (or for new
+> columns in a future version), build the tables with the schema-driven path
+> (`ctdp_build_table()` or the `set_*()` methods with a custom `schema =`)
+> rather than the `create_*()` helpers.

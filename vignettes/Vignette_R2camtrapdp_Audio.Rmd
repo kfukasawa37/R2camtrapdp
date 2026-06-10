@@ -1,0 +1,200 @@
+---
+title: "R2camtrapdp: acoustic (audio) data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{R2camtrapdp acoustic (audio) data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(R2camtrapdp)
+```
+
+# Overview
+
+Acoustic (audio) recordings use the **bioacoustics flavor** of Camtrap DP. Audio
+data is **media-based** (`observationLevel = "media"`): each observation refers
+to a media file (`mediaID`). The differences from the camera-trap schema are read
+automatically from the bioacoustics schemas; the main ones are:
+
+* **deployments** use **`device*`** fields (`deviceID`, `deviceModel`, ...) plus
+  `elevation`, `devicePlatform`, `recordingSchedule`, `locationType`.
+* **media** add `duration`, `samplingFrequency`, `bitDepth`, `gain`, `channels`;
+  `fileMediatype` is an audio type such as `audio/wav`.
+* **observations** add `frequencyLow`, `frequencyHigh`; `cameraSetupType` becomes
+  `deviceSetupType`.
+* **datetime formats differ per table**: `deployments` use `%Y-%m-%dT%H:%M:%S%z`
+  (no fractional seconds); `media` / `observations` timestamps use fractional
+  seconds `%Y-%m-%dT%H:%M:%S.%f%z`.
+* `project$captureMethod` for audio is one of `activityDetection`, `continuous`,
+  `recordingSchedule` (not `timeLapse`).
+
+> **Tip — pass datetimes as `POSIXct`.** The package then formats each table's
+> datetime correctly (offset `+0900`, and `.000` fractional seconds where the
+> schema requires them). A raw string like `"2026/6/12 12:00:00"` is written
+> as-is and fails validation.
+
+This example assumes you have only two field notebooks — a **deployment**
+notebook and an **observation** notebook — and that the observation notebook
+carries the audio **file names**, from which `media` is derived.
+
+# Data
+
+```{r}
+data("Adep")   # deployment field-notebook (one row per device deployment)
+data("Aobs")   # observation field-notebook (one row per observation; has `filename`)
+str(Adep, vec.len = 2)
+str(Aobs, vec.len = 2)
+```
+
+`Adep` has `deploymentID`, coordinates, `startDate`/`startTime`,
+`endDate`/`endTime`, `deviceID`, `deviceModel`, the recording settings
+(`samplingFrequency`, `bitDepth`, `channels`) and `setupBy`. `Aobs` has
+`deploymentID`, `filename`, `date`/`time`, `duration`, the taxonomy
+(`class`/`genus`/`species`), `individualCount`, `frequencyLow`/`frequencyHigh`
+and `eventStart`/`eventEnd`. In this example data the coordinates fall in the
+Izu Peninsula (Japan), `individualCount` is `NA` (not counted from audio), and
+`frequencyLow`/`frequencyHigh` use approximate values from the literature.
+
+# 1. Point the package at the bioacoustics flavor
+
+```{r, eval = FALSE}
+ba <- "https://raw.githubusercontent.com/camera-traps/bioacoustics/main/camtrap-dp/1.0.2/%s"
+
+dp <- R6_CamtrapDP$new(version = "1.0.2",
+  title = "Acoustic survey example", description = "AudioMoth recordings",
+  id = "https://example.org/dataset/acoustic-1")
+
+dp$set_properties(
+  version     = "1.0.2",
+  profile     = sprintf(ba, "camtrap-dp-profile-acoustic.json"),
+  schema_urls = list(
+    deployments  = sprintf(ba, "deployments-table-schema-acoustic.json"),
+    media        = sprintf(ba, "media-table-schema-acoustic.json"),
+    observations = sprintf(ba, "observations-table-schema-acoustic.json")))
+```
+
+# 2. Deployments (from the deployment notebook)
+
+Build the deployments table from `Adep`. Combine the date and time columns into
+`POSIXct` so the package writes the correct datetime format.
+
+```{r}
+deployments <- data.frame(
+  deploymentID    = Adep$deploymentID,
+  latitude        = Adep$latitude,
+  longitude       = Adep$longitude,
+  locationID      = Adep$locationID,
+  deploymentStart = as.POSIXct(paste(Adep$startDate, Adep$startTime), tz = "Japan"),
+  deploymentEnd   = as.POSIXct(paste(Adep$endDate,   Adep$endTime),   tz = "Japan"),
+  deviceID        = Adep$deviceID,
+  deviceModel     = Adep$deviceModel,
+  setupBy         = Adep$setupBy,
+  stringsAsFactors = FALSE)
+```
+```{r, eval = FALSE}
+dp$set_deployments(deployments)
+```
+
+# 3. Media (derived from the observation notebook's file names)
+
+There is no separate media notebook: build `media` from the unique `filename`s
+in `Aobs` (one row per audio file), and bring the recording settings over from
+`Adep`.
+
+```{r}
+files <- Aobs[!duplicated(Aobs$filename), ]   # one row per audio file
+
+media <- data.frame(
+  mediaID       = files$filename,             # the file name is the media identifier
+  deploymentID  = files$deploymentID,
+  timestamp     = as.POSIXct(paste(files$date, files$time), tz = "Japan"),
+  filePath      = file.path("audio", files$filename),
+  filePublic    = TRUE,
+  fileMediatype = paste0("audio/", tolower(tools::file_ext(files$filename))),  # "audio/wav"
+  duration      = files$duration,
+  stringsAsFactors = FALSE)
+
+# add device recording settings (samplingFrequency / bitDepth / channels) from Adep
+media <- merge(media, Adep[, c("deploymentID", "samplingFrequency", "bitDepth", "channels")],
+               by = "deploymentID", all.x = TRUE)
+head(media)
+```
+```{r, eval = FALSE}
+dp$set_media(media)
+```
+
+`timestamp` is written **with** fractional seconds (e.g.
+`2026-06-12T06:00:00.000+0900`) to match the acoustic `media` format — handled
+automatically because it is a `POSIXct`.
+
+# 4. Observations (from the observation notebook)
+
+```{r}
+observations <- data.frame(
+  observationID    = paste(Aobs$deploymentID, Aobs$eventID, Aobs$obsID, sep = "_"),
+  deploymentID     = Aobs$deploymentID,
+  mediaID          = Aobs$filename,           # link to media (mediaID = filename)
+  eventStart       = as.POSIXct(Aobs$eventStart, tz = "Japan"),
+  eventEnd         = as.POSIXct(Aobs$eventEnd,   tz = "Japan"),
+  observationLevel = "media",
+  observationType  = ifelse(Aobs$object == "none", "blank",
+                     ifelse(Aobs$object == "hito", "human", "animal")),
+  scientificName   = ifelse(is.na(Aobs$genus), Aobs$class, paste(Aobs$genus, Aobs$species)),
+  count            = Aobs$individualCount,    # NA here (not counted from audio)
+  frequencyLow     = Aobs$frequencyLow,
+  frequencyHigh    = Aobs$frequencyHigh,
+  stringsAsFactors = FALSE)
+```
+```{r, eval = FALSE}
+dp$set_observations(observations)
+```
+
+# 5. Metadata, relations, write, validate
+
+```{r, eval = FALSE}
+dp$add_contributors(data.frame(title = "Jane Doe", role = "contact",
+                               organization = "NIES", stringsAsFactors = FALSE))
+dp$add_license(name = "CC0-1.0",   scope = "data")
+dp$add_license(name = "CC-BY-4.0", scope = "media")
+dp$set_project(title = "Acoustic survey", samplingDesign = "systematicRandom",
+               captureMethod = "recordingSchedule", individualAnimals = FALSE,
+               observationLevel = "media")
+dp$set_st()
+# dp$set_taxon()   # taxonID from GBIF/ITIS/NCBI; requires the taxadb package + internet
+
+dp$check_relations()   # PK/FK; warns and points at datapackage$data$... if a key is missing
+
+path <- file.path(tempdir(), "acoustic-package")
+dp$out_camtrapdp(write = TRUE, directory = path)
+
+issues <- dp$validate_frictionless(directory = path, python = "python")  # pip install frictionless
+ctdp_is_valid(issues)
+```
+
+To validate a package that already exists on disk **without overwriting it**:
+
+```{r, eval = FALSE}
+ctdp_validate_frictionless("path/to/existing/acoustic-package", python = "python")
+```
+
+# 6. Inspecting the acoustic requirements
+
+```{r, eval = FALSE}
+ba <- "https://raw.githubusercontent.com/camera-traps/bioacoustics/main/camtrap-dp/1.0.2/%s"
+acoustic_media <- TableSchema$new(
+  "media", version = "1.0.2",
+  url_template = sprintf(ba, "media-table-schema-acoustic.json"))
+
+acoustic_media$field_names()
+acoustic_media$requirements()                 # type / format / required / enum per field
+acoustic_media$field("timestamp")$format      # "%Y-%m-%dT%H:%M:%S.%f%z"
+```

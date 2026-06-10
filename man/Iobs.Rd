@@ -3,8 +3,37 @@
 \docType{data}
 \name{Iobs}
 \alias{Iobs}
-\title{Observation data of image and media-based observation which collected by 10 camera-trap (dummy data)}
-\description{
-Observation data of image and media-based observation which collected by 10 camera-trap (dummy data)
+\title{Example observation data (image records)}
+\format{
+A data frame with 388 rows and 17 variables:
+\describe{
+\item{institutionCode}{Institution code.}
+\item{collectionCode}{Collection code.}
+\item{obsID}{Observation identifier (within an event).}
+\item{eventID}{Identifier of the event the observation belongs to.}
+\item{locationID}{Identifier of the deployment location.}
+\item{date}{Date the media file was recorded.}
+\item{time}{Time the media file was recorded.}
+\item{object}{Recorded object category (raw label).}
+\item{class}{Taxonomic class of the observed organism.}
+\item{genus}{Genus of the observed organism.}
+\item{species}{Species epithet of the observed organism.}
+\item{individualCount}{Number of observed individuals.}
+\item{SDcardID}{Identifier of the SD card.}
+\item{filename}{Name of the media file.}
+\item{deploymentID}{Identifier of the deployment the observation belongs to.}
+\item{eventStart}{Date and time at which the event started.}
+\item{eventEnd}{Date and time at which the event ended.}
 }
-\keyword{data}
+}
+\usage{
+Iobs
+}
+\description{
+A small example observation table used in the package vignettes and examples.
+One row per observation.
+}
+\seealso{
+\link{Idep}
+}
+\keyword{datasets}

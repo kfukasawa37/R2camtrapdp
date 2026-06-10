@@ -3,8 +3,36 @@
 \docType{data}
 \name{Idep}
 \alias{Idep}
-\title{Deployment data of images which collected by 10 camera-trap (dummy data)}
-\description{
-Deployment data of images which collected by 10 camera-trap (dummy data)
+\title{Example deployment data (multiple camera deployments with image records)}
+\format{
+A data frame with 10 rows and 14 variables:
+\describe{
+\item{deploymentID}{Unique identifier of the deployment.}
+\item{longitude}{Longitude in decimal degrees (WGS84).}
+\item{latitude}{Latitude in decimal degrees (WGS84).}
+\item{locationID}{Identifier of the deployment location.}
+\item{startDate}{Deployment start date.}
+\item{startTime}{Deployment start time.}
+\item{endDate}{Deployment end date.}
+\item{endTime}{Deployment end time.}
+\item{cameraID}{Identifier of the camera.}
+\item{cameraModel}{Manufacturer and model of the camera.}
+\item{Delay}{Predefined duration after detection during which further
+activity is ignored (camera delay).}
+\item{Height}{Height at which the camera was deployed.}
+\item{bait}{Whether bait was used for the deployment.}
+\item{setupBy}{Name or identifier of the person/organization that deployed
+the camera.}
 }
-\keyword{data}
+}
+\usage{
+Idep
+}
+\description{
+A small example deployment table used in the package vignettes and examples.
+One row per camera deployment.
+}
+\seealso{
+\link{Iobs}
+}
+\keyword{datasets}

@@ -1,41 +1,199 @@
-#' Deployment data of videos which collected by a camera-trap
-#' 
-#' @name Vdep
-#' @docType data
-#' @references Originally data can be used from https://doi.org/10.34462/0002000233
-#' @keywords data
-#' 
-NULL
+#' Example deployment data (multiple camera deployments with image records)
+#'
+#' A small example deployment table used in the package vignettes and examples.
+#' One row per camera deployment.
+#'
+#' @format A data frame with 10 rows and 14 variables:
+#' \describe{
+#'   \item{deploymentID}{Unique identifier of the deployment.}
+#'   \item{longitude}{Longitude in decimal degrees (WGS84).}
+#'   \item{latitude}{Latitude in decimal degrees (WGS84).}
+#'   \item{locationID}{Identifier of the deployment location.}
+#'   \item{startDate}{Deployment start date.}
+#'   \item{startTime}{Deployment start time.}
+#'   \item{endDate}{Deployment end date.}
+#'   \item{endTime}{Deployment end time.}
+#'   \item{cameraID}{Identifier of the camera.}
+#'   \item{cameraModel}{Manufacturer and model of the camera.}
+#'   \item{Delay}{Predefined duration after detection during which further
+#'     activity is ignored (camera delay).}
+#'   \item{Height}{Height at which the camera was deployed.}
+#'   \item{bait}{Whether bait was used for the deployment.}
+#'   \item{setupBy}{Name or identifier of the person/organization that deployed
+#'     the camera.}
+#' }
+#' @seealso [Iobs]
+"Idep"
 
-#' Observation data of videos which collected by a camera-trap
-#' @name Vobs
-#' @docType data
-#' @references Originally data can be used from https://doi.org/10.34462/0002000233
-#' @keywords data
-NULL
+#' Example observation data (image records)
+#'
+#' A small example observation table used in the package vignettes and examples.
+#' One row per observation.
+#'
+#' @format A data frame with 388 rows and 17 variables:
+#' \describe{
+#'   \item{institutionCode}{Institution code.}
+#'   \item{collectionCode}{Collection code.}
+#'   \item{obsID}{Observation identifier (within an event).}
+#'   \item{eventID}{Identifier of the event the observation belongs to.}
+#'   \item{locationID}{Identifier of the deployment location.}
+#'   \item{date}{Date the media file was recorded.}
+#'   \item{time}{Time the media file was recorded.}
+#'   \item{object}{Recorded object category (raw label).}
+#'   \item{class}{Taxonomic class of the observed organism.}
+#'   \item{genus}{Genus of the observed organism.}
+#'   \item{species}{Species epithet of the observed organism.}
+#'   \item{individualCount}{Number of observed individuals.}
+#'   \item{SDcardID}{Identifier of the SD card.}
+#'   \item{filename}{Name of the media file.}
+#'   \item{deploymentID}{Identifier of the deployment the observation belongs to.}
+#'   \item{eventStart}{Date and time at which the event started.}
+#'   \item{eventEnd}{Date and time at which the event ended.}
+#' }
+#' @seealso [Idep]
+"Iobs"
 
-#' Camtrap DP objects have been created from Vdep and Vobs
-#' @name datapackageVdata
-#' @docType data
-#' @references Originally data can be used from https://doi.org/10.34462/0002000233
-#' @keywords data camtrapDP
-NULL
+#' Example single camera-trap deployment data (video)
+#'
+#' Example deployment data for a single camera trap (at NIES, Japan), used in the
+#' single-camera vignette. One row.
+#'
+#' @format A data frame with 1 row and 14 variables:
+#' \describe{
+#'   \item{deploymentID}{Unique identifier of the deployment.}
+#'   \item{longitude}{Longitude in decimal degrees (WGS84).}
+#'   \item{latitude}{Latitude in decimal degrees (WGS84).}
+#'   \item{locationID}{Identifier of the deployment location.}
+#'   \item{startDate}{Deployment start date.}
+#'   \item{startTime}{Deployment start time.}
+#'   \item{endDate}{Deployment end date.}
+#'   \item{endTime}{Deployment end time.}
+#'   \item{cameraID}{Identifier of the camera.}
+#'   \item{cameraModel}{Manufacturer and model of the camera.}
+#'   \item{Delay}{Camera delay.}
+#'   \item{Height}{Height at which the camera was deployed.}
+#'   \item{bait}{Whether bait was used.}
+#'   \item{setupBy}{Name or identifier of the person/organization that deployed the camera.}
+#' }
+#' @references Originally data can be used from <https://doi.org/10.34462/0002000233>
+#' @seealso [Vobs]
+"Vdep"
 
-#' Deployment data of images which collected by 10 camera-trap (dummy data)
-#' @name Idep
-#' @docType data
-#' @keywords data
-#' 
-NULL
+#' Example single camera-trap observation data (video)
+#'
+#' Example observation data for the [Vdep] single camera-trap deployment, used in
+#' the single-camera vignette. One row per observation; `filename` is the video
+#' file from which the `media` table is built.
+#'
+#' @format A data frame with 38 rows and 13 variables:
+#' \describe{
+#'   \item{institutionCode}{Institution code.}
+#'   \item{collectionCode}{Collection code.}
+#'   \item{videoID}{Video identifier.}
+#'   \item{locationID}{Identifier of the deployment location.}
+#'   \item{date}{Date the video was recorded.}
+#'   \item{time}{Time the video was recorded.}
+#'   \item{object}{Recorded object category.}
+#'   \item{class}{Taxonomic class of the observed organism.}
+#'   \item{genus}{Genus of the observed organism.}
+#'   \item{species}{Species epithet of the observed organism.}
+#'   \item{individualCount}{Number of observed individuals.}
+#'   \item{SDcardID}{Identifier of the SD card.}
+#'   \item{filename}{Name of the video file (used to build `media`).}
+#' }
+#' @references Originally data can be used from <https://doi.org/10.34462/0002000233>
+#' @seealso [Vdep]
+"Vobs"
 
-#' Observation data of image and media-based observation which collected by 10 camera-trap (dummy data)
-#' @name Iobs
-#' @docType data
-#' @keywords data
-NULL
+#' Example Camtrap DP data package (single camera trap)
+#'
+#' A pre-built Camtrap DP object (class `camtrapdp`) created from [Vdep] and
+#' [Vobs], for trying out the package without rebuilding from scratch.
+#'
+#' @format A `camtrapdp` object (a list with the package metadata and the
+#'   `deployments` / `media` / `observations` tables under `$data`).
+#' @references Originally data can be used from <https://doi.org/10.34462/0002000233>
+#' @seealso [datapackageIdata]
+"datapackageVdata"
 
-#' Camtrap DP objects have been created from Idep and Iobs
-#' @name datapackageIdata
-#' @docType data
-#' @keywords data camtrapDP
-NULL
+#' Example Camtrap DP data package (multiple camera traps)
+#'
+#' A pre-built Camtrap DP object (class `camtrapdp`) created from [Idep] and
+#' [Iobs], for trying out the package without rebuilding from scratch.
+#'
+#' @format A `camtrapdp` object (a list with the package metadata and the
+#'   `deployments` / `media` / `observations` tables under `$data`).
+#' @seealso [datapackageVdata]
+"datapackageIdata"
+
+#' Example acoustic deployment field-notebook
+#'
+#' Example deployment notebook for an acoustic (audio) survey, used in the
+#' acoustic vignette. One row per device deployment. Coordinates are random
+#' points within the inland Izu Peninsula (Shizuoka, Japan).
+#'
+#' @format A data frame with 2 rows and 14 variables:
+#' \describe{
+#'   \item{deploymentID}{Unique identifier of the deployment.}
+#'   \item{longitude}{Longitude in decimal degrees (WGS84).}
+#'   \item{latitude}{Latitude in decimal degrees (WGS84).}
+#'   \item{locationID}{Identifier of the deployment location.}
+#'   \item{startDate}{Deployment start date.}
+#'   \item{startTime}{Deployment start time.}
+#'   \item{endDate}{Deployment end date.}
+#'   \item{endTime}{Deployment end time.}
+#'   \item{deviceID}{Identifier of the recording device.}
+#'   \item{deviceModel}{Manufacturer and model of the recording device.}
+#'   \item{samplingFrequency}{Sampling frequency of the recordings (Hz).}
+#'   \item{bitDepth}{Bit depth of the recordings.}
+#'   \item{channels}{Number of audio channels.}
+#'   \item{setupBy}{Name or identifier of the person/organization that deployed
+#'     the device.}
+#' }
+#' @seealso [Aobs]
+"Adep"
+
+#' Example acoustic observation field-notebook
+#'
+#' Example observation notebook for an acoustic (audio) survey, used in the
+#' acoustic vignette. One row per observation; the `filename` column is the
+#' audio file from which the `media` table is derived.
+#'
+#' @format A data frame with 6 rows and 19 variables:
+#' \describe{
+#'   \item{institutionCode}{Institution code.}
+#'   \item{collectionCode}{Collection code.}
+#'   \item{obsID}{Observation identifier (within an event).}
+#'   \item{eventID}{Identifier of the event the observation belongs to.}
+#'   \item{deploymentID}{Identifier of the deployment.}
+#'   \item{locationID}{Identifier of the deployment location.}
+#'   \item{date}{Date the recording was made.}
+#'   \item{time}{Time the recording started.}
+#'   \item{filename}{Name of the audio file (used to build `media`).}
+#'   \item{duration}{Duration of the recording file (seconds).}
+#'   \item{object}{Recorded object category (`animal`, `none`, ...).}
+#'   \item{class}{Taxonomic class of the observed organism.}
+#'   \item{genus}{Genus of the observed organism.}
+#'   \item{species}{Species epithet of the observed organism.}
+#'   \item{individualCount}{Number of observed individuals; `NA` here (not
+#'     counted from audio).}
+#'   \item{frequencyLow}{Lower bound of the call frequency (Hz); approximate
+#'     values from the bioacoustics literature for each species.}
+#'   \item{frequencyHigh}{Upper bound of the call frequency (Hz); approximate
+#'     values from the bioacoustics literature for each species.}
+#'   \item{eventStart}{Date and time at which the event started.}
+#'   \item{eventEnd}{Date and time at which the event ended.}
+#' }
+#' @seealso [Adep]
+"Aobs"
+
+#' Example Camtrap DP data package (acoustic)
+#'
+#' A pre-built Camtrap DP object (class `camtrapdp`, bioacoustics flavor) created
+#' from [Adep] and [Aobs], for trying out the acoustic workflow without
+#' rebuilding from scratch. `media` is derived from the audio file names.
+#'
+#' @format A `camtrapdp` object (a list with the package metadata and the
+#'   `deployments` / `media` / `observations` tables under `$data`).
+#' @seealso [datapackageVdata], [datapackageIdata]
+"datapackageAdata"
