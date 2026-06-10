@@ -58,7 +58,9 @@ str(Aobs, vec.len = 2)
 `deviceID`、`deviceModel`、録音設定（`samplingFrequency`, `bitDepth`,
 `channels`）、`setupBy` を持ちます。`Aobs` は `deploymentID`、`filename`、
 `date`/`time`、`duration`、分類（`class`/`genus`/`species`）、`individualCount`、
-`frequencyLow`/`frequencyHigh`、`eventStart`/`eventEnd` を持ちます。
+`frequencyLow`/`frequencyHigh`、`eventStart`/`eventEnd` を持ちます。この例データでは、
+座標は伊豆半島内、`individualCount` は `NA`（音響では個体数を数えない）、
+`frequencyLow`/`frequencyHigh` は文献に基づく概算値です。
 
 # 1. bioacoustics フレーバーを指定
 
@@ -143,7 +145,7 @@ observations <- data.frame(
   observationType  = ifelse(Aobs$object == "none", "blank",
                      ifelse(Aobs$object == "hito", "human", "animal")),
   scientificName   = ifelse(is.na(Aobs$genus), Aobs$class, paste(Aobs$genus, Aobs$species)),
-  count            = Aobs$individualCount,    # blank（none）の行は NA
+  count            = Aobs$individualCount,    # 音響では個体数を数えないため NA
   frequencyLow     = Aobs$frequencyLow,
   frequencyHigh    = Aobs$frequencyHigh,
   stringsAsFactors = FALSE)

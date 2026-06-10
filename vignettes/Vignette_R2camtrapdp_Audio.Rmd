@@ -60,7 +60,9 @@ str(Aobs, vec.len = 2)
 (`samplingFrequency`, `bitDepth`, `channels`) and `setupBy`. `Aobs` has
 `deploymentID`, `filename`, `date`/`time`, `duration`, the taxonomy
 (`class`/`genus`/`species`), `individualCount`, `frequencyLow`/`frequencyHigh`
-and `eventStart`/`eventEnd`.
+and `eventStart`/`eventEnd`. In this example data the coordinates fall in the
+Izu Peninsula (Japan), `individualCount` is `NA` (not counted from audio), and
+`frequencyLow`/`frequencyHigh` use approximate values from the literature.
 
 # 1. Point the package at the bioacoustics flavor
 
@@ -147,7 +149,7 @@ observations <- data.frame(
   observationType  = ifelse(Aobs$object == "none", "blank",
                      ifelse(Aobs$object == "hito", "human", "animal")),
   scientificName   = ifelse(is.na(Aobs$genus), Aobs$class, paste(Aobs$genus, Aobs$species)),
-  count            = Aobs$individualCount,    # NA for blank observations
+  count            = Aobs$individualCount,    # NA here (not counted from audio)
   frequencyLow     = Aobs$frequencyLow,
   frequencyHigh    = Aobs$frequencyHigh,
   stringsAsFactors = FALSE)
