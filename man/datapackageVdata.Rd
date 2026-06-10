@@ -3,12 +3,19 @@
 \docType{data}
 \name{datapackageVdata}
 \alias{datapackageVdata}
-\title{Camtrap DP objects have been created from Vdep and Vobs}
+\title{Example Camtrap DP data package (single camera trap)}
+\format{
+A \code{camtrapdp} object (a list with the package metadata and the
+\code{deployments} / \code{media} / \code{observations} tables under \verb{$data}).
+}
+\usage{
+datapackageVdata
+}
 \description{
-Camtrap DP objects have been created from Vdep and Vobs
+A pre-built Camtrap DP object (class \code{camtrapdp}) created from \link{Vdep} and
+\link{Vobs}, for trying out the package without rebuilding from scratch.
 }
-\references{
-Originally data can be used from https://doi.org/10.34462/0002000233
+\seealso{
+\link{datapackageIdata}
 }
-\keyword{camtrapDP}
-\keyword{data}
+\keyword{datasets}

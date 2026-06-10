@@ -21,9 +21,12 @@ A data frame with 6 rows and 19 variables:
 \item{class}{Taxonomic class of the observed organism.}
 \item{genus}{Genus of the observed organism.}
 \item{species}{Species epithet of the observed organism.}
-\item{individualCount}{Number of observed individuals (\code{NA} for blanks).}
-\item{frequencyLow}{Lower bound of the call frequency (Hz).}
-\item{frequencyHigh}{Upper bound of the call frequency (Hz).}
+\item{individualCount}{Number of observed individuals; \code{NA} here (not
+counted from audio).}
+\item{frequencyLow}{Lower bound of the call frequency (Hz); approximate
+values from the bioacoustics literature for each species.}
+\item{frequencyHigh}{Upper bound of the call frequency (Hz); approximate
+values from the bioacoustics literature for each species.}
 \item{eventStart}{Date and time at which the event started.}
 \item{eventEnd}{Date and time at which the event ended.}
 }

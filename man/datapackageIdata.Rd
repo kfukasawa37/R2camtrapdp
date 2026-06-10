@@ -3,9 +3,19 @@
 \docType{data}
 \name{datapackageIdata}
 \alias{datapackageIdata}
-\title{Camtrap DP objects have been created from Idep and Iobs}
-\description{
-Camtrap DP objects have been created from Idep and Iobs
+\title{Example Camtrap DP data package (multiple camera traps)}
+\format{
+A \code{camtrapdp} object (a list with the package metadata and the
+\code{deployments} / \code{media} / \code{observations} tables under \verb{$data}).
 }
-\keyword{camtrapDP}
-\keyword{data}
+\usage{
+datapackageIdata
+}
+\description{
+A pre-built Camtrap DP object (class \code{camtrapdp}) created from \link{Idep} and
+\link{Iobs}, for trying out the package without rebuilding from scratch.
+}
+\seealso{
+\link{datapackageVdata}
+}
+\keyword{datasets}

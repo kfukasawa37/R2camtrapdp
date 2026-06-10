@@ -29,7 +29,8 @@ Adep
 }
 \description{
 Example deployment notebook for an acoustic (audio) survey, used in the
-acoustic vignette. One row per device deployment.
+acoustic vignette. One row per device deployment. Coordinates are random
+points within the inland Izu Peninsula (Shizuoka, Japan).
 }
 \seealso{
 \link{Aobs}

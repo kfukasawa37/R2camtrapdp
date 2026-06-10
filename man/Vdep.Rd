@@ -3,11 +3,37 @@
 \docType{data}
 \name{Vdep}
 \alias{Vdep}
-\title{Deployment data of videos which collected by a camera-trap}
+\title{Example single camera-trap deployment data (video)}
+\format{
+A data frame with 1 row and 14 variables:
+\describe{
+\item{deploymentID}{Unique identifier of the deployment.}
+\item{longitude}{Longitude in decimal degrees (WGS84).}
+\item{latitude}{Latitude in decimal degrees (WGS84).}
+\item{locationID}{Identifier of the deployment location.}
+\item{startDate}{Deployment start date.}
+\item{startTime}{Deployment start time.}
+\item{endDate}{Deployment end date.}
+\item{endTime}{Deployment end time.}
+\item{cameraID}{Identifier of the camera.}
+\item{cameraModel}{Manufacturer and model of the camera.}
+\item{Delay}{Camera delay.}
+\item{Height}{Height at which the camera was deployed.}
+\item{bait}{Whether bait was used.}
+\item{setupBy}{Name or identifier of the person/organization that deployed the camera.}
+}
+}
+\usage{
+Vdep
+}
 \description{
-Deployment data of videos which collected by a camera-trap
+Example deployment data for a single camera trap (at NIES, Japan), used in the
+single-camera vignette. One row.
 }
 \references{
 Originally data can be used from https://doi.org/10.34462/0002000233
 }
-\keyword{data}
+\seealso{
+\link{Vobs}
+}
+\keyword{datasets}

@@ -3,11 +3,37 @@
 \docType{data}
 \name{Vobs}
 \alias{Vobs}
-\title{Observation data of videos which collected by a camera-trap}
+\title{Example single camera-trap observation data (video)}
+\format{
+A data frame with 38 rows and 13 variables:
+\describe{
+\item{institutionCode}{Institution code.}
+\item{collectionCode}{Collection code.}
+\item{videoID}{Video identifier.}
+\item{locationID}{Identifier of the deployment location.}
+\item{date}{Date the video was recorded.}
+\item{time}{Time the video was recorded.}
+\item{object}{Recorded object category.}
+\item{class}{Taxonomic class of the observed organism.}
+\item{genus}{Genus of the observed organism.}
+\item{species}{Species epithet of the observed organism.}
+\item{individualCount}{Number of observed individuals.}
+\item{SDcardID}{Identifier of the SD card.}
+\item{filename}{Name of the video file (used to build \code{media}).}
+}
+}
+\usage{
+Vobs
+}
 \description{
-Observation data of videos which collected by a camera-trap
+Example observation data for the \link{Vdep} single camera-trap deployment, used in
+the single-camera vignette. One row per observation; \code{filename} is the video
+file from which the \code{media} table is built.
 }
 \references{
 Originally data can be used from https://doi.org/10.34462/0002000233
 }
-\keyword{data}
+\seealso{
+\link{Vdep}
+}
+\keyword{datasets}
