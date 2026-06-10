@@ -186,3 +186,14 @@
 #' }
 #' @seealso [Adep]
 "Aobs"
+
+#' Example Camtrap DP data package (acoustic)
+#'
+#' A pre-built Camtrap DP object (class `camtrapdp`, bioacoustics flavor) created
+#' from [Adep] and [Aobs], for trying out the acoustic workflow without
+#' rebuilding from scratch. `media` is derived from the audio file names.
+#'
+#' @format A `camtrapdp` object (a list with the package metadata and the
+#'   `deployments` / `media` / `observations` tables under `$data`).
+#' @seealso [datapackageVdata], [datapackageIdata]
+"datapackageAdata"
