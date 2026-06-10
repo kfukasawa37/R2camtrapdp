@@ -3,6 +3,7 @@
 <!-- badges: start -->
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version/R2camtrapdp)](https://CRAN.R-project.org/package=R2camtrapdp) -->
 <!-- [![R-CMD-check](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml) -->
+[![R-CMD-check](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 *(日本語版 README: `README.ja.md`, in the GitHub repository)*
