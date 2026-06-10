@@ -15,6 +15,9 @@ datapackageVdata
 A pre-built Camtrap DP object (class \code{camtrapdp}) created from \link{Vdep} and
 \link{Vobs}, for trying out the package without rebuilding from scratch.
 }
+\references{
+Originally data can be used from \url{https://doi.org/10.34462/0002000233}
+}
 \seealso{
 \link{datapackageIdata}
 }

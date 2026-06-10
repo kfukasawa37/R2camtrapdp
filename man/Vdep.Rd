@@ -31,7 +31,7 @@ Example deployment data for a single camera trap (at NIES, Japan), used in the
 single-camera vignette. One row.
 }
 \references{
-Originally data can be used from https://doi.org/10.34462/0002000233
+Originally data can be used from \url{https://doi.org/10.34462/0002000233}
 }
 \seealso{
 \link{Vobs}
