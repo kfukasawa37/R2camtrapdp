@@ -265,7 +265,7 @@ The "set_properties()" function can be used to list some additional information 
 **id**: A property reserved for globally unique identifiers. (e.g., UUID and DOI)
 **description**: Description of "datapackage".  
 **version**: The Camtrap DP version of "datapackage". The default is "1.0.1".  
-**profile**: Profile of the resource. The dafault is "https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json".  
+**profile**: Profile of the resource. The default is `https://raw.githubusercontent.com/tdwg/camtrap-dp/<version>/camtrap-dp-profile.json`.
 **keywords**: Keywords of "datapackage".  
 **image**: A URL or Path of an image for "datapackage".  
 **homepage**: A URL for the home on the web that is related to "datapackage".  
