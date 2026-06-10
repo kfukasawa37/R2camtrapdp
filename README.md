@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version/R2camtrapdp)](https://CRAN.R-project.org/package=R2camtrapdp) -->
-<!-- [![R-CMD-check](https://github.com/<you>/R2camtrapdp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/<you>/R2camtrapdp/actions/workflows/R-CMD-check.yaml) -->
+<!-- [![R-CMD-check](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml) -->
 <!-- badges: end -->
 
 *(日本語版 README: [README.ja.md](README.ja.md))*
@@ -34,9 +34,9 @@ including custom/extra columns — without hard-coding any rules.
 ## Installation
 
 ```r
-# from GitHub
-# install.packages("remotes")
-remotes::install_github("<you>/R2camtrapdp")
+# from GitHub (build_vignettes = TRUE to install the vignettes too)
+# install.packages("devtools")
+devtools::install_github("kfukasawa37/R2camtrapdp", build_vignettes = TRUE)
 
 # (once on CRAN)
 # install.packages("R2camtrapdp")
@@ -158,20 +158,34 @@ Every check returns a tidy **issue table** with columns `source`, `field`,
 
 ## Example data
 
-* `Idep`, `Iobs` — camera-trap example (deployments / observations with images).
-* `Adep`, `Aobs` — acoustic example (deployment notebook / observation notebook
-  with file names; `media` is derived from the file names).
+* `Vdep`, `Vobs` — single camera-trap example: `Vdep` is the deployment of one
+  camera trap (at NIES, Japan) and `Vobs` is the **video** data for it.
+* `Idep`, `Iobs` — multiple camera-trap example (dummy): `Idep` is 10 deployments
+  and `Iobs` is the **image** data for them.
+* `Adep`, `Aobs` — acoustic example: deployment notebook / observation notebook
+  with file names (`media` is derived from the file names).
+* `datapackageVdata`, `datapackageIdata` — pre-built Camtrap DP objects, from
+  `Vdep`/`Vobs` and `Idep`/`Iobs` respectively.
 
 ## Vignettes
 
-* *R2camtrapdp: schema-driven workflow* (English / Japanese `_ja`)
-* *R2camtrapdp: acoustic (audio) data* (English / Japanese `_ja`)
+Open a vignette with `vignette(...)`:
+
+```r
+library(R2camtrapdp)
+vignette("Vignette_R2camtrapdp")               # multiple camera traps
+vignette("Vignette_R2camtrapdp_SingleCamera")  # single camera trap
+vignette("Vignette_R2camtrapdp_SchemaDriven")  # schema-driven workflow (also _ja)
+vignette("Vignette_R2camtrapdp_Audio")         # acoustic (audio) data (also _ja)
+```
 
 ## Dependencies
 
 * **R**: R6, jsonlite, tibble, magrittr, lubridate, dplyr, tidyr, purrr, readr,
   httr, taxadb (for `set_taxon()`).
-* **Suggests**: knitr, rmarkdown, testthat, jsonvalidate.
+* **Suggests**: camtrapdp (the output object has class `camtrapdp`, for
+  interoperability with the camtrapdp reader package), knitr, rmarkdown,
+  testthat, jsonvalidate.
 * **System (optional)**: Python with `frictionless` for `validate_frictionless()`.
 
 ## License

@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version/R2camtrapdp)](https://CRAN.R-project.org/package=R2camtrapdp) -->
-<!-- [![R-CMD-check](https://github.com/<you>/R2camtrapdp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/<you>/R2camtrapdp/actions/workflows/R-CMD-check.yaml) -->
+<!-- [![R-CMD-check](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml) -->
 <!-- badges: end -->
 
 *（English README: [README.md](README.md)）*
@@ -32,9 +32,9 @@
 ## インストール
 
 ```r
-# GitHub から
-# install.packages("remotes")
-remotes::install_github("<you>/R2camtrapdp")
+# GitHub から（build_vignettes = TRUE で vignette も併せて導入）
+# install.packages("devtools")
+devtools::install_github("kfukasawa37/R2camtrapdp", build_vignettes = TRUE)
 
 # （CRAN 登録後）
 # install.packages("R2camtrapdp")
@@ -154,19 +154,32 @@ vignette を参照してください。
 
 ## 同梱データ
 
-* `Idep`, `Iobs` — カメラトラップ例（画像つきデプロイメント／観察）。
+* `Vdep`, `Vobs` — 単一カメラトラップの例。`Vdep` は1台のカメラトラップ（NIES, Japan）
+  の設置データ、`Vobs` はその**動画**データ。
+* `Idep`, `Iobs` — 複数カメラトラップの例（ダミー）。`Idep` は10件の設置、`Iobs` は
+  その**画像**データ。
 * `Adep`, `Aobs` — 音響例（設置野帳／ファイル名つき観察野帳。`media` はファイル名から生成）。
+* `datapackageVdata`, `datapackageIdata` — 事前構築済みの Camtrap DP オブジェクト
+  （それぞれ `Vdep`/`Vobs`、`Idep`/`Iobs` から作成）。
 
 ## Vignette
 
-* *R2camtrapdp: スキーマ駆動ワークフロー*（英語 / 日本語 `_ja`）
-* *R2camtrapdp: 音声（音響）データ*（英語 / 日本語 `_ja`）
+`vignette(...)` で開けます:
+
+```r
+library(R2camtrapdp)
+vignette("Vignette_R2camtrapdp")               # 複数カメラトラップ
+vignette("Vignette_R2camtrapdp_SingleCamera")  # 単一カメラトラップ
+vignette("Vignette_R2camtrapdp_SchemaDriven")  # スキーマ駆動ワークフロー（_ja もあり）
+vignette("Vignette_R2camtrapdp_Audio")         # 音声（音響）データ（_ja もあり）
+```
 
 ## 依存関係
 
 * **R**: R6, jsonlite, tibble, magrittr, lubridate, dplyr, tidyr, purrr, readr,
   httr, taxadb（`set_taxon()` 用）。
-* **Suggests**: knitr, rmarkdown, testthat, jsonvalidate。
+* **Suggests**: camtrapdp（出力オブジェクトはクラス `camtrapdp` を持ち、camtrapdp
+  リーダーパッケージとの相互運用のため）, knitr, rmarkdown, testthat, jsonvalidate。
 * **システム（任意）**: `validate_frictionless()` 用に Python ＋ `frictionless`。
 
 ## ライセンス
