@@ -22,11 +22,14 @@ The remaining NOTE is from "checking CRAN incoming feasibility":
 
 ## Test environments
 
-* Local: Windows 11, R <your local R version, e.g. 4.5.3>
+* Local: Windows 11, R <4.4.1>
 * win-builder: R Under development (unstable) (R-devel), x86_64-w64-mingw32
-* <add any others actually run, e.g.:>
-  * GitHub Actions: ubuntu-latest (R-release, R-devel), macOS-latest, windows-latest
-  * R-hub
+* GitHub Actions (r-lib/actions "check-standard"):
+  * macOS-latest, R release
+  * Windows-latest, R release
+  * Ubuntu-latest, R devel
+  * Ubuntu-latest, R release
+  * Ubuntu-latest, R oldrel-1
 
 ## Notes for the reviewer
 
