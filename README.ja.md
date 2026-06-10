@@ -185,7 +185,7 @@ vignette("Vignette_R2camtrapdp_Audio")         # 音声（音響）データ（_
 
 ## ライセンス
 
-未定（例: MIT）。`LICENSE` を参照。
+MIT。[`LICENSE`](LICENSE) / [`LICENSE.md`](LICENSE.md) を参照。
 
 ---
 

@@ -191,7 +191,7 @@ vignette("Vignette_R2camtrapdp_Audio")         # acoustic (audio) data (also _ja
 
 ## License
 
-TBD (e.g. MIT). See `LICENSE`.
+MIT — see [`LICENSE`](LICENSE) and [`LICENSE.md`](LICENSE.md).
 
 ---
 
