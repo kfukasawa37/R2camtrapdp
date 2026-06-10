@@ -164,8 +164,9 @@ Every check returns a tidy **issue table** with columns `source`, `field`,
   and `Iobs` is the **image** data for them.
 * `Adep`, `Aobs` — acoustic example: deployment notebook / observation notebook
   with file names (`media` is derived from the file names).
-* `datapackageVdata`, `datapackageIdata` — pre-built Camtrap DP objects, from
-  `Vdep`/`Vobs` and `Idep`/`Iobs` respectively.
+* `datapackageVdata`, `datapackageIdata`, `datapackageAdata` — pre-built Camtrap
+  DP objects, from `Vdep`/`Vobs`, `Idep`/`Iobs` and `Adep`/`Aobs` respectively
+  (`datapackageAdata` is the bioacoustics flavor).
 
 ## Vignettes
 

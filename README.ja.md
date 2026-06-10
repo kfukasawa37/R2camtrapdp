@@ -159,8 +159,9 @@ vignette を参照してください。
 * `Idep`, `Iobs` — 複数カメラトラップの例（ダミー）。`Idep` は10件の設置、`Iobs` は
   その**画像**データ。
 * `Adep`, `Aobs` — 音響例（設置野帳／ファイル名つき観察野帳。`media` はファイル名から生成）。
-* `datapackageVdata`, `datapackageIdata` — 事前構築済みの Camtrap DP オブジェクト
-  （それぞれ `Vdep`/`Vobs`、`Idep`/`Iobs` から作成）。
+* `datapackageVdata`, `datapackageIdata`, `datapackageAdata` — 事前構築済みの
+  Camtrap DP オブジェクト（それぞれ `Vdep`/`Vobs`、`Idep`/`Iobs`、`Adep`/`Aobs` から
+  作成。`datapackageAdata` は bioacoustics フレーバー）。
 
 ## Vignette
 
