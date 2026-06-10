@@ -466,6 +466,9 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
     #' @param taxonDB Taxon database passed to taxadb: \code{"gbif"} (default),
     #'   \code{"itis"} or \code{"ncbi"}.
     #' @importFrom taxadb get_ids filter_name
+    #' @importFrom stats na.omit
+    #' @importFrom tidyr nest unnest
+    #' @importFrom purrr map
     set_taxon = function(taxonDB = "gbif") {
       if (is.null(self$data$observations)) stop("'observations' should be registered.")
       if (!is.element(taxonDB, c("gbif", "itis", "ncbi"))) {

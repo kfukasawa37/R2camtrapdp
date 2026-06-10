@@ -11,6 +11,7 @@ NULL
 #' Returns `a` unless it is `NULL` (or zero-length), otherwise `b`.
 #' @param a,b Values.
 #' @keywords internal
+#' @noRd
 `%||%` <- function(a, b) {
   if (is.null(a) || length(a) == 0) b else a
 }

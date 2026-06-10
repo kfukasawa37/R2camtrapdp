@@ -76,12 +76,12 @@ ctdp_bind_issues <- function(...) {
 #' @export
 ctdp_summarize_validation <- function(issues, max_detail = 50L) {
   if (is.null(issues) || nrow(issues) == 0) {
-    cat("✔ No validation issues found.\n")
+    cat("\u2714 No validation issues found.\n")
     return(invisible(issues))
   }
   n_err <- sum(issues$severity == "error", na.rm = TRUE)
   n_warn <- sum(issues$severity == "warning", na.rm = TRUE)
-  cat(sprintf("✖ Validation found %d error(s) and %d warning(s).\n\n", n_err, n_warn))
+  cat(sprintf("\u2716 Validation found %d error(s) and %d warning(s).\n\n", n_err, n_warn))
 
   # Summary by source + severity
   cat("Summary by location:\n")

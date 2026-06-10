@@ -75,8 +75,8 @@
 #'   \item{bait}{Whether bait was used.}
 #'   \item{setupBy}{Name or identifier of the person/organization that deployed the camera.}
 #' }
+#' @references Originally data can be used from <https://doi.org/10.34462/0002000233>
 #' @seealso [Vobs]
-#' @references Originally data can be used from https://doi.org/10.34462/0002000233
 "Vdep"
 
 #' Example single camera-trap observation data (video)
@@ -101,8 +101,8 @@
 #'   \item{SDcardID}{Identifier of the SD card.}
 #'   \item{filename}{Name of the video file (used to build `media`).}
 #' }
+#' @references Originally data can be used from <https://doi.org/10.34462/0002000233>
 #' @seealso [Vdep]
-#' @references Originally data can be used from https://doi.org/10.34462/0002000233
 "Vobs"
 
 #' Example Camtrap DP data package (single camera trap)
@@ -112,6 +112,7 @@
 #'
 #' @format A `camtrapdp` object (a list with the package metadata and the
 #'   `deployments` / `media` / `observations` tables under `$data`).
+#' @references Originally data can be used from <https://doi.org/10.34462/0002000233>
 #' @seealso [datapackageIdata]
 "datapackageVdata"
 
