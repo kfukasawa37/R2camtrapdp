@@ -186,8 +186,3 @@ vignette("Vignette_R2camtrapdp_Audio")         # 音声（音響）データ（_
 ## ライセンス
 
 MIT。[`LICENSE`](LICENSE) / [`LICENSE.md`](LICENSE.md) を参照。
-
----
-
-開発者向け: `MANUAL.md`（アーキテクチャ・内部仕様）と `ROADMAP.md`
-（正式パッケージ化／CRAN ロードマップ）を参照。

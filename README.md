@@ -192,8 +192,3 @@ vignette("Vignette_R2camtrapdp_Audio")         # acoustic (audio) data (also _ja
 ## License
 
 MIT — see [`LICENSE`](LICENSE) and [`LICENSE.md`](LICENSE.md).
-
----
-
-Developer notes: see `MANUAL.md` (architecture & internals) and `ROADMAP.md`
-(package-ization / CRAN roadmap).
