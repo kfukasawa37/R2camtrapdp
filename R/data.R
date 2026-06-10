@@ -1,25 +1,3 @@
-#' Deployment data of videos which collected by a camera-trap
-#' 
-#' @name Vdep
-#' @docType data
-#' @references Originally data can be used from https://doi.org/10.34462/0002000233
-#' @keywords data
-#' 
-NULL
-
-#' Observation data of videos which collected by a camera-trap
-#' @name Vobs
-#' @docType data
-#' @references Originally data can be used from https://doi.org/10.34462/0002000233
-#' @keywords data
-NULL
-
-#' Camtrap DP objects have been created from Vdep and Vobs
-#' @name datapackageVdata
-#' @docType data
-#' @references Originally data can be used from https://doi.org/10.34462/0002000233
-#' @keywords data camtrapDP
-NULL
 #' Example deployment data (multiple camera deployments with image records)
 #'
 #' A small example deployment table used in the package vignettes and examples.
@@ -75,10 +53,83 @@ NULL
 #' @seealso [Idep]
 "Iobs"
 
+#' Example single camera-trap deployment data (video)
+#'
+#' Example deployment data for a single camera trap (at NIES, Japan), used in the
+#' single-camera vignette. One row.
+#'
+#' @format A data frame with 1 row and 14 variables:
+#' \describe{
+#'   \item{deploymentID}{Unique identifier of the deployment.}
+#'   \item{longitude}{Longitude in decimal degrees (WGS84).}
+#'   \item{latitude}{Latitude in decimal degrees (WGS84).}
+#'   \item{locationID}{Identifier of the deployment location.}
+#'   \item{startDate}{Deployment start date.}
+#'   \item{startTime}{Deployment start time.}
+#'   \item{endDate}{Deployment end date.}
+#'   \item{endTime}{Deployment end time.}
+#'   \item{cameraID}{Identifier of the camera.}
+#'   \item{cameraModel}{Manufacturer and model of the camera.}
+#'   \item{Delay}{Camera delay.}
+#'   \item{Height}{Height at which the camera was deployed.}
+#'   \item{bait}{Whether bait was used.}
+#'   \item{setupBy}{Name or identifier of the person/organization that deployed the camera.}
+#' }
+#' @seealso [Vobs]
+#' @references Originally data can be used from https://doi.org/10.34462/0002000233
+"Vdep"
+
+#' Example single camera-trap observation data (video)
+#'
+#' Example observation data for the [Vdep] single camera-trap deployment, used in
+#' the single-camera vignette. One row per observation; `filename` is the video
+#' file from which the `media` table is built.
+#'
+#' @format A data frame with 38 rows and 13 variables:
+#' \describe{
+#'   \item{institutionCode}{Institution code.}
+#'   \item{collectionCode}{Collection code.}
+#'   \item{videoID}{Video identifier.}
+#'   \item{locationID}{Identifier of the deployment location.}
+#'   \item{date}{Date the video was recorded.}
+#'   \item{time}{Time the video was recorded.}
+#'   \item{object}{Recorded object category.}
+#'   \item{class}{Taxonomic class of the observed organism.}
+#'   \item{genus}{Genus of the observed organism.}
+#'   \item{species}{Species epithet of the observed organism.}
+#'   \item{individualCount}{Number of observed individuals.}
+#'   \item{SDcardID}{Identifier of the SD card.}
+#'   \item{filename}{Name of the video file (used to build `media`).}
+#' }
+#' @seealso [Vdep]
+#' @references Originally data can be used from https://doi.org/10.34462/0002000233
+"Vobs"
+
+#' Example Camtrap DP data package (single camera trap)
+#'
+#' A pre-built Camtrap DP object (class `camtrapdp`) created from [Vdep] and
+#' [Vobs], for trying out the package without rebuilding from scratch.
+#'
+#' @format A `camtrapdp` object (a list with the package metadata and the
+#'   `deployments` / `media` / `observations` tables under `$data`).
+#' @seealso [datapackageIdata]
+"datapackageVdata"
+
+#' Example Camtrap DP data package (multiple camera traps)
+#'
+#' A pre-built Camtrap DP object (class `camtrapdp`) created from [Idep] and
+#' [Iobs], for trying out the package without rebuilding from scratch.
+#'
+#' @format A `camtrapdp` object (a list with the package metadata and the
+#'   `deployments` / `media` / `observations` tables under `$data`).
+#' @seealso [datapackageVdata]
+"datapackageIdata"
+
 #' Example acoustic deployment field-notebook
 #'
 #' Example deployment notebook for an acoustic (audio) survey, used in the
-#' acoustic vignette. One row per device deployment.
+#' acoustic vignette. One row per device deployment. Coordinates are random
+#' points within the inland Izu Peninsula (Shizuoka, Japan).
 #'
 #' @format A data frame with 2 rows and 14 variables:
 #' \describe{
@@ -123,9 +174,12 @@ NULL
 #'   \item{class}{Taxonomic class of the observed organism.}
 #'   \item{genus}{Genus of the observed organism.}
 #'   \item{species}{Species epithet of the observed organism.}
-#'   \item{individualCount}{Number of observed individuals (`NA` for blanks).}
-#'   \item{frequencyLow}{Lower bound of the call frequency (Hz).}
-#'   \item{frequencyHigh}{Upper bound of the call frequency (Hz).}
+#'   \item{individualCount}{Number of observed individuals; `NA` here (not
+#'     counted from audio).}
+#'   \item{frequencyLow}{Lower bound of the call frequency (Hz); approximate
+#'     values from the bioacoustics literature for each species.}
+#'   \item{frequencyHigh}{Upper bound of the call frequency (Hz); approximate
+#'     values from the bioacoustics literature for each species.}
 #'   \item{eventStart}{Date and time at which the event started.}
 #'   \item{eventEnd}{Date and time at which the event ended.}
 #' }
