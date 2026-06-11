@@ -3,9 +3,10 @@
 <!-- badges: start -->
 <!-- [![CRAN status](https://www.r-pkg.org/badges/version/R2camtrapdp)](https://CRAN.R-project.org/package=R2camtrapdp) -->
 <!-- [![R-CMD-check](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml) -->
+[![R-CMD-check](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kfukasawa37/R2camtrapdp/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-*(日本語版 README: [README.ja.md](README.ja.md))*
+*(日本語版 README: `README.ja.md`, in the GitHub repository)*
 
 Convert arbitrary spreadsheet camera-trap (and acoustic) data into a
 [Camera Trap Data Package (Camtrap DP)](https://camtrap-dp.tdwg.org/), the
@@ -86,7 +87,7 @@ ctdp_is_valid(issues)
 
 A complete, runnable end-to-end script (schema inspection → mapping → build →
 relations/metadata checks → write → Frictionless validation) is in
-[`examples/example_usage.R`](examples/example_usage.R):
+`examples/example_usage.R` (in the GitHub repository):
 
 ```r
 source("r2camtrapdp.R")      # or: library(R2camtrapdp)
@@ -191,4 +192,4 @@ vignette("Vignette_R2camtrapdp_Audio")         # acoustic (audio) data (also _ja
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE) and [`LICENSE.md`](LICENSE.md).
+MIT — see the `LICENSE` file (full text in `LICENSE.md`).

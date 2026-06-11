@@ -1,9 +1,11 @@
 Package: R2camtrapdp
 Type: Package
-Title: An R package for converting camera trap dataset into Camera trap data package (Camtrap DP)
+Title: An R Package for Converting Camera Trap Dataset into Camera Trap Data Package (Camtrap DP)
 Version: 2.0.0
-Author: Kana Terayama (@KanaTerayama) and Keita Fukasawa (@kfukasawa37)
-Maintainer: Keita Fukasawa <k.fukasawa37@gmail.com>
+Authors@R: c(
+    person("Kana", "Terayama", role = c("aut", "cre"),
+           email = "terayama.kana@nies.go.jp", comment = "@KanaTerayama"),
+    person("Keita", "Fukasawa", role = "aut", comment = "@kfukasawa37"))
 Description: Builds Camera Trap Data Packages (Camtrap DP) from arbitrary spreadsheets in a schema-driven way: table structure, types, constraints and relations are read from the Frictionless table schemas of the requested Camtrap DP version, so any version and custom columns are handled automatically. Provides validation against the schemas and an optional bridge to the Python 'frictionless' validator.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -28,7 +30,8 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    jsonvalidate
+    jsonvalidate,
+    spelling
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.5.0)
@@ -38,3 +41,4 @@ SystemRequirements: Python (>= 3.8) with the 'frictionless' package
     Config/testthat/edition: 3
 URL: https://github.com/kfukasawa37/R2camtrapdp
 BugReports: https://github.com/kfukasawa37/R2camtrapdp/issues
+Language: en-US
