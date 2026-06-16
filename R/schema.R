@@ -132,7 +132,7 @@ TableSchema <- R6::R6Class("TableSchema",
     #' @param complete If `TRUE` (default), include all schema fields, filling
     #'   absent ones with typed `NA`. If `FALSE`, keep only the supplied columns.
     #' @return A tibble.
-    coerce = function(df, tz = "Japan", complete = TRUE) {
+    coerce = function(df, tz = "Asia/Tokyo", complete = TRUE) {
       df <- tibble::as_tibble(df)
       nrow_df <- nrow(df)
       extra <- setdiff(names(df), self$field_order)
