@@ -9,7 +9,7 @@ ctdp_build_table(
   data,
   mapping = NULL,
   datetime_merges = NULL,
-  tz = "Japan",
+  tz = "Asia/Tokyo",
   source = NULL,
   coerce = TRUE,
   stop_on_error = FALSE

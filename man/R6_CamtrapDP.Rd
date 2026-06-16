@@ -126,7 +126,7 @@ methods (\code{get_schema()}, \code{add_table()}, \code{check_relations()}, \cod
   Creates a new instance.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{CamtrapDP$new(tz = "Japan", ...)}
+    \preformatted{CamtrapDP$new(tz = "Asia/Tokyo", ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -146,7 +146,7 @@ methods (\code{get_schema()}, \code{add_table()}, \code{check_relations()}, \cod
   Updates the created timestamp.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{CamtrapDP$update_created(tz = "Japan")}
+    \preformatted{CamtrapDP$update_created(tz = "Asia/Tokyo")}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -261,7 +261,7 @@ schema is reachable the data is coerced and validated against it.
   datetime_merges = NULL,
   validate = TRUE,
   local_schema = NULL,
-  tz = "Japan"
+  tz = "Asia/Tokyo"
 )}
     \if{html}{\out{</div>}}
   }
@@ -307,7 +307,7 @@ bioacoustics flavor).}
   datetime_merges = NULL,
   validate = TRUE,
   local_schema = NULL,
-  tz = "Japan"
+  tz = "Asia/Tokyo"
 )}
     \if{html}{\out{</div>}}
   }
@@ -350,7 +350,7 @@ bioacoustics flavor).}
   datetime_merges = NULL,
   validate = TRUE,
   local_schema = NULL,
-  tz = "Japan"
+  tz = "Asia/Tokyo"
 )}
     \if{html}{\out{</div>}}
   }
@@ -399,7 +399,7 @@ appends a proper tabular-data resource.
   mediatype = "text/csv",
   encoding = "utf-8",
   validate = TRUE,
-  tz = "Japan"
+  tz = "Asia/Tokyo"
 )}
     \if{html}{\out{</div>}}
   }

@@ -18,7 +18,7 @@ create_media(
   exifData = NULL,
   favorite = NULL,
   mediaComments = NULL,
-  tz = "Japan",
+  tz = "Asia/Tokyo",
   omitduplicate = TRUE
 )
 }

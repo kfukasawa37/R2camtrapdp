@@ -37,7 +37,7 @@ create_observations(
   classificationProbability = NULL,
   observationTags = NULL,
   observationComments = NULL,
-  tz = "Japan",
+  tz = "Asia/Tokyo",
   omitduplicate = TRUE
 )
 }
