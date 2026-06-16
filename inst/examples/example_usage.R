@@ -57,7 +57,7 @@ built <- ctdp_build_table(
     list(date_col = "start_day", time_col = "start_clk", target = "deploymentStart"),
     list(date_col = "end_day",   time_col = "end_clk",   target = "deploymentEnd")
   ),
-  tz = "Japan"
+  tz = "Asia/Tokyo"
 )
 ctdp_summarize_validation(built$issues)     # R-side schema check
 
