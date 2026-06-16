@@ -156,7 +156,7 @@ pairs), `locationName`, `coordinateUncertainty`, `cameraDepth` (mutually
 exclusive with `cameraHeight`), `cameraTilt`, `cameraHeading`,
 `detectionDistance`, `timestampIssues`, `featureType`, `habitat`,
 `deploymentGroups`, `deploymentTags`, `deploymentComments`, and `tz` (time zone,
-default `"Japan"`).
+default `"Asia/Tokyo"`).
 
 ## Create media
 
@@ -371,7 +371,7 @@ so you can clean or check those names.
 ### Created
 
 ```{r}
-datapackage$update_created(tz = "Japan")
+datapackage$update_created(tz = "Asia/Tokyo")
 ```
 
 ## Optional metadata
