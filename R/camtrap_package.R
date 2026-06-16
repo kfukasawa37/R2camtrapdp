@@ -86,7 +86,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
     #' @description Creates a new instance.
     #' @param tz Time zone.
     #' @param ... Passed to `set_properties()`.
-    initialize = function(tz = "Japan", ...) {
+    initialize = function(tz = "Asia/Tokyo", ...) {
       self$schema_urls <- .ctdp_default_urls()
       self$cache_dir <- file.path(tempdir(), "camtrapdp-schemas")
       self$update_created(tz = tz)
@@ -95,7 +95,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
 
     #' @description Updates the created timestamp.
     #' @param tz Time zone.
-    update_created = function(tz = "Japan") {
+    update_created = function(tz = "Asia/Tokyo") {
       self$created <- Sys.time() %>%
         as.POSIXct() %>%
         strftime("%Y-%m-%dT%H:%M:%S%z", tz = tz)
@@ -211,7 +211,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
                                mediatype = "text/csv", encoding = "utf-8",
                                schema = NULL,
                                mapping = NULL, datetime_merges = NULL,
-                               validate = TRUE, local_schema = NULL, tz = "Japan") {
+                               validate = TRUE, local_schema = NULL, tz = "Asia/Tokyo") {
       private$set_standard("deployments", 1L, data, path, profile, format, mediatype,
                            encoding, schema, mapping, datetime_merges, validate,
                            local_schema, tz)
@@ -235,7 +235,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
                          mediatype = "text/csv", encoding = "utf-8",
                          schema = NULL,
                          mapping = NULL, datetime_merges = NULL,
-                         validate = TRUE, local_schema = NULL, tz = "Japan") {
+                         validate = TRUE, local_schema = NULL, tz = "Asia/Tokyo") {
       private$set_standard("media", 2L, data, path, profile, format, mediatype,
                            encoding, schema, mapping, datetime_merges, validate,
                            local_schema, tz)
@@ -259,7 +259,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
                                 mediatype = "text/csv", encoding = "utf-8",
                                 schema = NULL,
                                 mapping = NULL, datetime_merges = NULL,
-                                validate = TRUE, local_schema = NULL, tz = "Japan") {
+                                validate = TRUE, local_schema = NULL, tz = "Asia/Tokyo") {
       private$set_standard("observations", 3L, data, path, profile, format, mediatype,
                            encoding, schema, mapping, datetime_merges, validate,
                            local_schema, tz)
@@ -289,7 +289,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
                          path = NULL, description = NULL,
                          profile = "tabular-data-resource", format = "csv",
                          mediatype = "text/csv", encoding = "utf-8",
-                         validate = TRUE, tz = "Japan") {
+                         validate = TRUE, tz = "Asia/Tokyo") {
       path <- path %||% paste0(name, ".csv")
       sch <- tryCatch(
         self$get_schema(name, schema_url = schema_url, local_path = local_schema,
