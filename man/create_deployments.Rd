@@ -33,7 +33,7 @@ create_deployments(
   deploymentGroups = NULL,
   deploymentTags = NULL,
   deploymentComments = NULL,
-  tz = "Japan"
+  tz = "Asia/Tokyo"
 )
 }
 \arguments{

@@ -9,7 +9,7 @@ ctdp_merge_datetime(
   date_col,
   time_col,
   target,
-  tz = "Japan",
+  tz = "Asia/Tokyo",
   format = .ctdp_datetime_format(),
   remove = TRUE
 )

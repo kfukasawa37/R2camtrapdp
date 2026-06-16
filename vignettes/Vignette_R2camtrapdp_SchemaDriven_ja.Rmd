@@ -148,7 +148,7 @@ deployments <- create_deployments(
 `locationName`、`coordinateUncertainty`、`cameraDepth`（`cameraHeight` と同時指定
 不可）、`cameraTilt`、`cameraHeading`、`detectionDistance`、`timestampIssues`、
 `featureType`、`habitat`、`deploymentGroups`、`deploymentTags`、
-`deploymentComments`、`tz`（タイムゾーン、既定 `"Japan"`）。
+`deploymentComments`、`tz`（タイムゾーン、既定 `"Asia/Tokyo"`）。
 
 ## メディアの作成
 
@@ -352,7 +352,7 @@ datapackage$set_taxon()
 ### 作成日時（Created）
 
 ```{r}
-datapackage$update_created(tz = "Japan")
+datapackage$update_created(tz = "Asia/Tokyo")
 ```
 
 ## 任意メタデータ

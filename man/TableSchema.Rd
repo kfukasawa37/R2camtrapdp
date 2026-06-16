@@ -208,7 +208,7 @@ the schema are kept after the schema columns (custom columns) and a
 warning is emitted listing them.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{TableSchema$coerce(df, tz = "Japan", complete = TRUE)}
+    \preformatted{TableSchema$coerce(df, tz = "Asia/Tokyo", complete = TRUE)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{

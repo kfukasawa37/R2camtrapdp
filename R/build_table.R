@@ -26,7 +26,7 @@ NULL
 #'   issue table from [ctdp_issues()]).
 #' @export
 ctdp_build_table <- function(schema, data, mapping = NULL, datetime_merges = NULL,
-                             tz = "Japan", source = NULL, coerce = TRUE,
+                             tz = "Asia/Tokyo", source = NULL, coerce = TRUE,
                              stop_on_error = FALSE) {
   if (!inherits(schema, "TableSchema")) {
     stop("'schema' must be a TableSchema object.", call. = FALSE)

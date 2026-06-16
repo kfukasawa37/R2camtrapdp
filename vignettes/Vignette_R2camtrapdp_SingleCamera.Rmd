@@ -10,7 +10,11 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE   # legacy walkthrough shown as code only: set_*()/set_taxon()/
+                 # out_camtrapdp() need internet (schema/taxonomy downloads), which
+                 # must not run during R CMD check. See the SchemaDriven vignette
+                 # for an executed, offline-buildable workflow.
 )
 ```
 
@@ -108,7 +112,7 @@ deploymentID<-Vdep$deploymentID
 mediaID<-mediaIDv
 
 #Timestamp (date and time) at which the observation started (e.g., the timestamp when the video or photo was taken)
-tz="Japan"
+tz="Asia/Tokyo"
 timestamp<-paste(Vobs$date,Vobs$time)
 
 #categorized observationType (animal, human, vehicle, blank, unknown, or unclassified)
@@ -223,8 +227,8 @@ datapackage$set_taxon()
 The datetime on which "datapackage" was created.  
 The "update_created()" function gets the current datetime from system time and can be update the datetime on which "datapackage" was created.
 ```{r}
-#set timezone ("Japan" is default value)
-tz="Japan"
+#set timezone ("Asia/Tokyo" is default value)
+tz="Asia/Tokyo"
 #update datetime
 datapackage$update_created()
 ```

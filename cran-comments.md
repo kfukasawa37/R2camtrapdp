@@ -1,9 +1,19 @@
+## Resubmission
+
+This is a resubmission. In the previous CRAN pre-test, vignette re-building
+failed on Linux (Debian) with
+`CCTZ: Unrecognized output timezone: "Japan"`. The cause was the use of the
+legacy time-zone alias `"Japan"`, which the current CCTZ/timechange backend on
+that platform does not recognise. We replaced every occurrence with the
+canonical IANA name `"Asia/Tokyo"` (identical UTC+09:00 behaviour) throughout the
+R code, vignettes and examples. All vignettes now re-build on Linux, macOS and
+Windows.
+
 ## Submission summary
 
-This is a new submission of R2camtrapdp (version 2.0.0), an R package that
-converts arbitrary camera-trap (and acoustic) spreadsheets into Camera Trap Data
-Packages (Camtrap DP), validating them against the official Frictionless table
-schemas.
+R2camtrapdp (version 2.0.0) converts arbitrary camera-trap (and acoustic)
+spreadsheets into Camera Trap Data Packages (Camtrap DP), validating them against
+the official Frictionless table schemas.
 
 ## R CMD check results
 

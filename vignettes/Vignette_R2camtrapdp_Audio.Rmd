@@ -93,8 +93,8 @@ deployments <- data.frame(
   latitude        = Adep$latitude,
   longitude       = Adep$longitude,
   locationID      = Adep$locationID,
-  deploymentStart = as.POSIXct(paste(Adep$startDate, Adep$startTime), tz = "Japan"),
-  deploymentEnd   = as.POSIXct(paste(Adep$endDate,   Adep$endTime),   tz = "Japan"),
+  deploymentStart = as.POSIXct(paste(Adep$startDate, Adep$startTime), tz = "Asia/Tokyo"),
+  deploymentEnd   = as.POSIXct(paste(Adep$endDate,   Adep$endTime),   tz = "Asia/Tokyo"),
   deviceID        = Adep$deviceID,
   deviceModel     = Adep$deviceModel,
   setupBy         = Adep$setupBy,
@@ -116,7 +116,7 @@ files <- Aobs[!duplicated(Aobs$filename), ]   # one row per audio file
 media <- data.frame(
   mediaID       = files$filename,             # the file name is the media identifier
   deploymentID  = files$deploymentID,
-  timestamp     = as.POSIXct(paste(files$date, files$time), tz = "Japan"),
+  timestamp     = as.POSIXct(paste(files$date, files$time), tz = "Asia/Tokyo"),
   filePath      = file.path("audio", files$filename),
   filePublic    = TRUE,
   fileMediatype = paste0("audio/", tolower(tools::file_ext(files$filename))),  # "audio/wav"
@@ -143,8 +143,8 @@ observations <- data.frame(
   observationID    = paste(Aobs$deploymentID, Aobs$eventID, Aobs$obsID, sep = "_"),
   deploymentID     = Aobs$deploymentID,
   mediaID          = Aobs$filename,           # link to media (mediaID = filename)
-  eventStart       = as.POSIXct(Aobs$eventStart, tz = "Japan"),
-  eventEnd         = as.POSIXct(Aobs$eventEnd,   tz = "Japan"),
+  eventStart       = as.POSIXct(Aobs$eventStart, tz = "Asia/Tokyo"),
+  eventEnd         = as.POSIXct(Aobs$eventEnd,   tz = "Asia/Tokyo"),
   observationLevel = "media",
   observationType  = ifelse(Aobs$object == "none", "blank",
                      ifelse(Aobs$object == "hito", "human", "animal")),

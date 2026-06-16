@@ -63,7 +63,7 @@ create_deployments<-function( deploymentID,
                               deploymentGroups=NULL,
                               deploymentTags=NULL,
                               deploymentComments=NULL,
-                              tz="Japan"
+                              tz="Asia/Tokyo"
 ){
   
   #Initial check
@@ -313,7 +313,7 @@ create_media<-function( mediaID,
                         exifData=NULL,
                         favorite=NULL,
                         mediaComments=NULL,
-                        tz="Japan",
+                        tz="Asia/Tokyo",
                         omitduplicate=TRUE
 ){
   if(any(is.na(mediaID))|any(is.na(deploymentID))|any(is.na(filePath))|any(is.na(filePublic))|any(is.na(fileMediatype))){
@@ -494,7 +494,7 @@ create_observations<-function(	observationID,
                                classificationProbability=NULL,
                                observationTags=NULL,
                                observationComments=NULL,
-                               tz="Japan",
+                               tz="Asia/Tokyo",
                                omitduplicate=TRUE
 ){
   

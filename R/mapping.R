@@ -83,7 +83,7 @@ ctdp_apply_mapping <- function(df, mapping, drop_unmapped = FALSE) {
 #' @importFrom lubridate as_datetime
 #' @export
 ctdp_merge_datetime <- function(df, date_col, time_col, target,
-                                tz = "Japan", format = .ctdp_datetime_format(),
+                                tz = "Asia/Tokyo", format = .ctdp_datetime_format(),
                                 remove = TRUE) {
   df <- tibble::as_tibble(df)
   for (col in c(date_col, time_col)) {

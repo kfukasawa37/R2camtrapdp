@@ -6,3 +6,4 @@
 ^README\.ja\.md$
 ^cran-comments\.md$
 ^\.github$
+^CRAN-SUBMISSION$
