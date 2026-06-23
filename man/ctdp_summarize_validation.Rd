@@ -18,3 +18,9 @@ The issue table, invisibly.
 Prints a grouped summary (errors / warnings per source) followed by a
 detailed listing showing the offending file, field, row and message.
 }
+\examples{
+issues <- ctdp_issues(source = "deployments", field = "latitude",
+                      constraint = "minimum", severity = "error",
+                      message = "latitude below -90", value = "-100")
+ctdp_summarize_validation(issues)
+}

@@ -19,3 +19,10 @@ constraint. For these fields Frictionless (and this package) can check the
 type/format but not the controlled vocabulary, so the values should be
 checked against the referenced authority manually.
 }
+\examples{
+sch <- list(name = "deployments",
+  fields = list(
+    list(name = "captureMethod", type = "string",
+         "skos:exactMatch" = "http://rs.tdwg.org/dwc/terms/samplingProtocol")))
+ctdp_semantic_only_fields(sch)
+}

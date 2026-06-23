@@ -6,6 +6,12 @@
 \usage{
 ctdp_no_issues()
 }
+\value{
+A 0-row issue tibble.
+}
 \description{
 An empty issue table
+}
+\examples{
+ctdp_no_issues()
 }

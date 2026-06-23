@@ -27,3 +27,11 @@ when known).
 Accepts either a parsed list (from \link[jsonlite:fromJSON]{jsonlite::fromJSON}) or a JSON string,
 supporting both Frictionless v4 and v5 report layouts.
 }
+\examples{
+# A valid Frictionless report parses to an empty issue table:
+ctdp_parse_frictionless(list(valid = TRUE, tasks = list()))
+\dontrun{
+# Typically the report comes from validate_frictionless() / the Python validator:
+issues <- ctdp_validate_frictionless("path/to/package")
+}
+}

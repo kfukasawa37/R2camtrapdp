@@ -19,3 +19,10 @@ A tibble with columns \code{resource}, \code{field} (\code{NA} for schema-level)
 \description{
 List the external (URL) references declared by a Table Schema
 }
+\examples{
+sch <- list(name = "deployments",
+  fields = list(
+    list(name = "captureMethod", type = "string",
+         "skos:exactMatch" = "http://rs.tdwg.org/dwc/terms/samplingProtocol")))
+ctdp_schema_references(sch)
+}
