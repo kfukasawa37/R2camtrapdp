@@ -17,6 +17,12 @@
 #' @import R6
 #' @importFrom jsonlite fromJSON
 #' @importFrom httr GET status_code content
+#' @examples
+#' \dontrun{
+#' # Fetches the package profile for a Camtrap DP version (needs internet):
+#' prof <- MetadataProfile$new(version = "1.0.1")
+#' prof
+#' }
 #' @export
 MetadataProfile <- R6::R6Class("MetadataProfile",
   public = list(

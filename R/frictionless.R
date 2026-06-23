@@ -136,6 +136,12 @@ NULL
 #'   `FALSE` to keep the directory strictly read-only.
 #' @param summarize Whether to print a summary.
 #' @return An issue table (see [ctdp_issues()]); engine `"frictionless"`.
+#' @examples
+#' \dontrun{
+#' # Validate an existing Camtrap DP on disk (needs Python with 'frictionless'):
+#' issues <- ctdp_validate_frictionless("path/to/camtrapdp", python = "python")
+#' ctdp_is_valid(issues)
+#' }
 #' @export
 ctdp_validate_frictionless <- function(directory, python = "python", script = NULL,
                                        patch_profile = TRUE, summarize = TRUE) {

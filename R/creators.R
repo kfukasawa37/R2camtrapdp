@@ -33,8 +33,16 @@
 #' @param deploymentTags Tags associated with the deployment
 #' @param deploymentComments Comments or notes about the deployment
 #' @param tz Deployment time zone
+#' @examples
+#' create_deployments(
+#'   deploymentID = c("A01", "A02"),
+#'   latitude = c(35.1, 36.2), longitude = c(139.5, 140.1),
+#'   deploymentStart_date = c("2023-04-01", "2023-04-02"),
+#'   deploymentStart_time = c("09:00:00", "10:30:00"),
+#'   deploymentEnd_date = c("2023-05-01", "2023-05-02"),
+#'   deploymentEnd_time = c("09:00:00", "10:30:00"))
 #' @export
-#' 
+#'
 create_deployments<-function( deploymentID,
                               latitude,
                               longitude,
@@ -297,9 +305,14 @@ create_deployments<-function( deploymentID,
 #' @param favorite true if the media file is deemed of interest
 #' @param mediaComments Comments or notes about the media file
 #' @param tz Time zone of the media file was recorded
-#' @param omitduplicate true if duplicate exclusion 
+#' @param omitduplicate true if duplicate exclusion
+#' @examples
+#' create_media(
+#'   mediaID = "m1", deploymentID = "A01",
+#'   timestamp_date = "2023-04-01", timestamp_time = "09:05:00",
+#'   filePath = "img/m1.jpg", filePublic = TRUE, fileMediatype = "image/jpeg")
 #' @export
-#' 
+#'
 create_media<-function( mediaID,
                         deploymentID,
                         timestamp=NULL,
@@ -460,8 +473,14 @@ create_media<-function( mediaID,
 #' @param observationComments Comments or notes about the observation
 #' @param tz Time zone of observation
 #' @param omitduplicate true if duplicate exclusion
+#' @examples
+#' create_observations(
+#'   observationID = "o1", deploymentID = "A01", mediaID = "m1",
+#'   eventStart = "2023-04-01 09:05:00", eventEnd = "2023-04-01 09:05:00",
+#'   observationLevel = "media", observationType = "animal",
+#'   scientificName = "Vulpes vulpes", count = 1L)
 #' @export
-#' 
+#'
 create_observations<-function(	observationID,
                                deploymentID,
                                mediaID=NULL,

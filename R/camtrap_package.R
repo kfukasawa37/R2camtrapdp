@@ -19,6 +19,19 @@
 #'
 #' @import R6
 #' @import magrittr
+#' @examples
+#' # Create the builder (offline):
+#' dp <- R6_CamtrapDP$new(version = "1.0.1", title = "Example", description = "...")
+#' \dontrun{
+#' # Registering tables fetches the schema for the chosen version (needs internet):
+#' deployments <- create_deployments(
+#'   deploymentID = "A01", latitude = 35.1, longitude = 139.5,
+#'   deploymentStart_date = "2023-04-01", deploymentStart_time = "09:00:00",
+#'   deploymentEnd_date = "2023-05-01", deploymentEnd_time = "09:00:00")
+#' dp$set_deployments(deployments)
+#' dp$check_relations()
+#' dp$out_camtrapdp(write = TRUE, directory = tempfile())
+#' }
 #' @export
 R6_CamtrapDP <- R6::R6Class("CamtrapDP",
   public = list(
@@ -905,7 +918,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
           readr::write_csv(private$prep_for_write(self$data[[rname]]),
                            file.path(directory, res$path), na = "")
         }
-        cat("Datapackage was saved to disk.\n")
+        message("Datapackage was saved to disk.")
       }
       return(dp)
     },
