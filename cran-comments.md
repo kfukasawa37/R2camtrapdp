@@ -1,13 +1,22 @@
 ## Resubmission
 
-This is a resubmission. In the previous CRAN pre-test, vignette re-building
-failed on Linux (Debian) with
-`CCTZ: Unrecognized output timezone: "Japan"`. The cause was the use of the
-legacy time-zone alias `"Japan"`, which the current CCTZ/timechange backend on
-that platform does not recognise. We replaced every occurrence with the
-canonical IANA name `"Asia/Tokyo"` (identical UTC+09:00 behaviour) throughout the
-R code, vignettes and examples. All vignettes now re-build on Linux, macOS and
-Windows.
+This is a resubmission addressing the CRAN reviewer's comments:
+
+1. Removed the redundant "An R Package" from the start of the Title.
+2. Put software, package and API names in single quotes in the Title and
+   Description ('Camtrap DP', 'Frictionless', 'Python', 'frictionless').
+3. Added a reference describing the methods to the Description:
+   Bubnicki et al. (2023) <doi:10.1002/rse2.374>.
+4. Added small executable examples to the Rd files of the exported functions
+   (run during R CMD check where possible; calls that require internet or Python
+   are wrapped in \dontrun{}).
+5. Replaced console output via cat()/print() in R/camtrap_package.R with
+   message(), so it can be suppressed.
+
+(An earlier pre-test failure on Linux — the legacy time-zone alias "Japan" being
+rejected by the current CCTZ/timechange backend — was also fixed by switching to
+the canonical IANA name "Asia/Tokyo"; all vignettes now build on Linux, macOS
+and Windows.)
 
 ## Submission summary
 
@@ -23,12 +32,10 @@ The remaining NOTE is from "checking CRAN incoming feasibility":
 
 * New submission.
 
-* Possibly misspelled words in DESCRIPTION: 'Camtrap', 'schemas', 'validator'.
-  These are spelled correctly:
-  - "Camtrap" is part of "Camtrap DP", the proper name of the data standard
-    (https://camtrap-dp.tdwg.org/).
-  - "schemas" and "validator" are standard technical terms used in the
-    Frictionless Data framework.
+* Any words still flagged as possibly misspelled (e.g. "schemas", "validator")
+  are standard technical terms and are spelled correctly. Software/standard names
+  such as 'Camtrap DP' and 'Frictionless' are now single-quoted in the Title and
+  Description.
 
 ## Test environments
 
