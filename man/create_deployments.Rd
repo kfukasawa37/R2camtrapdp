@@ -101,3 +101,12 @@ A tibble of deployments.
 \description{
 \code{create_deployments} creates a table of deployments.
 }
+\examples{
+create_deployments(
+  deploymentID = c("A01", "A02"),
+  latitude = c(35.1, 36.2), longitude = c(139.5, 140.1),
+  deploymentStart_date = c("2023-04-01", "2023-04-02"),
+  deploymentStart_time = c("09:00:00", "10:30:00"),
+  deploymentEnd_date = c("2023-05-01", "2023-05-02"),
+  deploymentEnd_time = c("09:00:00", "10:30:00"))
+}

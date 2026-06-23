@@ -116,3 +116,10 @@ A tibble of observations.
 \description{
 \code{create_media} creates a table of observations.
 }
+\examples{
+create_observations(
+  observationID = "o1", deploymentID = "A01", mediaID = "m1",
+  eventStart = "2023-04-01 09:05:00", eventEnd = "2023-04-01 09:05:00",
+  observationLevel = "media", observationType = "animal",
+  scientificName = "Vulpes vulpes", count = 1L)
+}

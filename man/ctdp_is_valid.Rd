@@ -15,3 +15,9 @@ ctdp_is_valid(issues)
 \description{
 Did a validation pass (no errors)?
 }
+\examples{
+ctdp_is_valid(ctdp_no_issues())   # TRUE
+bad <- ctdp_issues(source = "deployments", constraint = "required",
+                   severity = "error", message = "missing")
+ctdp_is_valid(bad)                # FALSE
+}

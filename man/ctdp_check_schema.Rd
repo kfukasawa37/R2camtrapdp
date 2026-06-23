@@ -19,3 +19,11 @@ independently of the data: non-empty \code{fields}, each field with a \code{name
 supported \code{type}, constraints that are valid for the field's type, unique
 field names, and primary/foreign keys that reference defined fields.
 }
+\examples{
+sch <- list(name = "deployments",
+  fields = list(
+    list(name = "deploymentID", type = "string", constraints = list(required = TRUE)),
+    list(name = "latitude", type = "number", constraints = list(minimum = -90, maximum = 90))),
+  primaryKey = "deploymentID")
+ctdp_check_schema(sch)
+}

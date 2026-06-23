@@ -9,6 +9,14 @@ ctdp_bind_issues(...)
 \arguments{
 \item{...}{Issue tables (tibbles), or \code{NULL}s which are dropped.}
 }
+\value{
+A single combined issue tibble.
+}
 \description{
 Row-bind several issue tables
+}
+\examples{
+a <- ctdp_issues(source = "media", constraint = "required",
+                 severity = "error", message = "missing mediaID")
+ctdp_bind_issues(a, ctdp_no_issues())
 }
