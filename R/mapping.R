@@ -20,6 +20,9 @@ NULL
 #' @param drop_unmapped If `TRUE`, keep only the mapped target columns; if
 #'   `FALSE` (default) also keep unmapped columns as-is.
 #' @return A tibble with renamed columns.
+#' @examples
+#' raw <- data.frame(station = c("A01", "A02"), lat = c(35.1, 36.2))
+#' ctdp_apply_mapping(raw, c(station = "deploymentID", lat = "latitude"))
 #' @export
 ctdp_apply_mapping <- function(df, mapping, drop_unmapped = FALSE) {
   df <- tibble::as_tibble(df)
@@ -81,6 +84,9 @@ ctdp_apply_mapping <- function(df, mapping, drop_unmapped = FALSE) {
 #' @return A tibble with the `target` datetime column added.
 #' @import magrittr
 #' @importFrom lubridate as_datetime
+#' @examples
+#' raw <- data.frame(d = c("2023-04-01", "2023-04-02"), t = c("09:00:00", "10:30:00"))
+#' ctdp_merge_datetime(raw, "d", "t", "deploymentStart")
 #' @export
 ctdp_merge_datetime <- function(df, date_col, time_col, target,
                                 tz = "Asia/Tokyo", format = .ctdp_datetime_format(),

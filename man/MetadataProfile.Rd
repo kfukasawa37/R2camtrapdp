@@ -17,6 +17,13 @@ This lets the package check / scaffold the required metadata structure on the
 R side, instead of only discovering metadata problems when Python Frictionless
 runs.
 }
+\examples{
+\dontrun{
+# Fetches the package profile for a Camtrap DP version (needs internet):
+prof <- MetadataProfile$new(version = "1.0.1")
+prof
+}
+}
 \section{Public fields}{
   \if{html}{\out{<div class="r6-fields">}}
   \describe{

@@ -37,3 +37,7 @@ Generalises the original \verb{*_date} / \verb{*_time} merging behaviour. Produc
 character column formatted in the Camtrap DP datetime format
 (\verb{\%Y-\%m-\%dT\%H:\%M:\%S\%z}) so it round-trips cleanly to CSV.
 }
+\examples{
+raw <- data.frame(d = c("2023-04-01", "2023-04-02"), t = c("09:00:00", "10:30:00"))
+ctdp_merge_datetime(raw, "d", "t", "deploymentStart")
+}

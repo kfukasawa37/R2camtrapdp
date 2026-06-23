@@ -28,3 +28,7 @@ Renames the columns of \code{df} from the source (spreadsheet) names to Camtrap 
 field names. Columns of \code{df} that are not mentioned in \code{mapping} are kept
 unchanged, so columns that already use Camtrap DP field names pass through.
 }
+\examples{
+raw <- data.frame(station = c("A01", "A02"), lat = c(35.1, 36.2))
+ctdp_apply_mapping(raw, c(station = "deploymentID", lat = "latitude"))
+}

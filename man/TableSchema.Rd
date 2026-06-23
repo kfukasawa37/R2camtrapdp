@@ -16,6 +16,21 @@ Because the structure is read from the schema itself, an arbitrary Camtrap DP
 version and any custom / extra columns are handled automatically: any field
 present in the supplied schema participates in validation.
 }
+\examples{
+# Build from an in-memory schema (offline):
+sch <- list(name = "deployments",
+  fields = list(
+    list(name = "deploymentID", type = "string", constraints = list(required = TRUE)),
+    list(name = "latitude", type = "number")),
+  primaryKey = "deploymentID")
+schema <- TableSchema$new("deployments", json = sch)
+schema$field_names()
+schema$required_field_names()
+\dontrun{
+# Or fetch the official schema for a Camtrap DP version (needs internet):
+TableSchema$new("deployments", version = "1.0.1")
+}
+}
 \section{Public fields}{
   \if{html}{\out{<div class="r6-fields">}}
   \describe{

@@ -42,3 +42,13 @@ issue table from \code{\link[=ctdp_issues]{ctdp_issues()}}).
 \description{
 Build and validate a table against a Table Schema
 }
+\examples{
+sch <- list(name = "deployments",
+  fields = list(
+    list(name = "deploymentID", type = "string", constraints = list(required = TRUE)),
+    list(name = "latitude", type = "number")),
+  primaryKey = "deploymentID")
+schema <- TableSchema$new("deployments", json = sch)
+built <- ctdp_build_table(schema, data.frame(deploymentID = "A01", latitude = 35.1))
+built$data
+}

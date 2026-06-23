@@ -48,3 +48,8 @@ Constructs a tibble of validation issues. All arguments are recycled to a
 common length. Use \code{\link[=ctdp_no_issues]{ctdp_no_issues()}} for an empty table with the right
 columns.
 }
+\examples{
+ctdp_issues(source = "deployments", field = "latitude",
+            constraint = "required", severity = "error",
+            message = "latitude is missing")
+}

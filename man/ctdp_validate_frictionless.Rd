@@ -39,3 +39,10 @@ tool or in a previous run) \strong{without writing or overwriting} the
 the \code{R6_CamtrapDP$validate_frictionless()} method, which (by default) rewrites
 the package from the R object before validating.
 }
+\examples{
+\dontrun{
+# Validate an existing Camtrap DP on disk (needs Python with 'frictionless'):
+issues <- ctdp_validate_frictionless("path/to/camtrapdp", python = "python")
+ctdp_is_valid(issues)
+}
+}

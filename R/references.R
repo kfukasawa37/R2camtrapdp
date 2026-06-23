@@ -31,6 +31,12 @@ NULL
 #'   `key` (the JSON key carrying the URL), `category` and `url`. Categories:
 #'   `"semantic-mapping"` (skos:*), `"description-reference"`, `"example"`,
 #'   `"schema-ref"` (the table schema's own URL).
+#' @examples
+#' sch <- list(name = "deployments",
+#'   fields = list(
+#'     list(name = "captureMethod", type = "string",
+#'          "skos:exactMatch" = "http://rs.tdwg.org/dwc/terms/samplingProtocol")))
+#' ctdp_schema_references(sch)
 #' @export
 ctdp_schema_references <- function(x) {
   if (inherits(x, "TableSchema")) {
@@ -74,6 +80,12 @@ ctdp_schema_references <- function(x) {
 #'
 #' @param x A [TableSchema] or a parsed table-schema list.
 #' @return A tibble: `resource`, `field`, `type`, `reason`, `urls`.
+#' @examples
+#' sch <- list(name = "deployments",
+#'   fields = list(
+#'     list(name = "captureMethod", type = "string",
+#'          "skos:exactMatch" = "http://rs.tdwg.org/dwc/terms/samplingProtocol")))
+#' ctdp_semantic_only_fields(sch)
 #' @export
 ctdp_semantic_only_fields <- function(x) {
   if (inherits(x, "TableSchema")) { raw <- x$raw; resource <- x$resource %||% x$name }

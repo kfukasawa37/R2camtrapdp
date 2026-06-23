@@ -49,6 +49,13 @@ NULL
 #' @param x A [TableSchema] or a parsed table-schema list.
 #' @return An issue table (see [ctdp_issues()]). Constraint codes:
 #'   `schema-structure`, `schema-type`, `schema-constraint`, `schema-key`.
+#' @examples
+#' sch <- list(name = "deployments",
+#'   fields = list(
+#'     list(name = "deploymentID", type = "string", constraints = list(required = TRUE)),
+#'     list(name = "latitude", type = "number", constraints = list(minimum = -90, maximum = 90))),
+#'   primaryKey = "deploymentID")
+#' ctdp_check_schema(sch)
 #' @export
 ctdp_check_schema <- function(x) {
   if (inherits(x, "TableSchema")) { raw <- x$raw; resource <- x$resource %||% x$name }

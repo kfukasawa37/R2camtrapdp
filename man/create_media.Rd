@@ -59,3 +59,9 @@ A tibble of media.
 \description{
 \code{create_media} creates a table of media.
 }
+\examples{
+create_media(
+  mediaID = "m1", deploymentID = "A01",
+  timestamp_date = "2023-04-01", timestamp_time = "09:05:00",
+  filePath = "img/m1.jpg", filePublic = TRUE, fileMediatype = "image/jpeg")
+}

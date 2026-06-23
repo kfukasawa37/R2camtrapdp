@@ -28,6 +28,10 @@ NULL
 #' @param value Character. The offending value(s), when known (e.g. the failing
 #'   cell value, or the value resolved from the descriptor for a metadata error).
 #' @return A tibble with one row per issue.
+#' @examples
+#' ctdp_issues(source = "deployments", field = "latitude",
+#'             constraint = "required", severity = "error",
+#'             message = "latitude is missing")
 #' @export
 ctdp_issues <- function(source, location_type = NA_character_, field = NA_character_,
                         row = NA_integer_, constraint = NA_character_,
@@ -47,6 +51,9 @@ ctdp_issues <- function(source, location_type = NA_character_, field = NA_charac
 }
 
 #' An empty issue table
+#' @return A 0-row issue tibble.
+#' @examples
+#' ctdp_no_issues()
 #' @export
 ctdp_no_issues <- function() {
   ctdp_issues(source = character(0), location_type = character(0),
@@ -57,6 +64,11 @@ ctdp_no_issues <- function() {
 
 #' Row-bind several issue tables
 #' @param ... Issue tables (tibbles), or `NULL`s which are dropped.
+#' @return A single combined issue tibble.
+#' @examples
+#' a <- ctdp_issues(source = "media", constraint = "required",
+#'                  severity = "error", message = "missing mediaID")
+#' ctdp_bind_issues(a, ctdp_no_issues())
 #' @export
 ctdp_bind_issues <- function(...) {
   parts <- Filter(Negate(is.null), list(...))
@@ -73,6 +85,11 @@ ctdp_bind_issues <- function(...) {
 #' @param issues An issue table from [ctdp_issues()].
 #' @param max_detail Maximum number of detail rows to print per source.
 #' @return The issue table, invisibly.
+#' @examples
+#' issues <- ctdp_issues(source = "deployments", field = "latitude",
+#'                       constraint = "minimum", severity = "error",
+#'                       message = "latitude below -90", value = "-100")
+#' ctdp_summarize_validation(issues)
 #' @export
 ctdp_summarize_validation <- function(issues, max_detail = 50L) {
   if (is.null(issues) || nrow(issues) == 0) {
@@ -132,6 +149,13 @@ ctdp_summarize_validation <- function(issues, max_detail = 50L) {
 #' @return An issue table (includes a `value` column with the offending value(s)
 #'   when known).
 #' @importFrom jsonlite fromJSON
+#' @examples
+#' # A valid Frictionless report parses to an empty issue table:
+#' ctdp_parse_frictionless(list(valid = TRUE, tasks = list()))
+#' \dontrun{
+#' # Typically the report comes from validate_frictionless() / the Python validator:
+#' issues <- ctdp_validate_frictionless("path/to/package")
+#' }
 #' @export
 ctdp_parse_frictionless <- function(report, resource_paths = NULL, descriptor = NULL) {
   if (is.character(report)) {
@@ -201,6 +225,11 @@ ctdp_parse_frictionless <- function(report, resource_paths = NULL, descriptor = 
 #' Did a validation pass (no errors)?
 #' @param issues An issue table.
 #' @return `TRUE` if there are no `"error"` severity rows.
+#' @examples
+#' ctdp_is_valid(ctdp_no_issues())   # TRUE
+#' bad <- ctdp_issues(source = "deployments", constraint = "required",
+#'                    severity = "error", message = "missing")
+#' ctdp_is_valid(bad)                # FALSE
 #' @export
 ctdp_is_valid <- function(issues) {
   if (is.null(issues) || nrow(issues) == 0) return(TRUE)
