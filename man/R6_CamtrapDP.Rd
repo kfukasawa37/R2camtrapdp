@@ -20,6 +20,20 @@ preserved for backward compatibility (\code{set_deployments()}, \code{set_media(
 methods (\code{get_schema()}, \code{add_table()}, \code{check_relations()}, \code{validate()},
 \code{validate_frictionless()}).
 }
+\examples{
+# Create the builder (offline):
+dp <- R6_CamtrapDP$new(version = "1.0.1", title = "Example", description = "...")
+\dontrun{
+# Registering tables fetches the schema for the chosen version (needs internet):
+deployments <- create_deployments(
+  deploymentID = "A01", latitude = 35.1, longitude = 139.5,
+  deploymentStart_date = "2023-04-01", deploymentStart_time = "09:00:00",
+  deploymentEnd_date = "2023-05-01", deploymentEnd_time = "09:00:00")
+dp$set_deployments(deployments)
+dp$check_relations()
+dp$out_camtrapdp(write = TRUE, directory = tempfile())
+}
+}
 \section{Public fields}{
   \if{html}{\out{<div class="r6-fields">}}
   \describe{
