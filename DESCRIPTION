@@ -1,6 +1,6 @@
 Package: R2camtrapdp
 Type: Package
-Title: Convert Camera Trap Spreadsheets to 'Camtrap DP'
+Title: Convert Camera Trap Dataset to 'Camtrap DP'
 Version: 2.0.0
 Authors@R: c(
     person("Kana", "Terayama", role = c("aut", "cre"),
