@@ -17,3 +17,9 @@ test_that("create_observations() validates cameraSetupType itself", {
   expect_equal(as.character(obs("calibration")$cameraSetupType), "calibration")
   expect_error(obs("maintenance"), "'cameraSetupType' has invalid elements")
 })
+
+test_that("add_contributors() adds nothing for a 0-row data frame", {
+  dp <- R6_CamtrapDP$new()
+  dp$add_contributors(data.frame(title = character(0)))
+  expect_length(dp$contributors, 0)
+})
