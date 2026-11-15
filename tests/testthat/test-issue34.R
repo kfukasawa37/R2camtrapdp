@@ -23,3 +23,9 @@ test_that("add_contributors() adds nothing for a 0-row data frame", {
   dp$add_contributors(data.frame(title = character(0)))
   expect_length(dp$contributors, 0)
 })
+
+test_that("import_metadata() ignores a list without importable properties", {
+  dp <- R6_CamtrapDP$new(title = "Kept")
+  expect_error(dp$import_metadata(list(unknown = 1)), NA)
+  expect_equal(dp$title, "Kept")
+})

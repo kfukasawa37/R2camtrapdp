@@ -930,7 +930,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
       listname <- listname[listname != "resources"]
       listname.valid <- listname[is.element(listname, names(self))]
       nlist <- length(listname.valid)
-      for (i in 1:nlist) self[[listname.valid[i]]] <- metadata0[[listname.valid[i]]]
+      for (i in seq_len(nlist)) self[[listname.valid[i]]] <- metadata0[[listname.valid[i]]]
     }
   ),
 
