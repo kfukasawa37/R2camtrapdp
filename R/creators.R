@@ -580,7 +580,7 @@ create_observations<-function(	observationID,
   observationType<-factor(observationType,c("animal", "human", "vehicle", "blank", "unknown", "unclassified"))
   
   if(!is.null(cameraSetupType)){
-    if(any(!grepl("^(setup|calibration)$",observationType),na.rm=TRUE)){
+    if(any(!grepl("^(setup|calibration)$",cameraSetupType),na.rm=TRUE)){
       stop("'cameraSetupType' has invalid elements.")
     }
   }else{
