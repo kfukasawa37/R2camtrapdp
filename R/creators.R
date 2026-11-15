@@ -158,7 +158,7 @@ create_deployments<-function( deploymentID,
   if(!is.null(cameraModel)){
     cameraModel<-as.character(cameraModel)
   }else{
-    cameraID<-as.character(rep(NA,ndep))
+    cameraModel<-as.character(rep(NA,ndep))
   }
   
   if(!is.null(cameraDelay)){
