@@ -1,7 +1,7 @@
 Package: R2camtrapdp
 Type: Package
 Title: Convert Camera Trap Dataset to 'Camtrap DP'
-Version: 2.0.0
+Version: 2.1.0
 Authors@R: c(
     person("Kana", "Terayama", role = c("aut", "cre"),
            email = "terayama.kana@nies.go.jp", comment = "@KanaTerayama"),
