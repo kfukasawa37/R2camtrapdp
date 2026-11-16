@@ -5,7 +5,8 @@ Version: 2.0.0
 Authors@R: c(
     person("Kana", "Terayama", role = c("aut", "cre"),
            email = "terayama.kana@nies.go.jp", comment = "@KanaTerayama"),
-    person("Keita", "Fukasawa", role = "aut", comment = "@kfukasawa37"))
+    person("Keita", "Fukasawa", role = "aut", comment = "@kfukasawa37"),
+    person("northfox",role="ctb",comment="@northfox"))
 Description: Builds Camera Trap Data Packages ('Camtrap DP') from arbitrary spreadsheets in a schema-driven way: table structure, types, constraints and relations are read from the 'Frictionless' table schemas of the requested 'Camtrap DP' version, so any version and custom columns are handled automatically. Provides validation against the schemas and an optional bridge to the 'frictionless' 'Python' framework. The 'Camtrap DP' standard is described in Bubnicki et al. (2023) <doi:10.1002/rse2.374>.
 License: MIT + file LICENSE
 Encoding: UTF-8
