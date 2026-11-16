@@ -199,7 +199,7 @@ create_deployments<-function( deploymentID,
   
   if(!is.null(timestampIssues)){
     if(is.character(timestampIssues)){
-      if(any(!grepl("^(true|false)$",timestampIssues),na.rm=TRUE)){
+      if(any(!is.na(timestampIssues) & !grepl("^(true|false)$",timestampIssues))){
         stop("'timestampIssues' has invalid elements.")
       }
     }
@@ -210,7 +210,7 @@ create_deployments<-function( deploymentID,
   
   if(!is.null(baitUse)){
     if(is.character(baitUse)){
-      if(any(!grepl("^(true|false)$",baitUse),na.rm=TRUE)){
+      if(any(!is.na(baitUse) & !grepl("^(true|false)$",baitUse))){
         stop("'baitUse' has invalid elements.")
       }
     }
@@ -369,7 +369,7 @@ create_media<-function( mediaID,
   fileMediatype<-as.character(fileMediatype)
   
   if(!is.null(captureMethod)){
-    if(any(!grepl("^(activityDetection|timeLapse)$",captureMethod),na.rm=TRUE)){
+    if(any(!is.na(captureMethod) & !grepl("^(activityDetection|timeLapse)$",captureMethod))){
       stop("'captureMethod' has invalid elements.")
     }
   }else{
@@ -391,7 +391,7 @@ create_media<-function( mediaID,
   
   if(!is.null(favorite)){	
     if(is.character(favorite)){
-      if(any(!grepl("^(true|false)$",favorite),na.rm=TRUE)){
+      if(any(!is.na(favorite) & !grepl("^(true|false)$",favorite))){
         stop("'favorite' has invalid elements.")
       }
     }
@@ -580,7 +580,7 @@ create_observations<-function(	observationID,
   observationType<-factor(observationType,c("animal", "human", "vehicle", "blank", "unknown", "unclassified"))
   
   if(!is.null(cameraSetupType)){
-    if(any(!grepl("^(setup|calibration)$",cameraSetupType),na.rm=TRUE)){
+    if(any(!is.na(cameraSetupType) & !grepl("^(setup|calibration)$",cameraSetupType))){
       stop("'cameraSetupType' has invalid elements.")
     }
   }else{
@@ -697,7 +697,7 @@ create_observations<-function(	observationID,
   }
   
   if(!is.null(classificationMethod)){
-    if(any(!grepl("^(human|machine)$",classificationMethod),na.rm=TRUE)){
+    if(any(!is.na(classificationMethod) & !grepl("^(human|machine)$",classificationMethod))){
       stop("'classificationMethod' has invalid elements.")
     }
   }else{
