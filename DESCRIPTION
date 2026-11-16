@@ -39,7 +39,7 @@ Depends:
 Config/roxygen2/version: 8.0.0
 SystemRequirements: Python (>= 3.8) with the 'frictionless' package
     (optional; only for validate_frictionless())
-    Config/testthat/edition: 3
+Config/testthat/edition: 3
 URL: https://github.com/kfukasawa37/R2camtrapdp
 BugReports: https://github.com/kfukasawa37/R2camtrapdp/issues
 Language: en-US
