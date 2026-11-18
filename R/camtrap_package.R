@@ -360,7 +360,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
         stop("Columns of 'contrib_table' should be either 'title','email','path','role' or 'organization'.")
       }
       ncontrib <- nrow(contrib_table)
-      for (i in 1:ncontrib) {
+      for (i in seq_len(ncontrib)) {
         title <- contrib_table$title[i]
         email <- if (is.element("email", colnames(contrib_table))) contrib_table$email[i] else NA
         path <- if (is.element("path", colnames(contrib_table))) contrib_table$path[i] else NA
@@ -930,7 +930,7 @@ R6_CamtrapDP <- R6::R6Class("CamtrapDP",
       listname <- listname[listname != "resources"]
       listname.valid <- listname[is.element(listname, names(self))]
       nlist <- length(listname.valid)
-      for (i in 1:nlist) self[[listname.valid[i]]] <- metadata0[[listname.valid[i]]]
+      for (i in seq_len(nlist)) self[[listname.valid[i]]] <- metadata0[[listname.valid[i]]]
     }
   ),
 
