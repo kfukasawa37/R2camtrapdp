@@ -221,6 +221,13 @@ observations <- create_observations(
 `bboxHeight`、`classifiedBy`、`classificationTimestamp`、`observationTags`、
 `observationComments`、`tz`、`omitduplicate`。
 
+1行が1つの観察なので、`observationID` は一意である必要があります。同じ画像や
+イベントで複数の種・性別・齢段階を記録した場合は、それぞれに別の ID を付けてください
+（上の例のように、メディア ID と記録ごとの番号を組み合わせます）。
+`omitduplicate = TRUE` で除外されるのは全列が同じ行だけで、異なる行が同じ ID を
+共有している場合はエラーになります。`mediaID` は `observationLevel = "media"` の行では
+必須、イベント単位の行では任意です。
+
 # 3. データパッケージの組み立て
 
 ## R6 オブジェクトの作成（バージョン指定）
@@ -250,7 +257,10 @@ datapackage$set_observations(observations)
 検証の要約は、各問題について、ファイル・列・行・違反した規則・メッセージを示します。
 例えば `enum` に反する値、`minimum`/`maximum` の範囲外の数値、必要な書式に一致しない
 日時などです。列の型にすら適合しない値（例: `number` 列の非数値文字列）は、無言で
-`NA` に変換されるのではなく `type` エラーとして報告されます。
+`NA` に変換されるのではなく `type` エラーとして報告されます。スキーマの列または
+独自の列の文字列に改行が含まれている場合は、`lineBreak` の警告として報告されます。
+CSV としては正しい形式ですが、行単位で読むツールや表計算ソフトで問題になりやすいため、
+空白に置き換えることを検討してください。警告だけでは検証は不合格になりません。
 
 ## テーブル間リレーションの検査
 
