@@ -21,7 +21,7 @@ NULL
 #' @param row Integer. 1-based data row number, or `NA`.
 #' @param constraint Character. The violated rule, e.g. `"required"`, `"unique"`,
 #'   `"enum"`, `"minimum"`, `"maximum"`, `"minLength"`, `"maxLength"`,
-#'   `"pattern"`, `"type"`, `"format"`, `"primaryKey"`, `"foreignKey"`.
+#'   `"pattern"`, `"type"`, `"format"`, `"primaryKey"`, `"foreignKey"`, `"lineBreak"` (a warning).
 #' @param severity Character. `"error"` or `"warning"`.
 #' @param message Character. Human-readable description.
 #' @param engine Character. `"R"` or `"frictionless"`.

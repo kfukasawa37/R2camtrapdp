@@ -362,11 +362,11 @@ TableSchema <- R6::R6Class("TableSchema",
       present_idx <- which(!missing)
       issues <- list()
 
-      add <- function(rows, constraint, msg_fun) {
+      add <- function(rows, constraint, msg_fun, severity = "error") {
         if (length(rows) == 0) return(invisible())
         issues[[length(issues) + 1]] <<- ctdp_issues(
           source = source, location_type = "table", field = n, row = rows,
-          constraint = constraint, severity = "error",
+          constraint = constraint, severity = severity,
           message = vapply(rows, msg_fun, character(1)))
       }
 
@@ -435,6 +435,15 @@ TableSchema <- R6::R6Class("TableSchema",
         rows <- present_idx[!ok]
         add(rows, "pattern", function(r) sprintf(
           "'%s' value '%s' does not match pattern /%s/.", n, cval[r], cons$pattern))
+      }
+
+      # line breaks in text values: valid CSV (quoted on write), but they
+      # often break line-based tools and spreadsheets, so only warn
+      if (type %in% c("string", "any") && length(present_idx)) {
+        rows <- present_idx[grepl("[\r\n]", cval[present_idx])]
+        add(rows, "lineBreak", function(r) sprintf(
+          "'%s' value contains a line break; consider replacing it with a space.", n),
+          severity = "warning")
       }
 
       # unique
