@@ -441,8 +441,9 @@ create_media<-function( mediaID,
 #' @return A tibble of observations.
 #' @param observationID Unique identifier of the observation
 #' @param deploymentID Identifier of the deployment the observation belongs to
-#' @param mediaID Identifier of the media file that was classified
-#' @param eventID Identifier of the event the observation belongs to
+#' @param mediaID Identifier of the media file that was classified. Required
+#'   for rows with `observationLevel = "media"`; optional for event-based rows.
+#' @param eventID Identifier of the event the observation belongs to (optional)
 #' @param eventStart Date and time at which the event started
 #' @param eventStart_date Date at which the event started
 #' @param eventStart_time Time at which the event started
@@ -472,7 +473,11 @@ create_media<-function( mediaID,
 #' @param observationTags Tags associated with the observation
 #' @param observationComments Comments or notes about the observation
 #' @param tz Time zone of observation
-#' @param omitduplicate true if duplicate exclusion
+#' @param omitduplicate If `TRUE`, rows that are identical in every column are
+#'   dropped. Rows that share an `observationID` but differ in any other column
+#'   (e.g. different species, sex or life stage in the same media or event) are
+#'   not dropped; they raise an error, because `observationID` is the primary
+#'   key of the observations table and must be unique.
 #' @examples
 #' create_observations(
 #'   observationID = "o1", deploymentID = "A01", mediaID = "m1",
@@ -547,10 +552,6 @@ create_observations<-function(	observationID,
     stop("NAs in 'observationID','deploymentID','observationLevel','observationType' are not permitted.")
   }
   
-  if(any(is.na(mediaID)&(is.na(eventID)))){
-    stop("Either 'mediaID' or 'eventID' should be non-NA values.")
-  }
-  
   nrows<-length(observationID)
   
   observationID<-as.character(observationID)
@@ -573,7 +574,17 @@ create_observations<-function(	observationID,
     stop("'observationLevel' has invalid elements.")
   }
   observationLevel<-factor(observationLevel,c("media","event"))
-  
+
+  # Camtrap DP: mediaID applies to media-based observations, which are directly
+  # associated with a media file. Checked after the NULL defaults are filled in,
+  # so omitting the argument cannot bypass it.
+  noMedia<-rep_len(observationLevel=="media",nrows)&is.na(rep_len(mediaID,nrows))
+  if(any(noMedia)){
+    stop("'mediaID' is required for observations with observationLevel = \"media\", but is missing for ",
+         sum(noMedia)," row(s) (observationID: ",
+         paste(utils::head(observationID[noMedia],5),collapse=", "),if(sum(noMedia)>5) ", ..." else "",").")
+  }
+
   if(any(!grepl("^(animal|human|vehicle|blank|unknown|unclassified)$",observationType))){
     stop("'observationType' has invalid elements.")
   }
@@ -769,12 +780,20 @@ create_observations<-function(	observationID,
                         observationComments
   )
   
+  # Drop only rows that are identical in every column. Rows that share an
+  # observationID but differ elsewhere (e.g. two species in one image) are kept
+  # and rejected below, instead of silently losing all but the first.
   if(omitduplicate){
-    observations<-distinct(observations,observationID,.keep_all=TRUE)
+    observations<-distinct(observations)
   }
-  
-  if(nrow(observations)!=length(unique(observations$observationID))){
-    stop("'observationID' is required to be unique.\n")
+
+  dupID<-unique(observations$observationID[duplicated(observations$observationID)])
+  if(length(dupID)>0){
+    stop("'observationID' must be unique, but ",length(dupID)," ID(s) are used by more than one row: ",
+         paste(utils::head(dupID,5),collapse=", "),if(length(dupID)>5) ", ..." else "",".\n",
+         "Each row is a separate observation: give every species, sex or life stage recorded ",
+         "in the same media or event its own observationID ",
+         "(e.g. paste(mediaID, obsID, sep = \"_\")).")
   }
   
   
