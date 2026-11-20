@@ -213,6 +213,15 @@ TableSchema <- R6::R6Class("TableSchema",
         issues[[length(issues) + 1]] <- private$validate_field(df, n, source, mv)
       }
 
+      # Custom columns (not in the schema) are written as-is; only check them
+      # for line breaks
+      for (n in setdiff(names(df), self$field_order)) {
+        if (is.character(df[[n]]) || is.factor(df[[n]])) {
+          issues[[length(issues) + 1]] <- private$check_line_breaks(
+            as.character(df[[n]]), n, source, mv)
+        }
+      }
+
       # Coercion loss: original value present but turned into NA by coercion
       # (a type-invalid entry). Without this, such values would be silently
       # dropped to NA and escape both the type and the enum checks.
@@ -352,6 +361,17 @@ TableSchema <- R6::R6Class("TableSchema",
       as.character(x)
     },
 
+    # Line breaks in text values are valid CSV (quoted on write), but they
+    # often break line-based tools and spreadsheets, so only warn.
+    check_line_breaks = function(cval, n, source, mv) {
+      rows <- which(!.ctdp_is_missing(cval, mv) & grepl("[\r\n]", cval))
+      if (length(rows) == 0) return(NULL)
+      ctdp_issues(
+        source = source, location_type = "table", field = n, row = rows,
+        constraint = "lineBreak", severity = "warning",
+        message = sprintf("'%s' value contains a line break; consider replacing it with a space.", n))
+    },
+
     validate_field = function(df, n, source, mv) {
       fld <- self$fields[[n]]
       cons <- fld$constraints %||% list()
@@ -435,6 +455,10 @@ TableSchema <- R6::R6Class("TableSchema",
         rows <- present_idx[!ok]
         add(rows, "pattern", function(r) sprintf(
           "'%s' value '%s' does not match pattern /%s/.", n, cval[r], cons$pattern))
+      }
+
+      if (type %in% c("string", "any")) {
+        issues[[length(issues) + 1]] <- private$check_line_breaks(cval, n, source, mv)
       }
 
       # unique

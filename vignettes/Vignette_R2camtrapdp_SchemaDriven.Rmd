@@ -230,6 +230,13 @@ observations <- create_observations(
 `bboxHeight`, `classifiedBy`, `classificationTimestamp`, `observationTags`,
 `observationComments`, `tz`, and `omitduplicate`.
 
+Each row is one observation, so `observationID` must be unique: when several
+species, sexes or life stages are recorded in the same image or event, give each
+its own ID (as above, by combining the media ID with a per-record number).
+`omitduplicate = TRUE` only removes rows that are identical in every column; an
+ID shared by different rows is an error. `mediaID` is required for rows with
+`observationLevel = "media"` and optional for event-level rows.
+
 # 3. Assemble the data package
 
 ## Create the R6 object (with a version)
@@ -263,7 +270,10 @@ row, the violated rule and a message — for example a value that breaks an
 `enum`, a number outside its `minimum`/`maximum`, or a datetime that does not
 match the required format. A value that does not even fit the column type (e.g.
 a non-numeric string in a `number` field) is reported as a `type` error rather
-than being silently turned into `NA`.
+than being silently turned into `NA`. A text value that contains a line break, in
+a schema field or a custom column, is reported as a `lineBreak` warning: it is
+valid CSV, but it often breaks line-based tools and spreadsheets, so consider
+replacing it with a space. Warnings do not make the validation fail.
 
 ## Check relations between tables
 
