@@ -46,9 +46,10 @@ create_observations(
 
 \item{deploymentID}{Identifier of the deployment the observation belongs to}
 
-\item{mediaID}{Identifier of the media file that was classified}
+\item{mediaID}{Identifier of the media file that was classified. Required
+for rows with \code{observationLevel = "media"}; optional for event-based rows.}
 
-\item{eventID}{Identifier of the event the observation belongs to}
+\item{eventID}{Identifier of the event the observation belongs to (optional)}
 
 \item{eventStart}{Date and time at which the event started}
 
@@ -108,7 +109,11 @@ create_observations(
 
 \item{tz}{Time zone of observation}
 
-\item{omitduplicate}{true if duplicate exclusion}
+\item{omitduplicate}{If \code{TRUE}, rows that are identical in every column are
+dropped. Rows that share an \code{observationID} but differ in any other column
+(e.g. different species, sex or life stage in the same media or event) are
+not dropped; they raise an error, because \code{observationID} is the primary
+key of the observations table and must be unique.}
 }
 \value{
 A tibble of observations.

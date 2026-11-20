@@ -29,7 +29,7 @@ ctdp_issues(
 
 \item{constraint}{Character. The violated rule, e.g. \code{"required"}, \code{"unique"},
 \code{"enum"}, \code{"minimum"}, \code{"maximum"}, \code{"minLength"}, \code{"maxLength"},
-\code{"pattern"}, \code{"type"}, \code{"format"}, \code{"primaryKey"}, \code{"foreignKey"}.}
+\code{"pattern"}, \code{"type"}, \code{"format"}, \code{"primaryKey"}, \code{"foreignKey"}, \code{"lineBreak"} (a warning).}
 
 \item{severity}{Character. \code{"error"} or \code{"warning"}.}
 
