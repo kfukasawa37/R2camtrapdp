@@ -19,7 +19,15 @@ Main changes (see NEWS.md for details):
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+* win-builder (R-devel): 0 errors | 0 warnings | 0 notes
+* GitHub Actions (all environments listed below): 0 errors | 0 warnings
+* Local (Windows 11, R 4.4.1): 0 errors | 0 warnings | 1 note
+
+The local NOTE is specific to the local machine and does not appear on
+win-builder:
+
+* "checking for future file timestamps ... unable to verify current time":
+  the time server could not be reached from the local network.
 
 ## Test environments
 
